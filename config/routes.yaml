@@ -1,0 +1,59 @@
+# ── City Definitions ──
+# weight = DGCA passenger traffic share (approximate)
+cities:
+  DEL:
+    name: "New Delhi"
+    code: "DEL"
+    weight: 0.30
+  BOM:
+    name: "Mumbai"
+    code: "BOM"
+    weight: 0.25
+  BLR:
+    name: "Bengaluru"
+    code: "BLR"
+    weight: 0.25
+  MAA:
+    name: "Chennai"
+    code: "MAA"
+    weight: 0.20
+
+# ── Route Basket ──
+# 12 directional routes (6 pairs x 2 directions)
+routes:
+  - origin: DEL
+    dest: BOM
+  - origin: BOM
+    dest: DEL
+  - origin: DEL
+    dest: BLR
+  - origin: BLR
+    dest: DEL
+  - origin: DEL
+    dest: MAA
+  - origin: MAA
+    dest: DEL
+  - origin: BOM
+    dest: BLR
+  - origin: BLR
+    dest: BOM
+  - origin: BOM
+    dest: MAA
+  - origin: MAA
+    dest: BOM
+  - origin: BLR
+    dest: MAA
+  - origin: MAA
+    dest: BLR
+
+# ── Advance-Purchase Windows ──
+# Number of days before departure to search
+lead_windows:
+  - 1     # T+1  (last-minute)
+  - 7     # T+7  (one week out)
+  - 30    # T+30 (one month out)
+
+# ── Index Settings ──
+index:
+  base_period: "first_available"  # Day 1 = index 100
+  round_to: 2                     # decimal places

@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Scraper Quiz — 30 Questions a Judge Can Ask</title>
+<style>
+:root{--bg:#F08080;--card:rgba(255,255,255,0.92);--blue:#0D47A1;--blue-mid:#1565C0;--blue-light:#BBDEFB;--green:#1B5E20;--green-light:#C8E6C9;--red:#B71C1C;--red-light:#FFCDD2;--black:#1A1A2E;--grey:#546E7A;--orange:#E65100;--orange-light:#FFE0B2}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--black);line-height:1.6}
+.wrap{max-width:800px;margin:0 auto;padding:20px}
+header{background:var(--blue);color:#fff;padding:28px 34px;border-radius:14px;margin-bottom:28px}
+header h1{font-size:1.6rem}
+header p{opacity:.8;margin-top:6px}
+.score-bar{background:var(--card);border-radius:12px;padding:14px 20px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;border:2px solid var(--blue-mid)}
+.score-bar .label{font-weight:600;color:var(--grey)}
+.score-bar .score{font-size:1.4rem;font-weight:700;color:var(--blue)}
+.nav{display:flex;justify-content:space-between;margin:20px 0}
+.nav a{background:var(--blue);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem}
+.nav a:hover{background:var(--blue-mid)}
+
+/* Question card */
+.q-card{background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:20px;border-left:6px solid var(--blue-mid);transition:border-color .3s}
+.q-card.correct{border-left-color:var(--green)}
+.q-card.wrong{border-left-color:var(--red)}
+.q-num{font-size:.8rem;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.q-text{font-size:1.05rem;font-weight:600;margin-bottom:14px;color:var(--black)}
+
+/* Options */
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{background:#f5f5f5;border:2px solid #ddd;border-radius:10px;padding:10px 16px;cursor:pointer;font-size:.92rem;transition:all .2s;position:relative}
+.opt:hover{border-color:var(--blue-mid);background:#E3F2FD}
+.opt.selected{border-color:var(--blue);background:#BBDEFB;font-weight:600}
+.opt.correct-answer{border-color:var(--green);background:#C8E6C9;font-weight:600}
+.opt.wrong-answer{border-color:var(--red);background:#FFCDD2}
+.opt.disabled{pointer-events:none;opacity:.7}
+.opt-letter{font-weight:700;color:var(--blue);margin-right:8px}
+
+/* Explanation */
+.explain-box{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:.9rem;display:none}
+.explain-box.show{display:block}
+.explain-box.correct-exp{background:#E8F5E9;border-left:4px solid var(--green);color:var(--green)}
+.explain-box.wrong-exp{background:#FFEBEE;border-left:4px solid var(--red);color:var(--red)}
+.explain-box strong{font-weight:700}
+
+/* Category badge */
+.cat-badge{display:inline-block;padding:2px 10px;border-radius:8px;font-size:.7rem;font-weight:700;margin-left:8px;vertical-align:middle}
+.cat-arch{background:#E3F2FD;color:var(--blue)}
+.cat-tech{background:#F3E5F5;color:#7B1FA2}
+.cat-data{background:#E8F5E9;color:var(--green)}
+.cat-error{background:#FFEBEE;color:var(--red)}
+.cat-design{background:#FFF3E0;color:var(--orange)}
+.cat-security{background:#E0F2F1;color:var(--teal,#00695C)}
+.cat-performance{background:#FBE9E7;color:#BF360C}
+
+/* Results */
+.results{background:var(--card);border-radius:14px;padding:30px;text-align:center;margin:30px 0;border:3px solid var(--blue-mid)}
+.results h2{color:var(--blue);font-size:1.5rem;margin-bottom:10px}
+.results .big-score{font-size:3rem;font-weight:700;color:var(--blue);margin:10px 0}
+.results .breakdown{display:flex;justify-content:center;gap:30px;margin-top:16px}
+.results .bd-item{text-align:center}
+.results .bd-num{font-size:1.8rem;font-weight:700}
+.results .bd-label{font-size:.8rem;color:var(--grey);text-transform:uppercase}
+
+/* Reset button */
+.reset-btn{background:var(--blue);color:#fff;border:none;padding:12px 28px;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer;margin-top:16px}
+.reset-btn:hover{background:var(--blue-mid)}
+
+/* Category filter */
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.filter-btn{background:var(--card);border:2px solid #ddd;border-radius:8px;padding:6px 14px;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s}
+.filter-btn:hover{border-color:var(--blue-mid)}
+.filter-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.filter-btn .count{font-size:.75rem;opacity:.7;margin-left:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+<h1>Scraper Quiz</h1>
+<p>30 questions a hackathon judge can ask. Click your answer, see if you're right, read the explanation.</p>
+</header>
+
+<div class="score-bar">
+<div><span class="label">Score</span></div>
+<div><span class="score" id="score">0</span> / <span id="total">30</span></div>
+</div>
+
+<div class="filters" id="filters"></div>
+
+<div id="questions"></div>
+
+<div class="results" id="results" style="display:none">
+<h2>Quiz Complete!</h2>
+<div class="big-score" id="final-score"></div>
+<div class="breakdown">
+<div class="bd-item"><div class="bd-num" style="color:var(--green)" id="final-correct">0</div><div class="bd-label">Correct</div></div>
+<div class="bd-item"><div class="bd-num" style="color:var(--red)" id="final-wrong">0</div><div class="bd-label">Wrong</div></div>
+</div>
+<button class="reset-btn" onclick="resetQuiz()">Try Again</button>
+</div>
+
+<div class="nav"><a href="../index.html">← Back to Index</a></div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    q: "Why does this project use Playwright instead of the simpler 'requests' library?",
+    cat: "tech",
+    opts: [
+      "Playwright is faster than requests",
+      "Google Flights loads flight data via JavaScript after page load, so we need a real browser",
+      "requests doesn't support HTTPS",
+      "Playwright has built-in database support"
+    ],
+    correct: 1,
+    explain: "Google Flights is a Single Page Application (SPA). The HTML that arrives first is empty — flight data is fetched by JavaScript after the page loads. 'requests' only gets the initial HTML, so it would see no flights. Playwright runs a real browser that executes JavaScript, letting us see the actual flight cards."
+  },
+  {
+    q: "What data does the scraper actually parse from Google Flights?",
+    cat: "data",
+    opts: [
+      "HTML table elements with class 'flight-row'",
+      "JSON data from Google's internal API endpoints",
+      "aria-label attributes on flight card elements",
+      "Meta tags in the page head section"
+    ],
+    correct: 2,
+    explain: "Google Flights embeds full flight descriptions in aria-label attributes on flight card divs. The text looks like: 'Nonstop flight with IndiGo. Leaves New Delhi at 8:45 AM. Arrives Mumbai at 11:00 AM. Total duration 2 hr 15 min. From 12882 Indian rupees.' We extract this text and parse it with regex."
+  },
+  {
+    q: "How many routes does the scraper cover in its current MVP?",
+    cat: "arch",
+    opts: [
+      "4 routes (one per city pair)",
+      "6 routes (all unique city pairs)",
+      "12 routes (6 pairs × 2 directions)",
+      "24 routes (12 pairs × 2 lead windows)"
+    ],
+    correct: 2,
+    explain: "4 cities create 6 unique pairs (DEL-BOM, DEL-BLR, DEL-MAA, BOM-BLR, BOM-MAA, BLR-MAA). Each pair has 2 directions (DEL→BOM and BOM→DEL), giving 12 directional routes. Each route is scraped for 3 lead windows (T+1, T+7, T+30)."
+  },
+  {
+    q: "What happens if Google Flights takes longer than 30 seconds to load?",
+    cat: "error",
+    opts: [
+      "The scraper waits forever until it loads",
+      "Playwright raises a TimeoutError, which triggers a retry",
+      "The scraper skips that route and moves to the next one",
+      "The browser crashes and the program exits"
+    ],
+    correct: 1,
+    explain: "The 30-second timeout is set via context.set_default_timeout(). If it fires, Playwright raises TimeoutError. The fetch_flights() method catches this and retries up to 3 times with exponential backoff (3s, 6s, 12s delays). If all 3 attempts fail, it logs an error and moves to the next route."
+  },
+  {
+    q: "What is 'headless' mode in the context of this scraper?",
+    cat: "tech",
+    opts: [
+      "Running the scraper without logging output",
+      "Running the browser without a visible GUI window",
+      "Scraping without saving to the database",
+      "Running without rate limiting"
+    ],
+    correct: 1,
+    explain: "Headless mode means the browser runs in the background without opening a visible window. It's faster and uses less memory. We currently have headless: false so you can watch the browser during demos, but in production you'd set it to true."
+  },
+  {
+    q: "Why does the scraper use a 'user agent' string?",
+    cat: "security",
+    opts: [
+      "To encrypt the HTTP requests",
+      "To make the browser look like a real user instead of a bot",
+      "To set the language to English",
+      "To increase the page load speed"
+    ],
+    correct: 1,
+    explain: "Websites can detect automated browsers by their default user agent (which says 'HeadlessChrome'). By setting a realistic user agent string like 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36...', we look like a regular Chrome browser, reducing the chance of being blocked."
+  },
+  {
+    q: "How does the scraper handle duplicate flight data from multiple runs?",
+    cat: "data",
+    opts: [
+      "It doesn't — duplicates are stored as-is",
+      "It uses an MD5 hash of key fields to detect and remove duplicates in the cleaner",
+      "It overwrites existing rows in the database",
+      "It only scrapes once per day and refuses to run again"
+    ],
+    correct: 1,
+    explain: "The cleaner (clean.py) computes an MD5 hash of: route|carrier|depart_time|total_fare|lead_window_days. If two rows have the same hash, the duplicate is removed. This happens in Phase 2 after scraping — raw_flights keeps all data, cleaned_flights has deduplicated data."
+  },
+  {
+    q: "What is the rate limiting strategy?",
+    cat: "design",
+    opts: [
+      "Maximum 60 requests per hour, with 3-8 second random delay between requests",
+      "Maximum 10 requests per minute with fixed 5-second delays",
+      "No rate limiting — the scraper runs as fast as possible",
+      "Rate limiting is handled by Google Flights, not by our code"
+    ],
+    correct: 0,
+    explain: "Configured in scraper.yaml: max_requests_per_hour: 60, delay_between_requests: min 3s, max 8s (random). If 60 requests are hit within an hour, the scraper waits 60 seconds before continuing. The random delay between requests (3-8s) makes the traffic pattern look more human."
+  },
+  {
+    q: "What does the 'exponential backoff' retry strategy mean?",
+    cat: "error",
+    opts: [
+      "Each retry waits twice as long as the previous one (3s, 6s, 12s)",
+      "Each retry waits half as long as the previous one",
+      "The scraper doubles the number of retries each time",
+      "The timeout increases exponentially with each page load"
+    ],
+    correct: 0,
+    explain: "backoff_multiplier: 2 in the config. First retry waits 3s, second waits 6s (3×2), third waits 12s (6×2). This gives the server more breathing room if it's under load, instead of hammering it with evenly-spaced retries."
+  },
+  {
+    q: "Why does the scraper use async/await instead of regular functions?",
+    cat: "tech",
+    opts: [
+      "It makes the code shorter and easier to read",
+      "It allows the browser to load pages without blocking other operations",
+      "async/await is required by Playwright — it has no synchronous API",
+      "It makes the scraper run on multiple CPU cores"
+    ],
+    correct: 1,
+    explain: "Playwright's Python API is async-only. While waiting for a page to load (which takes 3-10 seconds), async lets the program do other work instead of freezing. Even though we currently scrape one route at a time, async makes it easy to scale to parallel scraping in the future."
+  },
+  {
+    q: "What regex pattern is used to extract the price from an aria-label?",
+    cat: "tech",
+    opts: [
+      "re.search(r'price[:\\s]+(\\d+)', label)",
+      "re.search(r'From\\s+([\\d,]+)\\s+Indian\\s+rupees', label)",
+      "re.search(r'\\$(\\d+\\.\\d{2})', label)",
+      "re.search(r'fare[=:]\\s*(\\d+)', label)"
+    ],
+    correct: 1,
+    explain: "The pattern r'From\\s+([\\d,]+)\\s+Indian\\s+rupees' matches: 'From' → whitespace → digits/commas → 'Indian rupees'. Example: 'From 12,882 Indian rupees' captures '12,882', which is converted to integer 12882 after removing the comma."
+  },
+  {
+    q: "What is the 'lead window' concept in this project?",
+    cat: "arch",
+    opts: [
+      "How many days of historical data to keep",
+      "How many days before departure the fare is checked (T+1, T+7, T+30)",
+      "How many days the scraper runs before stopping",
+      "How many days to wait before recalculating the index"
+    ],
+    correct: 1,
+    explain: "Lead window = how far in advance we check the fare. T+1 means 1 day before departure, T+7 means 7 days before, T+30 means 30 days before. This lets us compare how prices change as the departure date approaches — a key insight for the airfare index."
+  },
+  {
+    q: "What is the purpose of the context manager (async with) in driver.py?",
+    cat: "tech",
+    opts: [
+      "It makes the browser run faster",
+      "It guarantees the browser is closed properly even if the scraper crashes",
+      "It caches the browser data between runs",
+      "It encrypts the browser's network traffic"
+    ],
+    correct: 1,
+    explain: "The async context manager pattern (async with + yield + finally) ensures cleanup code always runs. Even if the scraper throws an exception mid-scrape, the finally block closes the browser context and kills the Chromium process. No zombie processes, no leaked memory."
+  },
+  {
+    q: "How does the scraper determine if a flight is nonstop vs has stops?",
+    cat: "data",
+    opts: [
+      "It counts the number of airports mentioned in the aria-label",
+      "It checks for 'nonstop'/'non-stop' text, or extracts the number from 'N stop(s)'",
+      "It looks at the flight duration — anything over 3 hours must have a stop",
+      "It checks the number of image elements in the flight card"
+    ],
+    correct: 1,
+    explain: "The _extract_stops_from_label() method first checks if the label contains 'nonstop' or 'non-stop' (returns 0). If not, it uses regex r'(\\d+)\\s+stop' to find '1 stop' or '2 stops' and extracts the number. Defaults to 0 if nothing is found."
+  },
+  {
+    q: "Why are flights with missing departure times skipped instead of assigned midnight?",
+    cat: "design",
+    opts: [
+      "Midnight flights don't exist in India",
+      "Wrong data is worse than no data — it corrupts the index",
+      "The Pydantic model rejects midnight values",
+      "SQLite doesn't support time values of 00:00"
+    ],
+    correct: 1,
+    explain: "If we can't parse the departure time and assign midnight as a fallback, that incorrect time feeds into the price index. A flight that actually departs at 8:45 AM would be recorded as departing at midnight, distorting any time-based analysis. Skipping it is always better than inventing data."
+  },
+  {
+    q: "How does the scraper handle next-day arrivals (e.g., flight departs 11 PM, arrives 2 AM)?",
+    cat: "data",
+    opts: [
+      "It assumes all arrivals before 6 AM are next day",
+      "It compares departure time to arrival time — if arrival < departure, it adds 1 day",
+      "It ignores the arrival date entirely and only stores the time",
+      "It asks Google Flights for the arrival date separately"
+    ],
+    correct: 1,
+    explain: "After parsing both times on the travel date, if arr_dt < dep_dt (like dep=23:00, arr=02:00), we add 1 day to the arrival datetime. This correctly handles overnight flights without the broken 6 AM threshold assumption."
+  },
+  {
+    q: "What database does the project use and why?",
+    cat: "arch",
+    opts: [
+      "MySQL — because it's the most popular database",
+      "PostgreSQL — because it supports JSON columns",
+      "SQLite — zero setup, single file, no server needed",
+      "MongoDB — because the data is unstructured"
+    ],
+    correct: 2,
+    explain: "SQLite stores everything in a single file (data/apix.db). No server to install, no user accounts to configure, no port to open. It's built into Python — zero extra dependencies. For a hackathon prototype with single-user access, it's the ideal choice."
+  },
+  {
+    q: "How many rows does a full scrape cycle produce?",
+    cat: "data",
+    opts: [
+      "12 rows (one per route)",
+      "36 rows (12 routes × 3 windows)",
+      "120-144 rows (10-12 flights per route × window combination)",
+      "1000+ rows (every flight on every route)"
+    ],
+    correct: 2,
+    explain: "Each route × window combination (e.g., DEL→BOM at T+7) returns 10-120 flights from Google Flights. With 36 combinations (12 routes × 3 windows), a full scrape produces roughly 400-3000 raw rows. The test run on just DEL→BOM T+7 produced 118 rows."
+  },
+  {
+    q: "What is the 'quality score' in the cleaned_flights table?",
+    cat: "data",
+    opts: [
+      "A score from 0-100 based on how many flights were found",
+      "A score from 0.0-1.0 based on how complete each row's fields are",
+      "A score based on how cheap the fare is compared to competitors",
+      "A score from Google Flights rating the data reliability"
+    ],
+    correct: 1,
+    explain: "Every row starts at 1.0 (perfect). Each missing critical field (carrier, depart_time, arrive_time, duration_mins, total_fare) subtracts 0.2. Unusual stop counts (not 0, 1, or 2) subtract 0.1. The score is clipped between 0.0 and 1.0. It helps identify low-quality rows."
+  },
+  {
+    q: "What is the IQR method used for in the cleaner?",
+    cat: "data",
+    opts: [
+      "Calculating the average fare across all routes",
+      "Detecting outlier fares that are statistically unusual",
+      "Sorting flights by price from lowest to highest",
+      "Merging duplicate rows from different scrape runs"
+    ],
+    correct: 1,
+    explain: "IQR (Interquartile Range) finds outliers: Q1 = 25th percentile, Q3 = 75th percentile, IQR = Q3 - Q1. Anything below Q1 - 1.5×IQR or above Q3 + 1.5×IQR is flagged as outlier. For example, a ₹50,000 fare on a route where most fares are ₹12,000-15,000 would be flagged."
+  },
+  {
+    q: "Why does the scraper use page.evaluate() to run JavaScript in the browser instead of Playwright's CSS selectors?",
+    cat: "tech",
+    opts: [
+      "JavaScript runs faster than CSS selectors",
+      "page.evaluate() can access elements that Playwright's query_selector cannot",
+      "Running JS directly in the browser is more reliable for extracting aria-labels from Google's dynamic DOM",
+      "It was the only way to bypass Google's anti-bot detection"
+    ],
+    correct: 2,
+    explain: "Google Flights uses dynamically-generated class names that change frequently. CSS selectors like 'div.JMc5Xc' break when Google updates their frontend. By running JavaScript via page.evaluate(), we query the DOM directly in the browser's own context, which is more resilient to class name changes."
+  },
+  {
+    q: "What happens if the scraper hits Google's rate limits or gets blocked?",
+    cat: "error",
+    opts: [
+      "The scraper automatically switches to a proxy server",
+      "Playwright raises an error, which triggers the retry mechanism (up to 3 attempts with backoff)",
+      "The scraper waits 10 minutes and tries again",
+      "The scraper deletes all collected data and starts fresh"
+    ],
+    correct: 1,
+    explain: "Any exception (timeout, connection error, blocked response) is caught by the retry loop. It waits with exponential backoff (3s → 6s → 12s) before retrying. If all 3 attempts fail, the error is logged and the scraper moves to the next route. The run_scrape loop continues with remaining routes."
+  },
+  {
+    q: "How is the weighted price index calculated from the scraped data?",
+    cat: "arch",
+    opts: [
+      "Simple average of all fares across all routes",
+      "For each route: (today's lowest fare / base day's lowest fare) × 100, then weighted average by traffic share",
+      "Median fare across all routes, normalized to 100",
+      "Sum of all fares divided by number of flights"
+    ],
+    correct: 1,
+    explain: "Route index = (today's lowest fare / base day's lowest fare) × 100. Base day index is always 100. Aggregate index = Σ(route_index × weight) / Σ(weight). DEL-BOM has weight 0.30 (30% of traffic), so its price movements affect the index 6× more than BLR-MAA (weight 0.05)."
+  },
+  {
+    q: "What is the purpose of the abstract base class (BaseScraper)?",
+    cat: "design",
+    opts: [
+      "It contains the actual scraping logic that subclasses inherit",
+      "It defines a contract (interface) that every scraper implementation must follow",
+      "It handles database connections for all scrapers",
+      "It manages the browser lifecycle for multiple scraper types"
+    ],
+    correct: 1,
+    explain: "BaseScraper defines the abstract method fetch_flights() that every scraper must implement. If we add a new data source (like MakeMyTrip), we just create a new class that inherits from BaseScraper and implements fetch_flights(). The rest of the code (run_scrape, database) works with any scraper that follows this contract."
+  },
+  {
+    q: "Why are config settings stored in YAML files instead of hardcoded in Python?",
+    cat: "design",
+    opts: [
+      "YAML files load faster than Python variables",
+      "To change settings without modifying code — separates configuration from logic",
+      "YAML is required by the Playwright library",
+      "To prevent settings from being visible in the source code"
+    ],
+    correct: 1,
+    explain: "If you want to change headless from false to true, you edit scraper.yaml — no Python code changes needed. This separation means non-programmers can adjust settings, different environments can use different configs, and code reviews don't need to include config changes."
+  },
+  {
+    q: "What is the maximum number of requests per hour the scraper allows?",
+    cat: "design",
+    opts: [
+      "10 requests per hour",
+      "30 requests per hour",
+      "60 requests per hour",
+      "Unlimited — no rate limiting"
+    ],
+    correct: 2,
+    explain: "Set in scraper.yaml: max_requests_per_hour: 60. This means roughly 1 request per minute. With 3-8 second delays between requests, this gives plenty of breathing room. A full scrape of 36 route×window combinations takes about 12-15 minutes."
+  },
+  {
+    q: "How does the scraper navigate to Google Flights — does it search or use a direct URL?",
+    cat: "tech",
+    opts: [
+      "It goes to google.com and types the search query manually",
+      "It constructs a direct URL with the query parameter: google.com/travel/flights?q=Flights from X to Y on DATE",
+      "It uses Google Flights API with an API key",
+      "It bookmarks the URL and navigates via browser history"
+    ],
+    correct: 1,
+    explain: "_build_url() constructs: https://www.google.com/travel/flights?q=Flights from New Delhi to Mumbai on 2026-09-11&hl=en&curr=INR. The query parameter tells Google Flights what to search for. hl=en sets English, curr=INR sets Indian Rupees."
+  },
+  {
+    q: "What is the purpose of the scrape_timestamp field in each flight record?",
+    cat: "data",
+    opts: [
+      "It records when the flight departs",
+      "It records exactly when the data was scraped — for tracking data freshness",
+      "It records when the database was last backed up",
+      "It records the server's current timezone"
+    ],
+    correct: 1,
+    explain: "scrape_timestamp = datetime.now() at the moment the record is created. This tells us how old the data is. A fare scraped 5 minutes ago is more reliable than one scraped 3 days ago. It's also used for deduplication — same flight scraped at different times gets different timestamps."
+  },
+  {
+    q: "Why does the project use 4 specific cities (DEL, BOM, BLR, MAA) instead of all Indian airports?",
+    cat: "arch",
+    opts: [
+      "These are the only airports Google Flights supports",
+      "These 4 cities represent the busiest domestic routes — manageable scope for an MVP",
+      "The project is limited to South Indian airports",
+      "These cities have the cheapest flights"
+    ],
+    correct: 1,
+    explain: "DEL (Delhi), BOM (Mumbai), BLR (Bengaluru), MAA (Chennai) are among India's busiest airports. Starting with 4 cities keeps the scope manageable for a hackathon while covering the most important routes. The architecture supports adding more cities by just editing routes.yaml."
+  },
+  {
+    q: "What would break if Google Flights changed their HTML structure?",
+    cat: "error",
+    opts: [
+      "Nothing — the scraper uses aria-labels which are stable",
+      "The CSS selectors for waiting would fail, but aria-label extraction would likely still work",
+      "The entire scraper would stop working completely",
+      "Only the price extraction would break"
+    ],
+    correct: 1,
+    explain: "The scraper has two layers of resilience: (1) _wait_for_results() tries 4 different CSS selectors — if one breaks, it tries the next. (2) _collect_aria_labels() uses a generic query for any element with aria-label containing 'rupees' and 'flight' — this is more stable than class-based selectors. However, if Google removes aria-labels entirely, the scraper would need rewrites."
+  },
+  {
+    q: "How long does a full scrape cycle (all routes × windows) take?",
+    cat: "performance",
+    opts: [
+      "About 1-2 minutes",
+      "About 12-15 minutes",
+      "About 1 hour",
+      "About 6 hours"
+    ],
+    correct: 1,
+    explain: "36 combinations × (3-8s delay + ~5s page load) ≈ 36 × 10s = 360s ≈ 6 minutes minimum. With retries and rate limiting, realistically 12-15 minutes. The constraint is PC1: full scrape cycle ≤ 60 minutes."
+  }
+];
+
+let score = 0;
+let answered = 0;
+const totalQ = questions.length;
+let activeFilter = 'all';
+
+function init() {
+  renderFilters();
+  renderQuestions();
+}
+
+function renderFilters() {
+  const cats = {all: totalQ};
+  questions.forEach(q => { cats[q.cat] = (cats[q.cat]||0) + 1; });
+  const labels = {arch:'Architecture',tech:'Technology',data:'Data',error:'Error Handling',design:'Design Decisions',security:'Security',performance:'Performance'};
+  const f = document.getElementById('filters');
+  f.innerHTML = '';
+  Object.keys(cats).forEach(c => {
+    const btn = document.createElement('div');
+    btn.className = 'filter-btn' + (c === activeFilter ? ' active' : '');
+    btn.innerHTML = (c === 'all' ? 'All' : labels[c] || c) + '<span class="count">' + cats[c] + '</span>';
+    btn.onclick = () => { activeFilter = c; renderFilters(); renderQuestions(); };
+    f.appendChild(btn);
+  });
+}
+
+function renderQuestions() {
+  const container = document.getElementById('questions');
+  container.innerHTML = '';
+  const catLabels = {arch:'Architecture',tech:'Technology',data:'Data',error:'Error Handling',design:'Design',security:'Security',performance:'Performance'};
+  const catClass = {arch:'cat-arch',tech:'cat-tech',data:'cat-data',error:'cat-error',design:'cat-design',security:'cat-security',performance:'cat-performance'};
+  questions.forEach((q, i) => {
+    if (activeFilter !== 'all' && q.cat !== activeFilter) return;
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.id = 'q-' + i;
+    let optsHtml = '';
+    q.opts.forEach((o, j) => {
+      optsHtml += '<div class="opt" id="opt-' + i + '-' + j + '" onclick="answer(' + i + ',' + j + ')"><span class="opt-letter">' + 'ABCD'[j] + '</span>' + o + '</div>';
+    });
+    card.innerHTML = `
+      <div class="q-num">Question ${i+1} <span class="cat-badge ${catClass[q.cat]}">${catLabels[q.cat]}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="opts">${optsHtml}</div>
+      <div class="explain-box" id="exp-${i}"></div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function answer(qi, oi) {
+  const q = questions[qi];
+  const card = document.getElementById('q-' + qi);
+  const exp = document.getElementById('exp-' + qi);
+  const isCorrect = oi === q.correct;
+
+  // Disable all options
+  q.opts.forEach((_, j) => {
+    const opt = document.getElementById('opt-' + qi + '-' + j);
+    opt.classList.add('disabled');
+    if (j === q.correct) opt.classList.add('correct-answer');
+    if (j === oi && !isCorrect) opt.classList.add('wrong-answer');
+    if (j === oi) opt.classList.add('selected');
+  });
+
+  // Show explanation
+  exp.className = 'explain-box show ' + (isCorrect ? 'correct-exp' : 'wrong-exp');
+  exp.innerHTML = (isCorrect ? '<strong>Correct!</strong> ' : '<strong>Wrong.</strong> ') + q.explain;
+
+  // Update card style
+  card.classList.add(isCorrect ? 'correct' : 'wrong');
+
+  // Update score
+  if (!card.dataset.answered) {
+    card.dataset.answered = '1';
+    answered++;
+    if (isCorrect) score++;
+    document.getElementById('score').textContent = score;
+    document.getElementById('total').textContent = totalQ;
+  }
+
+  // Show results when all answered
+  if (answered === totalQ) {
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('final-score').textContent = score + ' / ' + totalQ;
+    document.getElementById('final-correct').textContent = score;
+    document.getElementById('final-wrong').textContent = totalQ - score;
+  }
+}
+
+function resetQuiz() {
+  score = 0;
+  answered = 0;
+  document.getElementById('score').textContent = 0;
+  document.getElementById('results').style.display = 'none';
+  renderQuestions();
+  window.scrollTo(0, 0);
+}
+
+init();
+</script>
+</body>
+</html>
