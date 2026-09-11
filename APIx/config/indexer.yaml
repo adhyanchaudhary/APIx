@@ -1,0 +1,12 @@
+# ── Index Builder Settings ──
+index:
+  base_period: "first_available"   # index = 100 on first day with data
+  round_to: 2                      # decimal places for index value
+  min_data_points: 30              # minimum days before index is valid
+
+# ── Outlier Detection ──
+cleaning:
+  outlier_method: "iqr"            # "iqr" or "zscore"
+  iqr_multiplier: 1.5             # Q1 - 1.5*IQR to Q3 + 1.5*IQR
+  zscore_threshold: 3.0           # used only if method = "zscore"
+  null_fare_action: "drop"        # "drop" or "forward_fill"
