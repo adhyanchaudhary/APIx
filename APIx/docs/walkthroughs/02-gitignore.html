@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Walkthrough 2: .gitignore</title>
+<style>
+:root{--bg:#F08080;--card:rgba(255,255,255,0.92);--blue:#0D47A1;--blue-mid:#1565C0;--blue-light:#BBDEFB;--green:#1B5E20;--green-light:#C8E6C9;--red:#B71C1C;--red-light:#FFCDD2;--black:#1A1A2E;--grey:#546E7A}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--black);line-height:1.7}
+.wrap{max-width:900px;margin:0 auto;padding:20px}
+header{background:var(--blue);color:#fff;padding:24px 32px;border-radius:14px;margin-bottom:24px}
+header h1{font-size:1.6rem}
+header .sub{opacity:.75;margin-top:4px;font-size:.9rem}
+.card{background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:20px;border-left:6px solid var(--blue-mid)}
+.card h2{color:var(--blue);font-size:1.2rem;margin-bottom:8px}
+.line-block{margin:14px 0;border-radius:8px;overflow:hidden;border:1px solid #ddd}
+.line-header{background:var(--blue);color:#fff;padding:6px 14px;font-size:.85rem;font-weight:600}
+.line-code{background:#263238;color:#80CBC4;padding:10px 16px;font-family:'Courier New',monospace;font-size:.85rem;white-space:pre;overflow-x:auto}
+.line-explain{background:#E8F5E9;padding:10px 16px;font-size:.9rem;border-top:1px solid #C8E6C9}
+.line-explain strong{color:var(--green)}
+.line-explain code{background:#C8E6C9;padding:1px 5px;border-radius:3px;font-family:'Courier New',monospace;font-size:.85rem}
+.nav{display:flex;justify-content:space-between;margin:20px 0}
+.nav a{background:var(--blue);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem}
+.nav a:hover{background:var(--blue-mid)}
+.note{background:var(--blue-light);border-left:4px solid var(--blue);padding:10px 14px;border-radius:6px;margin:10px 0;font-size:.9rem}
+.summary{background:var(--green-light);border-left:4px solid var(--green);padding:12px 16px;border-radius:6px;margin:14px 0;color:var(--green)}
+.summary::before{content:"Key takeaway: ";font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Walkthrough 2: .gitignore</h1>
+<div class="sub">.gitignore</div>
+</header>
+<div class="nav"><a href="01-env.html">&larr; Previous</a><a href="03-requirements.html">Next &rarr;</a></div>
+<div class="card">
+<h2>File Overview</h2>
+<p>Below is every line of this file with an explanation of what it does and why.</p>
+</div>
+<div class="line-block">
+<div class="line-header">Line 1</div>
+<div class="line-code"># Python</div>
+<div class="line-explain">Section header comment: these patterns relate to Python artifacts.</div>
+</div><div class="line-block">
+<div class="line-header">Line 2</div>
+<div class="line-code">__pycache__/</div>
+<div class="line-explain">Python automatically creates a folder called <code>__pycache__</code> to store compiled versions of your .py files. This speeds up imports but the files are computer-generated, so we don't want them in version control.</div>
+</div><div class="line-block">
+<div class="line-header">Line 3</div>
+<div class="line-code">*.py[cod]</div>
+<div class="line-explain">The <code>*</code> is a wildcard. This matches any file ending in <code>.pyc</code>, <code>.pyo</code>, or <code>.pyd</code> - all Python compiled files.</div>
+</div><div class="line-block">
+<div class="line-header">Line 4</div>
+<div class="line-code">*.pyo</div>
+<div class="line-explain">Catches Python optimized files specifically (redundant with above but explicit).</div>
+</div><div class="line-block">
+<div class="line-header">Line 5</div>
+<div class="line-code">*.egg-info/</div>
+<div class="line-explain">If you ever package this project for distribution, Python creates an <code>.egg-info</code> folder. It's auto-generated metadata.</div>
+</div><div class="line-block">
+<div class="line-header">Line 6</div>
+<div class="line-code">dist/</div>
+<div class="line-explain">The <code>dist</code> folder holds distributable packages. Auto-generated when you build the project.</div>
+</div><div class="line-block">
+<div class="line-header">Line 7</div>
+<div class="line-code">build/</div>
+<div class="line-explain">Similar to dist - temporary build artifacts go here.</div>
+</div><div class="line-block">
+<div class="line-header">Line 8</div>
+<div class="line-code">*.egg</div>
+<div class="line-explain">Egg files are an older Python packaging format. Rarely seen now but safe to ignore.</div>
+</div><div class="line-block">
+<div class="line-header">Line 9</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line separating sections.</div>
+</div><div class="line-block">
+<div class="line-header">Line 10</div>
+<div class="line-code"># Environment</div>
+<div class="line-explain">Section: environment and secrets files.</div>
+</div><div class="line-block">
+<div class="line-header">Line 11</div>
+<div class="line-code">.env</div>
+<div class="line-explain">Our secrets file! It contains settings we don't want to share publicly. If someone puts this on GitHub, anyone can see our configuration.</div>
+</div><div class="line-block">
+<div class="line-header">Line 12</div>
+<div class="line-code">venv/</div>
+<div class="line-explain">The <code>venv</code> folder is where Python installs packages locally for this project. It can be huge (hundreds of MB) and is recreated with <code>pip install</code>.</div>
+</div><div class="line-block">
+<div class="line-header">Line 13</div>
+<div class="line-code">.venv/</div>
+<div class="line-explain">Alternative name some people use for the virtual environment folder.</div>
+</div><div class="line-block">
+<div class="line-header">Line 14</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 15</div>
+<div class="line-code"># Database</div>
+<div class="line-explain">Section: database files.</div>
+</div><div class="line-block">
+<div class="line-header">Line 16</div>
+<div class="line-code">data/*.db</div>
+<div class="line-explain">Any <code>.db</code> file inside the <code>data/</code> folder. Our SQLite database will be at <code>data/apix.db</code>. It's generated data that can be recreated by running the scraper.</div>
+</div><div class="line-block">
+<div class="line-header">Line 17</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 18</div>
+<div class="line-code"># IDE</div>
+<div class="line-explain">Section: code editor files.</div>
+</div><div class="line-block">
+<div class="line-header">Line 19</div>
+<div class="line-code">.vscode/</div>
+<div class="line-explain">VS Code creates this folder to store workspace-specific settings. Different developers use different settings, so we don't share it.</div>
+</div><div class="line-block">
+<div class="line-header">Line 20</div>
+<div class="line-code">.idea/</div>
+<div class="line-explain">JetBrains IDEs (PyCharm) create this folder. Same reason as .vscode.</div>
+</div><div class="line-block">
+<div class="line-header">Line 21</div>
+<div class="line-code">*.swp</div>
+<div class="line-explain">Vim editor creates .swp files when you have a file open. They're temporary.</div>
+</div><div class="line-block">
+<div class="line-header">Line 22</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 23</div>
+<div class="line-code"># OS</div>
+<div class="line-explain">Section: operating system junk files.</div>
+</div><div class="line-block">
+<div class="line-header">Line 24</div>
+<div class="line-code">Thumbs.db</div>
+<div class="line-explain">Windows creates this file in every folder to cache thumbnail images. It's useless to others.</div>
+</div><div class="line-block">
+<div class="line-header">Line 25</div>
+<div class="line-code">Desktop.ini</div>
+<div class="line-explain">Windows stores folder display settings here. Auto-generated by Windows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 26</div>
+<div class="line-code">.DS_Store</div>
+<div class="line-explain">macOS creates this in every folder to remember icon positions. Useless to others.</div>
+</div><div class="line-block">
+<div class="line-header">Line 27</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 28</div>
+<div class="line-code"># Secrets</div>
+<div class="line-explain">Section: security-sensitive files.</div>
+</div><div class="line-block">
+<div class="line-header">Line 29</div>
+<div class="line-code">*.pem</div>
+<div class="line-explain">PEM files often contain SSL certificates or private keys. Never share these.</div>
+</div><div class="line-block">
+<div class="line-header">Line 30</div>
+<div class="line-code">*.key</div>
+<div class="line-explain">Private key files. Sharing these would let others impersonate your server.</div>
+</div>
+<div class="card">
+<h2>Summary</h2>
+<p>This file has <strong>30 lines</strong>.</p>
+</div>
+<div class="nav"><a href="01-env.html">&larr; Previous</a><a href="03-requirements.html">Next &rarr;</a></div>
+</div>
+</body>
+</html>

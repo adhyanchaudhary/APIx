@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Walkthrough 13: src/cleaner/clean.py</title>
+<style>
+:root{--bg:#F08080;--card:rgba(255,255,255,0.92);--blue:#0D47A1;--blue-mid:#1565C0;--blue-light:#BBDEFB;--green:#1B5E20;--green-light:#C8E6C9;--red:#B71C1C;--red-light:#FFCDD2;--black:#1A1A2E;--grey:#546E7A}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--black);line-height:1.7}
+.wrap{max-width:900px;margin:0 auto;padding:20px}
+header{background:var(--blue);color:#fff;padding:24px 32px;border-radius:14px;margin-bottom:24px}
+header h1{font-size:1.6rem}
+header .sub{opacity:.75;margin-top:4px;font-size:.9rem}
+.card{background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:20px;border-left:6px solid var(--blue-mid)}
+.card h2{color:var(--blue);font-size:1.2rem;margin-bottom:8px}
+.line-block{margin:14px 0;border-radius:8px;overflow:hidden;border:1px solid #ddd}
+.line-header{background:var(--blue);color:#fff;padding:6px 14px;font-size:.85rem;font-weight:600}
+.line-code{background:#263238;color:#80CBC4;padding:10px 16px;font-family:'Courier New',monospace;font-size:.85rem;white-space:pre;overflow-x:auto}
+.line-explain{background:#E8F5E9;padding:10px 16px;font-size:.9rem;border-top:1px solid #C8E6C9}
+.line-explain strong{color:var(--green)}
+.line-explain code{background:#C8E6C9;padding:1px 5px;border-radius:3px;font-family:'Courier New',monospace;font-size:.85rem}
+.nav{display:flex;justify-content:space-between;margin:20px 0}
+.nav a{background:var(--blue);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem}
+.nav a:hover{background:var(--blue-mid)}
+.note{background:var(--blue-light);border-left:4px solid var(--blue);padding:10px 14px;border-radius:6px;margin:10px 0;font-size:.9rem}
+.summary{background:var(--green-light);border-left:4px solid var(--green);padding:12px 16px;border-radius:6px;margin:14px 0;color:var(--green)}
+.summary::before{content:"Key takeaway: ";font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Walkthrough 13: src/cleaner/clean.py</h1>
+<div class="sub">src/cleaner/clean.py</div>
+</header>
+<div class="nav"><a href="12-run-scrape-py.html">&larr; Previous</a></div>
+<div class="card">
+<h2>File Overview</h2>
+<p>Below is every line of this file with an explanation of what it does and why.</p>
+</div>
+<div class="line-block">
+<div class="line-header">Line 1</div>
+<div class="line-code">import hashlib</div>
+<div class="line-explain">For generating unique fingerprint hashes to detect duplicate rows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 2</div>
+<div class="line-code">import logging</div>
+<div class="line-explain">For printing status messages (INFO, WARNING, ERROR) to the terminal.</div>
+</div><div class="line-block">
+<div class="line-header">Line 3</div>
+<div class="line-code">import sys</div>
+<div class="line-explain">For accessing system features like the Python path.</div>
+</div><div class="line-block">
+<div class="line-header">Line 4</div>
+<div class="line-code">from pathlib import Path</div>
+<div class="line-explain">For working with file/folder paths in a cross-platform way (Windows, Mac, Linux).</div>
+</div><div class="line-block">
+<div class="line-header">Line 5</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 6</div>
+<div class="line-code">import pandas as pd</div>
+<div class="line-explain">Import the Pandas library — Python's tool for working with tables of data (like Excel, but in code).</div>
+</div><div class="line-block">
+<div class="line-header">Line 7</div>
+<div class="line-code">import yaml</div>
+<div class="line-explain">For reading YAML config files (like indexer.yaml).</div>
+</div><div class="line-block">
+<div class="line-header">Line 8</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 9</div>
+<div class="line-code">log = logging.getLogger(__name__)</div>
+<div class="line-explain">Create a logger that prints messages with this module's name.</div>
+</div><div class="line-block">
+<div class="line-header">Line 10</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 11</div>
+<div class="line-code">CONFIG_PATH = Path(__file__).resolve().parent.parent.parent / "config" / "indexer.yaml"</div>
+<div class="line-explain">Build the full path to the indexer config file. Goes up 3 folders from this file, then into config/.</div>
+</div><div class="line-block">
+<div class="line-header">Line 12</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 13</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 14</div>
+<div class="line-code">def _load_cleaning_config(cfg_path: Path | None = None) -&gt; dict:</div>
+<div class="line-explain">Load cleaning settings from indexer.yaml. Returns a dictionary like {'outlier_method': 'iqr', 'iqr_multiplier': 1.5, ...}.</div>
+</div><div class="line-block">
+<div class="line-header">Line 15</div>
+<div class="line-code">    path = cfg_path or CONFIG_PATH</div>
+<div class="line-explain">Use the provided path, or fall back to the default CONFIG_PATH.</div>
+</div><div class="line-block">
+<div class="line-header">Line 16</div>
+<div class="line-code">    with open(path) as f:</div>
+<div class="line-explain">Open and read the YAML file.</div>
+</div><div class="line-block">
+<div class="line-header">Line 17</div>
+<div class="line-code">        cfg = yaml.safe_load(f)</div>
+<div class="line-explain">Parse the YAML into a Python dictionary.</div>
+</div><div class="line-block">
+<div class="line-header">Line 18</div>
+<div class="line-code">    return cfg.get("cleaning", {})</div>
+<div class="line-explain">Return just the 'cleaning' section. If it doesn't exist, return an empty dict.</div>
+</div><div class="line-block">
+<div class="line-header">Line 19</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 20</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 21</div>
+<div class="line-code">def _compute_hash(row: pd.Series) -&gt; str:</div>
+<div class="line-explain">Create a unique fingerprint for each flight row. Used to detect duplicates.</div>
+</div><div class="line-block">
+<div class="line-header">Line 22</div>
+<div class="line-code">    key = f"{row['route']}|{row['carrier']}|{row['depart_time']}|{row['total_fare']}|{row['lead_window_days']}"</div>
+<div class="line-explain">Combine the key fields into one string: 'DEL-BOM|IndiGo|2026-09-11 08:45|5500|7'.</div>
+</div><div class="line-block">
+<div class="line-header">Line 23</div>
+<div class="line-code">    return hashlib.md5(key.encode()).hexdigest()</div>
+<div class="line-explain">Hash that string into a fixed-length fingerprint like 'a1b2c3d4e5f6...'. Identical rows produce identical hashes.</div>
+</div><div class="line-block">
+<div class="line-header">Line 24</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 25</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 26</div>
+<div class="line-code">def _flag_outliers_iqr(group: pd.Series, multiplier: float = 1.5) -&gt; pd.Series:</div>
+<div class="line-explain">Detect outlier fares using the IQR method. Takes a group of fares and returns 0 (normal) or 1 (outlier) for each.</div>
+</div><div class="line-block">
+<div class="line-header">Line 27</div>
+<div class="line-code">    q1 = group.quantile(0.25)</div>
+<div class="line-explain">Q1 = the 25th percentile. 25% of fares are below this value.</div>
+</div><div class="line-block">
+<div class="line-header">Line 28</div>
+<div class="line-code">    q3 = group.quantile(0.75)</div>
+<div class="line-explain">Q3 = the 75th percentile. 75% of fares are below this value.</div>
+</div><div class="line-block">
+<div class="line-header">Line 29</div>
+<div class="line-code">    iqr = q3 - q1</div>
+<div class="line-explain">IQR = the range of the middle 50% of fares.</div>
+</div><div class="line-block">
+<div class="line-header">Line 30</div>
+<div class="line-code">    lower = q1 - multiplier * iqr</div>
+<div class="line-explain">Lower bound. Anything below this is an outlier. Default: Q1 - 1.5×IQR.</div>
+</div><div class="line-block">
+<div class="line-header">Line 31</div>
+<div class="line-code">    upper = q3 + multiplier * iqr</div>
+<div class="line-explain">Upper bound. Anything above this is an outlier. Default: Q3 + 1.5×IQR.</div>
+</div><div class="line-block">
+<div class="line-header">Line 32</div>
+<div class="line-code">    return group.apply(lambda x: 1 if x &lt; lower or x &gt; upper else 0)</div>
+<div class="line-explain">Mark each fare: 1 if outside bounds, 0 if inside.</div>
+</div><div class="line-block">
+<div class="line-header">Line 33</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 34</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 35</div>
+<div class="line-code">def _compute_quality_score(df: pd.DataFrame) -&gt; pd.Series:</div>
+<div class="line-explain">Calculate a quality score (0.0 to 1.0) for each row. More complete data = higher score.</div>
+</div><div class="line-block">
+<div class="line-header">Line 36</div>
+<div class="line-code">    score = pd.Series(1.0, index=df.index)</div>
+<div class="line-explain">Start every row at 1.0 (perfect).</div>
+</div><div class="line-block">
+<div class="line-header">Line 37</div>
+<div class="line-code">    for col in ["carrier", "depart_time", "arrive_time", "duration_mins", "total_fare"]:</div>
+<div class="line-explain">Check each critical column.</div>
+</div><div class="line-block">
+<div class="line-header">Line 38</div>
+<div class="line-code">        score = score.where(df[col].notna(), score - 0.2)</div>
+<div class="line-explain">If a column is null/missing, subtract 0.2 from the score.</div>
+</div><div class="line-block">
+<div class="line-header">Line 39</div>
+<div class="line-code">    score = score.where(df["stops"].isin([0, 1, 2]), score - 0.1)</div>
+<div class="line-explain">If stops is not 0, 1, or 2 (unusual), subtract 0.1.</div>
+</div><div class="line-block">
+<div class="line-header">Line 40</div>
+<div class="line-code">    return score.clip(lower=0, upper=1)</div>
+<div class="line-explain">Clamp the score between 0.0 and 1.0 (never negative, never above 1).</div>
+</div><div class="line-block">
+<div class="line-header">Line 41</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 42</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 43</div>
+<div class="line-code">def clean_raw_data(</div>
+<div class="line-explain">Main cleaning function. Reads raw flights, cleans them, writes cleaned flights.</div>
+</div><div class="line-block">
+<div class="line-header">Line 44</div>
+<div class="line-code">    db_path: str | Path | None = None,</div>
+<div class="line-explain">Optional: path to a specific database file.</div>
+</div><div class="line-block">
+<div class="line-header">Line 45</div>
+<div class="line-code">    cfg_path: Path | None = None,</div>
+<div class="line-explain">Optional: path to a specific indexer config file.</div>
+</div><div class="line-block">
+<div class="line-header">Line 46</div>
+<div class="line-code">) -&gt; dict:</div>
+<div class="line-explain">Returns a dictionary with cleaning statistics.</div>
+</div><div class="line-block">
+<div class="line-header">Line 47</div>
+<div class="line-code">    from src.storage.database import DB_PATH, get_connection</div>
+<div class="line-explain">Import database functions. Using local import to avoid circular imports.</div>
+</div><div class="line-block">
+<div class="line-header">Line 48</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 49</div>
+<div class="line-code">    path = Path(db_path) if db_path else DB_PATH</div>
+<div class="line-explain">Use the provided path, or the default database path.</div>
+</div><div class="line-block">
+<div class="line-header">Line 50</div>
+<div class="line-code">    cfg = _load_cleaning_config(cfg_path)</div>
+<div class="line-explain">Load cleaning settings from indexer.yaml.</div>
+</div><div class="line-block">
+<div class="line-header">Line 51</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 52</div>
+<div class="line-code">    multiplier = cfg.get("iqr_multiplier", 1.5)</div>
+<div class="line-explain">IQR multiplier for outlier detection. Default 1.5.</div>
+</div><div class="line-block">
+<div class="line-header">Line 53</div>
+<div class="line-code">    null_action = cfg.get("null_fare_action", "drop")</div>
+<div class="line-explain">What to do with null fares: 'drop' removes them, 'forward_fill' fills from previous.</div>
+</div><div class="line-block">
+<div class="line-header">Line 54</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 55</div>
+<div class="line-code">    log.info("Reading raw_flights from %s", path)</div>
+<div class="line-explain">Log which database we're reading from.</div>
+</div><div class="line-block">
+<div class="line-header">Line 56</div>
+<div class="line-code">    conn = get_connection(path)</div>
+<div class="line-explain">Open a database connection.</div>
+</div><div class="line-block">
+<div class="line-header">Line 57</div>
+<div class="line-code">    df = pd.read_sql("SELECT * FROM raw_flights", conn)</div>
+<div class="line-explain">Load the entire raw_flights table into a Pandas DataFrame (a table object).</div>
+</div><div class="line-block">
+<div class="line-header">Line 58</div>
+<div class="line-code">    conn.close()</div>
+<div class="line-explain">Close the database connection.</div>
+</div><div class="line-block">
+<div class="line-header">Line 59</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 60</div>
+<div class="line-code">    if df.empty:</div>
+<div class="line-explain">If there are no raw rows...</div>
+</div><div class="line-block">
+<div class="line-header">Line 61</div>
+<div class="line-code">        log.warning("raw_flights is empty — nothing to clean")</div>
+<div class="line-explain">...log a warning.</div>
+</div><div class="line-block">
+<div class="line-header">Line 62</div>
+<div class="line-code">        return {"raw": 0, "cleaned": 0, "duplicates": 0, "outliers": 0, "nulls": 0}</div>
+<div class="line-explain">...and return empty stats.</div>
+</div><div class="line-block">
+<div class="line-header">Line 63</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 64</div>
+<div class="line-code">    raw_count = len(df)</div>
+<div class="line-explain">Count how many raw rows we started with.</div>
+</div><div class="line-block">
+<div class="line-header">Line 65</div>
+<div class="line-code">    log.info("Loaded %d raw rows", raw_count)</div>
+<div class="line-explain">Log the count.</div>
+</div><div class="line-block">
+<div class="line-header">Line 66</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 67</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 68</div>
+<div class="line-code">    # Step 1: Deduplication</div>
+<div class="line-explain">Remove exact duplicate rows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 69</div>
+<div class="line-code">    df["dedup_hash"] = df.apply(_compute_hash, axis=1)</div>
+<div class="line-explain">Add a 'dedup_hash' column: each row gets a unique fingerprint.</div>
+</div><div class="line-block">
+<div class="line-header">Line 70</div>
+<div class="line-code">    before_dedup = len(df)</div>
+<div class="line-explain">Count rows before removing duplicates.</div>
+</div><div class="line-block">
+<div class="line-header">Line 71</div>
+<div class="line-code">    df = df.drop_duplicates(subset=["dedup_hash"], keep="first")</div>
+<div class="line-explain">Keep only the first occurrence of each hash. Remove the rest.</div>
+</div><div class="line-block">
+<div class="line-header">Line 72</div>
+<div class="line-code">    duplicates = before_dedup - len(df)</div>
+<div class="line-explain">Calculate how many were removed.</div>
+</div><div class="line-block">
+<div class="line-header">Line 73</div>
+<div class="line-code">    log.info("Removed %d duplicates", duplicates)</div>
+<div class="line-explain">Log the dedup count.</div>
+</div><div class="line-block">
+<div class="line-header">Line 74</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 75</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 76</div>
+<div class="line-code">    # Step 2: Handle null fares</div>
+<div class="line-explain">Remove or fill rows where total_fare is missing.</div>
+</div><div class="line-block">
+<div class="line-header">Line 77</div>
+<div class="line-code">    if null_action == "drop":</div>
+<div class="line-explain">If configured to drop null fares...</div>
+</div><div class="line-block">
+<div class="line-header">Line 78</div>
+<div class="line-code">        before_null = len(df)</div>
+<div class="line-explain">Count before.</div>
+</div><div class="line-block">
+<div class="line-header">Line 79</div>
+<div class="line-code">        df = df.dropna(subset=["total_fare"])</div>
+<div class="line-explain">Remove any row where total_fare is NaN/null.</div>
+</div><div class="line-block">
+<div class="line-header">Line 80</div>
+<div class="line-code">        nulls = before_null - len(df)</div>
+<div class="line-explain">Count how many were removed.</div>
+</div><div class="line-block">
+<div class="line-header">Line 81</div>
+<div class="line-code">        log.info("Dropped %d rows with null fare", nulls)</div>
+<div class="line-explain">Log it.</div>
+</div><div class="line-block">
+<div class="line-header">Line 82</div>
+<div class="line-code">    else:</div>
+<div class="line-explain">If configured to forward-fill...</div>
+</div><div class="line-block">
+<div class="line-header">Line 83</div>
+<div class="line-code">        df = df.sort_values(["route", "lead_window_days", "scrape_timestamp"])</div>
+<div class="line-explain">Sort rows so the same route+window are grouped together.</div>
+</div><div class="line-block">
+<div class="line-header">Line 84</div>
+<div class="line-code">        df["total_fare"] = df.groupby(["route", "lead_window_days"])["total_fare"].transform(</div>
+<div class="line-explain">For each route+window group...</div>
+</div><div class="line-block">
+<div class="line-header">Line 85</div>
+<div class="line-code">            lambda x: x.ffill()</div>
+<div class="line-explain">...fill null fares with the previous non-null value (forward fill).</div>
+</div><div class="line-block">
+<div class="line-header">Line 86</div>
+<div class="line-code">        )</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 87</div>
+<div class="line-code">        nulls = int(df["total_fare"].isna().sum())</div>
+<div class="line-explain">Count any remaining nulls that couldn't be filled.</div>
+</div><div class="line-block">
+<div class="line-header">Line 88</div>
+<div class="line-code">        df = df.dropna(subset=["total_fare"])</div>
+<div class="line-explain">Drop any still-null rows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 89</div>
+<div class="line-code">        log.info("Forward-filled null fares, dropped %d remaining", nulls)</div>
+<div class="line-explain">Log it.</div>
+</div><div class="line-block">
+<div class="line-header">Line 90</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 91</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 92</div>
+<div class="line-code">    # Step 3: Outlier detection</div>
+<div class="line-explain">Flag rows with unusually high or low fares.</div>
+</div><div class="line-block">
+<div class="line-header">Line 93</div>
+<div class="line-code">    df["is_outlier"] = (</div>
+<div class="line-explain">Add a new column 'is_outlier'.</div>
+</div><div class="line-block">
+<div class="line-header">Line 94</div>
+<div class="line-code">        df.groupby(["route", "lead_window_days"])["total_fare"]</div>
+<div class="line-explain">For each route+window group...</div>
+</div><div class="line-block">
+<div class="line-header">Line 95</div>
+<div class="line-code">        .transform(lambda x: _flag_outliers_iqr(x, multiplier))</div>
+<div class="line-explain">...run IQR outlier detection on the fares.</div>
+</div><div class="line-block">
+<div class="line-header">Line 96</div>
+<div class="line-code">    )</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 97</div>
+<div class="line-code">    outlier_count = int(df["is_outlier"].sum())</div>
+<div class="line-explain">Count total outliers (sum of 1s).</div>
+</div><div class="line-block">
+<div class="line-header">Line 98</div>
+<div class="line-code">    log.info("Flagged %d outliers via IQR (×%.1f)", outlier_count, multiplier)</div>
+<div class="line-explain">Log the outlier count.</div>
+</div><div class="line-block">
+<div class="line-header">Line 99</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 100</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 101</div>
+<div class="line-code">    # Step 4: Quality scores</div>
+<div class="line-explain">Assign a quality score to each row.</div>
+</div><div class="line-block">
+<div class="line-header">Line 102</div>
+<div class="line-code">    df["quality_score"] = _compute_quality_score(df)</div>
+<div class="line-explain">Calculate how complete/reliable each row is (0.0 to 1.0).</div>
+</div><div class="line-block">
+<div class="line-header">Line 103</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 104</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 105</div>
+<div class="line-code">    # Step 5: Format dates</div>
+<div class="line-explain">Convert datetime objects to consistent string format.</div>
+</div><div class="line-block">
+<div class="line-header">Line 106</div>
+<div class="line-code">    df["scrape_date"] = pd.to_datetime(df["scrape_timestamp"]).dt.date.astype(str)</div>
+<div class="line-explain">Extract just the date part (YYYY-MM-DD) from the timestamp.</div>
+</div><div class="line-block">
+<div class="line-header">Line 107</div>
+<div class="line-code">    df["scrape_timestamp"] = pd.to_datetime(df["scrape_timestamp"]).dt.strftime("%Y-%m-%d %H:%M:%S")</div>
+<div class="line-explain">Format timestamp as '2026-09-04 15:30:00'.</div>
+</div><div class="line-block">
+<div class="line-header">Line 108</div>
+<div class="line-code">    df["depart_time"] = pd.to_datetime(df["depart_time"], errors="coerce").dt.strftime("%Y-%m-%d %H:%M:%S")</div>
+<div class="line-explain">Format departure time. If parsing fails, set to NaT (then null).</div>
+</div><div class="line-block">
+<div class="line-header">Line 109</div>
+<div class="line-code">    df["arrive_time"] = pd.to_datetime(df["arrive_time"], errors="coerce").dt.strftime("%Y-%m-%d %H:%M:%S")</div>
+<div class="line-explain">Format arrival time same way.</div>
+</div><div class="line-block">
+<div class="line-header">Line 110</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 111</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 112</div>
+<div class="line-code">    # Step 6: Select columns</div>
+<div class="line-explain">Keep only the columns the cleaned_flights table expects.</div>
+</div><div class="line-block">
+<div class="line-header">Line 113</div>
+<div class="line-code">    keep_cols = [</div>
+<div class="line-explain">List of columns to keep.</div>
+</div><div class="line-block">
+<div class="line-header">Line 114</div>
+<div class="line-code">        "scrape_date", "route", "origin", "dest", "carrier", "flight_no",</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 115</div>
+<div class="line-code">        "depart_time", "arrive_time", "duration_mins", "stops",</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 116</div>
+<div class="line-code">        "base_fare", "taxes", "total_fare", "currency", "lead_window_days",</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 117</div>
+<div class="line-code">        "scrape_timestamp", "quality_score", "is_outlier", "dedup_hash",</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 118</div>
+<div class="line-code">    ]</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 119</div>
+<div class="line-code">    df = df[keep_cols]</div>
+<div class="line-explain">Keep only these columns, drop everything else (like 'id' from raw_flights).</div>
+</div><div class="line-block">
+<div class="line-header">Line 120</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 121</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 122</div>
+<div class="line-code">    # Step 7: Write to cleaned_flights</div>
+<div class="line-explain">Save the cleaned data to the database.</div>
+</div><div class="line-block">
+<div class="line-header">Line 123</div>
+<div class="line-code">    log.info("Writing %d cleaned rows to cleaned_flights", len(df))</div>
+<div class="line-explain">Log how many cleaned rows we're writing.</div>
+</div><div class="line-block">
+<div class="line-header">Line 124</div>
+<div class="line-code">    conn = get_connection(path)</div>
+<div class="line-explain">Open a database connection.</div>
+</div><div class="line-block">
+<div class="line-header">Line 125</div>
+<div class="line-code">    df.to_sql("cleaned_flights", conn, if_exists="append", index=False)</div>
+<div class="line-explain">Write the DataFrame to the cleaned_flights table. append = add to existing rows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 126</div>
+<div class="line-code">    conn.close()</div>
+<div class="line-explain">Close the connection.</div>
+</div><div class="line-block">
+<div class="line-header">Line 127</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 128</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 129</div>
+<div class="line-code">    stats = {</div>
+<div class="line-explain">Build a summary dictionary.</div>
+</div><div class="line-block">
+<div class="line-header">Line 130</div>
+<div class="line-code">        "raw": raw_count, "cleaned": len(df),</div>
+<div class="line-explain">Raw count and cleaned count.</div>
+</div><div class="line-block">
+<div class="line-header">Line 131</div>
+<div class="line-code">        "duplicates": duplicates, "outliers": outlier_count, "nulls": nulls,</div>
+<div class="line-explain">How many duplicates, outliers, and nulls.</div>
+</div><div class="line-block">
+<div class="line-header">Line 132</div>
+<div class="line-code">    }</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 133</div>
+<div class="line-code">    log.info("Cleaning complete: %s", stats)</div>
+<div class="line-explain">Log the final stats.</div>
+</div><div class="line-block">
+<div class="line-header">Line 134</div>
+<div class="line-code">    return stats</div>
+<div class="line-explain">Return the stats dictionary.</div>
+</div><div class="line-block">
+<div class="line-header">Line 135</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 136</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 137</div>
+<div class="line-code">if __name__ == "__main__":</div>
+<div class="line-explain">Only runs when this file is executed directly.</div>
+</div><div class="line-block">
+<div class="line-header">Line 138</div>
+<div class="line-code">    logging.basicConfig(</div>
+<div class="line-explain">Configure the logging system.</div>
+</div><div class="line-block">
+<div class="line-header">Line 139</div>
+<div class="line-code">        level=logging.INFO,</div>
+<div class="line-explain">Show INFO-level and above.</div>
+</div><div class="line-block">
+<div class="line-header">Line 140</div>
+<div class="line-code">        format="%(asctime)s | %(levelname)-7s | %(message)s",</div>
+<div class="line-explain">Format: time | level | message.</div>
+</div><div class="line-block">
+<div class="line-header">Line 141</div>
+<div class="line-code">        datefmt="%H:%M:%S",</div>
+<div class="line-explain">Time format: HH:MM:SS.</div>
+</div><div class="line-block">
+<div class="line-header">Line 142</div>
+<div class="line-code">        handlers=[logging.StreamHandler(sys.stdout)],</div>
+<div class="line-explain">Print to terminal.</div>
+</div><div class="line-block">
+<div class="line-header">Line 143</div>
+<div class="line-code">    )</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 144</div>
+<div class="line-code">    result = clean_raw_data()</div>
+<div class="line-explain">Run the cleaning pipeline.</div>
+</div><div class="line-block">
+<div class="line-header">Line 145</div>
+<div class="line-code">    print(f"\nResults: {result}")</div>
+<div class="line-explain">Print the final stats.</div>
+</div>
+<div class="card">
+<h2>Summary</h2>
+<p>This file has <strong>145 lines</strong>.</p>
+</div>
+<div class="nav"><a href="12-run-scrape-py.html">&larr; Previous</a></div>
+</div>
+</body>
+</html>
