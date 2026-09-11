@@ -189,7 +189,7 @@ for route in [DEL-BOM, BOM-DEL, DEL-BLR, ...]:     # 12 routes
 <div class="card">
     <h2>How to Run the Scraper</h2>
     <h3>Test one route (DEL -> BOM, 7 days ahead):</h3>
-    <pre>python src/test_scraper.py</pre>
+    <pre>python -m src.scraper.run_smoke</pre>
 
     <h3>Run full scrape (all 12 routes x 3 windows):</h3>
     <pre>python -m src.scraper.run_scrape</pre>

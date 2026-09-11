@@ -41,6 +41,7 @@ class IndexEntry(BaseModel):
     """One row in the daily_index / weekly_index / monthly_index tables."""
 
     index_date: str
+    lead_window_days: int
     route: str
     weight: float
     route_price: float

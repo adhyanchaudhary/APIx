@@ -26,7 +26,7 @@ ol li .desc{color:var(--grey);font-size:.9rem}
 <div class="wrap">
 <header>
 <h1>Code Walkthrough - Master Index</h1>
-<p>13 files, explained line by line. Read them in order.</p>
+<p>15 files, explained line by line. Read them in order.</p>
 </header>
 
 <div class="card">
@@ -60,10 +60,18 @@ ol li .desc{color:var(--grey);font-size:.9rem}
 </ol>
 </div>
 
+<div class="card">
+<h2>Phase 3 - The Index Builder (Files 14-15)</h2>
+<ol start="14">
+<li><a href="14-run-index-py.html">src/indexer/run_index.py</a> <span class="phase-label p1">P3</span><br><span class="desc">Phase 3 entry point: reads cleaned data, builds daily + weekly + monthly indices, writes to SQLite.</span></li>
+<li><a href="15-api-index-py.html">src/indexer/api_index.py</a> <span class="phase-label p1">P3</span><br><span class="desc">Laspeyres-style weighted basket math, per lead window. The core of APIx.</span></li>
+</ol>
+</div>
+
 <div class="card" style="border-left-color:var(--green);">
 <h2 style="color:var(--green);">How to Use These Walkthroughs</h2>
-<p>Open any file above. Each walkthrough shows every line of code with a plain-English explanation beneath it. Read them in order (1-12) for the best learning experience.</p>
-<p style="margin-top:10px;">Files 1-8 are Phase 0 (setup). Files 9-12 are Phase 1 (the scraper). The project currently has 120 flights scraped from Google Flights for the Delhi-Mumbai route.</p>
+<p>Open any file above. Each walkthrough shows every line of code with a plain-English explanation beneath it. Read them in order (1-15) for the best learning experience.</p>
+<p style="margin-top:10px;">Files 1-8 are Phase 0 (setup). Files 9-12 are Phase 1 (the scraper). File 13 is Phase 2 (cleaning). Files 14-15 are Phase 3 (the APIx index).</p>
 </div>
 </div>
 </body>

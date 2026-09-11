@@ -5,595 +5,234 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Walkthrough 10: src/scraper/driver.py</title>
 <style>
-:root{--bg:#F08080;--card:rgba(255,255,255,0.92);--blue:#0D47A1;--blue-mid:#1565C0;--blue-light:#BBDEFB;--green:#1B5E20;--green-light:#C8E6C9;--red:#B71C1C;--red-light:#FFCDD2;--black:#1A1A2E;--grey:#546E7A;--orange:#E65100;--orange-light:#FFE0B2;--purple:#4A148C;--purple-light:#E1BEE7}
+:root{--bg:#F08080;--card:rgba(255,255,255,0.92);--blue:#0D47A1;--blue-mid:#1565C0;--blue-light:#BBDEFB;--green:#1B5E20;--green-light:#C8E6C9;--red:#B71C1C;--red-light:#FFCDD2;--black:#1A1A2E;--grey:#546E7A}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--black);line-height:1.7}
-.wrap{max-width:960px;margin:0 auto;padding:20px}
-header{background:var(--blue);color:#fff;padding:28px 34px;border-radius:14px;margin-bottom:28px}
-header h1{font-size:1.7rem}
-header .sub{opacity:.75;margin-top:6px;font-size:.9rem}
-.card{background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:22px;border-left:6px solid var(--blue-mid)}
-.card h2{color:var(--blue);font-size:1.25rem;margin-bottom:10px}
-.card p{margin-bottom:8px}
-
-.section{background:var(--blue);color:#fff;padding:12px 20px;border-radius:10px;margin:28px 0 16px;font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:10px}
-.section .num{background:rgba(255,255,255,0.25);padding:2px 10px;border-radius:8px;font-size:.85rem}
-
-.code-block{background:#263238;color:#80CBC4;border-radius:10px;padding:16px 20px;margin:12px 0;font-family:'Courier New',monospace;font-size:.88rem;white-space:pre;overflow-x:auto;line-height:1.6}
-.code-block .kw{color:#C792EA}
-.code-block .fn{color:#82AAFF}
-.code-block .st{color:#C3E88D}
-.code-block .cm{color:#546E7A;font-style:italic}
-
-.explain{background:#E8F5E9;padding:14px 18px;border-radius:8px;margin:12px 0;font-size:.92rem;border-left:4px solid var(--green)}
-.explain strong{color:var(--green)}
-.explain code{background:#C8E6C9;padding:1px 6px;border-radius:3px;font-family:'Courier New',monospace;font-size:.85rem}
-
-.concept{background:var(--blue-light);border-left:4px solid var(--blue);padding:14px 18px;border-radius:8px;margin:14px 0}
-.concept h3{color:var(--blue);font-size:1rem;margin-bottom:6px}
-.concept p{font-size:.9rem}
-
-.analogy{background:#FFF3E0;border-left:4px solid var(--orange);padding:14px 18px;border-radius:8px;margin:14px 0}
-.analogy h3{color:var(--orange);font-size:1rem;margin-bottom:6px}
-.analogy p{font-size:.9rem}
-
-.warning{background:var(--red-light);border-left:4px solid var(--red);padding:14px 18px;border-radius:8px;margin:14px 0}
-.warning h3{color:var(--red);font-size:1rem;margin-bottom:6px}
-.warning p{font-size:.9rem}
-
+.wrap{max-width:900px;margin:0 auto;padding:20px}
+header{background:var(--blue);color:#fff;padding:24px 32px;border-radius:14px;margin-bottom:24px}
+header h1{font-size:1.6rem}
+header .sub{opacity:.75;margin-top:4px;font-size:.9rem}
+.card{background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:20px;border-left:6px solid var(--blue-mid)}
+.card h2{color:var(--blue);font-size:1.2rem;margin-bottom:8px}
+.line-block{margin:14px 0;border-radius:8px;overflow:hidden;border:1px solid #ddd}
+.line-header{background:var(--blue);color:#fff;padding:6px 14px;font-size:.85rem;font-weight:600}
+.line-code{background:#263238;color:#80CBC4;padding:10px 16px;font-family:'Courier New',monospace;font-size:.85rem;white-space:pre;overflow-x:auto}
+.line-explain{background:#E8F5E9;padding:10px 16px;font-size:.9rem;border-top:1px solid #C8E6C9}
+.line-explain strong{color:var(--green)}
+.line-explain code{background:#C8E6C9;padding:1px 5px;border-radius:3px;font-family:'Courier New',monospace;font-size:.85rem}
 .nav{display:flex;justify-content:space-between;margin:20px 0}
 .nav a{background:var(--blue);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem}
 .nav a:hover{background:var(--blue-mid)}
-
-.summary{background:var(--green-light);border-left:4px solid var(--green);padding:16px 20px;border-radius:8px;margin:16px 0;color:var(--green)}
+.note{background:var(--blue-light);border-left:4px solid var(--blue);padding:10px 14px;border-radius:6px;margin:10px 0;font-size:.9rem}
+.summary{background:var(--green-light);border-left:4px solid var(--green);padding:12px 16px;border-radius:6px;margin:14px 0;color:var(--green)}
 .summary::before{content:"Key takeaway: ";font-weight:700}
-
-.what-box{background:linear-gradient(135deg,#E3F2FD,#BBDEFB);border-radius:14px;padding:24px 28px;margin:20px 0;border:2px solid var(--blue-mid)}
-.what-box h2{color:var(--blue);margin-bottom:10px}
-.what-box ul{padding-left:20px}
-.what-box li{margin-bottom:6px}
-
-/* Browser hierarchy diagram */
-.browser-hierarchy{display:flex;flex-direction:column;align-items:center;gap:0;margin:20px 0}
-.bh-box{border:3px solid;border-radius:12px;padding:14px 20px;text-align:center;position:relative}
-.bh-box.playwright{border-color:var(--blue);background:#E3F2FD;width:90%}
-.bh-box.browser{border-color:var(--red);background:#FFEBEE;width:75%;margin-top:12px}
-.bh-box.context{border-color:var(--orange);background:#FFF3E0;width:60%;margin-top:12px}
-.bh-box.page{border-color:var(--green);background:#E8F5E9;width:45%;margin-top:12px}
-.bh-box h4{font-size:.9rem;margin-bottom:4px}
-.bh-box p{font-size:.8rem;color:var(--grey)}
-.bh-label{position:absolute;left:-8px;top:50%;transform:translateY(-50%);background:var(--blue);color:#fff;padding:2px 8px;border-radius:6px;font-size:.7rem;font-weight:700;white-space:nowrap}
-
-/* Timeline */
-.timeline{position:relative;margin:20px 0;padding-left:30px}
-.timeline::before{content:'';position:absolute;left:12px;top:0;bottom:0;width:3px;background:var(--blue-mid)}
-.tl-item{position:relative;margin-bottom:18px}
-.tl-item::before{content:'';position:absolute;left:-22px;top:6px;width:14px;height:14px;border-radius:50%;border:3px solid var(--blue-mid);background:#fff}
-.tl-item.active::before{background:var(--blue-mid)}
-.tl-item.cleanup::before{background:var(--orange)}
-.tl-item h4{font-size:.95rem;color:var(--blue);margin-bottom:2px}
-.tl-item p{font-size:.88rem;color:var(--grey)}
 </style>
 </head>
 <body>
 <div class="wrap">
-
 <header>
 <h1>Walkthrough 10: src/scraper/driver.py</h1>
-<div class="sub">The browser launcher — opens Chromium, gives it to the scraper, then closes it safely</div>
+<div class="sub">src/scraper/driver.py</div>
 </header>
-
 <div class="nav"><a href="09-base-py.html">&larr; Previous</a><a href="11-google-flights-py.html">Next &rarr;</a></div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- WHAT IS THIS FILE? -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="what-box">
-<h2>What does this file do?</h2>
-<p>This file is the <strong>browser manager</strong>. It does 3 things:</p>
-<ul>
-<li><strong>1. Opens</strong> a Chromium browser (like Chrome but automated)</li>
-<li><strong>2. Hands it</strong> to the scraper so it can visit Google Flights</li>
-<li><strong>3. Closes</strong> everything safely when done — even if the scraper crashes</li>
-</ul>
-<p>It's only <strong>47 lines</strong> but packs in some advanced Python concepts. Let's break each one down.</p>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- ANALOGY -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="analogy">
-<h3>Analogy: A car rental service</h3>
-<p>Imagine you're renting a car to drive somewhere:</p>
-<p>• <strong>The rental desk</strong> = this file (driver.py)</p>
-<p>• <strong>The car</strong> = Chromium browser</p>
-<p>• <strong>The driver</strong> = the scraper (google_flights.py)</p>
-<p>The rental desk gives you the car, you drive it, and when you return it — the desk takes the keys, cleans the car, and parks it. Even if you crash, the desk handles the cleanup.</p>
-<p>This file is the rental desk. It <strong>opens</strong> the browser, <strong>hands it over</strong>, and <strong>closes it no matter what happens</strong>.</p>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- CONCEPT: WHAT IS A BROWSER -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="concept">
-<h3>What is Playwright and why do we need it?</h3>
-<p><strong>Playwright</strong> is a Python library that controls a real web browser through code. Instead of you clicking buttons and typing URLs, Playwright does it automatically.</p>
-<p>Why not just use <code>requests</code> (which fetches web pages)? Because Google Flights loads flight data using JavaScript after the page opens. A simple HTTP request can't run JavaScript — you need a real browser.</p>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- BROWSER HIERARCHY -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section"><span class="num">0</span> Before we read the code — Understanding the browser hierarchy</div>
-
-<div class="explain">
-<strong>Playwright has 4 layers.</strong> Each one contains the next, like Russian nesting dolls. Understanding this hierarchy makes the code much easier to follow.
-</div>
-
-<div class="browser-hierarchy">
-<div class="bh-box playwright">
-<h4>1. Playwright (pw)</h4>
-<p>The master controller. Launches browsers. Created by <code>async_playwright()</code>.</p>
-</div>
-<div class="bh-box browser">
-<h4>2. Browser</h4>
-<p>A Chromium instance. Like opening Chrome. Created by <code>pw.chromium.launch()</code>.</p>
-</div>
-<div class="bh-box context">
-<h4>3. Browser Context</h4>
-<p>An isolated session (like an Incognito window). Has its own cookies, history, settings. Created by <code>browser.new_context()</code>.</p>
-</div>
-<div class="bh-box page">
-<h4>4. Page</h4>
-<p>One tab. Navigates to URLs, reads content. Created by <code>context.new_page()</code>. The scraper works with this.</p>
-</div>
-</div>
-
-<div class="code-block"><span class="cm"># How they nest inside each other:</span>
-
-Playwright
-  └── Browser (Chromium)
-        └── Browser Context (Incognito window)
-              ├── Page (Tab 1) ← scraper uses this
-              ├── Page (Tab 2)
-              └── Page (Tab 3)</div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- SECTION 1: IMPORTS -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section"><span class="num">1</span> Imports — Getting the tools we need</div>
-
-<div class="code-block"><span class="kw">import</span> asyncio
-<span class="kw">import</span> logging
-<span class="kw">from</span> contextlib <span class="kw">import</span> asynccontextmanager
-<span class="kw">from</span> pathlib <span class="kw">import</span> Path
-
-<span class="kw">import</span> yaml
-<span class="kw">from</span> playwright.async_api <span class="kw">import</span> async_playwright, Browser, BrowserContext, Page</div>
-
-<div class="explain">
-<strong>What each import does:</strong>
-</div>
-
-<table class="kw-table" style="width:100%;border-collapse:collapse;margin:12px 0;font-size:.9rem">
-<tr><th style="background:#f5f5f5;text-align:left;padding:8px 12px;color:var(--grey);font-size:.8rem;text-transform:uppercase">Import</th><th style="background:#f5f5f5;text-align:left;padding:8px 12px;color:var(--grey);font-size:.8rem;text-transform:uppercase">What it is</th><th style="background:#f5f5f5;text-align:left;padding:8px 12px;color:var(--grey);font-size:.8rem;text-transform:uppercase">Why we need it</th></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap">asyncio</td><td style="padding:8px 12px;border-top:1px solid #eee">Python's async library</td><td style="padding:8px 12px;border-top:1px solid #eee">Lets us do things without blocking (explained below)</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap">logging</td><td style="padding:8px 12px;border-top:1px solid #eee">Status message printer</td><td style="padding:8px 12px;border-top:1px solid #eee">Prints "Browser started", "Browser closed", etc.</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap">asynccontextmanager</td><td style="padding:8px 12px;border-top:1px solid #eee">A special decorator</td><td style="padding:8px 12px;border-top:1px solid #eee">Enables the "open → use → auto-close" pattern (explained below)</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap">Path</td><td style="padding:8px 12px;border-top:1px solid #eee">File path helper</td><td style="padding:8px 12px;border-top:1px solid #eee">Builds the path to scraper.yaml</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap">yaml</td><td style="padding:8px 12px;border-top:1px solid #eee">YAML parser</td><td style="padding:8px 12px;border-top:1px solid #eee">Reads config/scraper.yaml settings</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap">async_playwright</td><td style="padding:8px 12px;border-top:1px solid #eee">Playwright launcher</td><td style="padding:8px 12px;border-top:1px solid #eee">Opens the browser automation engine</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap">Browser, BrowserContext, Page</td><td style="padding:8px 12px;border-top:1px solid #eee">Type hints</td><td style="padding:8px 12px;border-top:1px solid #eee">Just labels — help VS Code suggest autocomplete</td></tr>
-</table>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- CONCEPT: ASYNC/AWAIT -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="concept">
-<h3>Concept: What is "async" and "await"?</h3>
-<p><strong>Normal code (synchronous):</strong> Do one thing, wait for it to finish, then do the next thing.</p>
-<div class="code-block"><span class="cm"># SYNCHRONOUS (slow)</span>
-page.goto("google.com")     <span class="cm"># Wait 3 seconds for page to load...</span>
-page.goto("flights.com")    <span class="cm"># Then wait 3 more seconds...</span>
-<span class="cm"># Total: 6 seconds</span></div>
-
-<p><strong>Async code:</strong> Start something, and while waiting, do other useful work.</p>
-<div class="code-block"><span class="cm"># ASYNC (fast)</span>
-<span class="kw">await</span> page.goto("google.com")      <span class="cm"># Start loading, wait...</span>
-<span class="kw">await</span> page.goto("flights.com")     <span class="cm"># Start loading, wait...</span>
-<span class="cm"># Total: still 6 seconds (Playwright handles the waiting)</span></div>
-
-<p><strong>The real benefit:</strong> If we wanted to scrape 12 routes, async lets us open multiple tabs simultaneously instead of one-by-one. For now, we only use one tab — but the code is ready for parallel scraping.</p>
-<p><strong>In short:</strong> <code>async def</code> = "this function might need to wait for something." <code>await</code> = "wait here, but don't block other code."</p>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- CONCEPT: CONTEXT MANAGER -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="concept">
-<h3>Concept: What is a "context manager" (the with / async with pattern)?</h3>
-<p>A context manager is a pattern that <strong>guarantees cleanup</strong>. It works in 3 steps:</p>
-
-<div class="code-block"><span class="cm"># STEP 1: Open (setup)</span>
-<span class="cm"># STEP 2: Use (do work)</span>
-<span class="cm"># STEP 3: Close (cleanup) — ALWAYS runs, even if step 2 crashes</span>
-
-<span class="cm"># Regular context manager (sync):</span>
-<span class="kw">with</span> open("file.txt") <span class="kw">as</span> f:
-    data = f.read()     <span class="cm"># If this crashes, the file STILL gets closed</span>
-
-<span class="cm"># Async context manager (what this file uses):</span>
-<span class="kw">async with</span> create_browser_context() <span class="kw">as</span> context:
-    page = <span class="kw">await</span> context.new_page()  <span class="cm"># If this crashes, the browser STILL gets closed</span></div>
-
-<div class="analogy">
-<h3>Analogy: Opening a hotel room</h3>
-<p>• <strong>Check-in</strong> = <code>async with</code> opens the door</p>
-<p>• <strong>Staying in the room</strong> = the code inside the block runs</p>
-<p>• <strong>Check-out</strong> = <code>finally</code> block closes the browser</p>
-<p>Even if you leave in a hurry, the hotel still processes your checkout. The <code>finally</code> block is your automatic checkout.</p>
-</div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- SECTION 2: PATH AND LOGGER -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section"><span class="num">2</span> Config path and logger — Setting up</div>
-
-<div class="code-block">CONFIG_PATH = Path(__file__).resolve().parent.parent.parent / "config" / "scraper.yaml"
-log = logging.getLogger(__name__)</div>
-
-<div class="explain">
-<strong>Line 1:</strong> Builds the path to <code>config/scraper.yaml</code>. Same technique as database.py — <code>__file__</code> finds this file, <code>.parent.parent.parent</code> goes up 3 folders to the project root.
-</div>
-
-<div class="code-block"><span class="cm"># This file is at: src/scraper/driver.py</span>
-<span class="cm"># Go up 3 levels:  src/scraper/ → src/ → project root</span>
-<span class="cm"># Then:  config/scraper.yaml</span>
-<span class="cm"># Result: C:\Users\you\Desktop\SIH-2026\config\scraper.yaml</span></div>
-
-<div class="explain">
-<strong>Line 2:</strong> Creates a logger named <code>"src.scraper.driver"</code>. Any messages it prints will show this name, so you know which file produced them.
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- SECTION 3: LOAD_SCRAPER_CONFIG -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section"><span class="num">3</span> load_scraper_config() — Reading settings from YAML</div>
-
-<div class="code-block"><span class="kw">def</span> <span class="fn">load_scraper_config</span>() -> dict:
-    <span class="kw">with</span> open(CONFIG_PATH) <span class="kw">as</span> f:
-        <span class="kw">return</span> yaml.safe_load(f)[<span class="st">"scraper"</span>]</div>
-
-<div class="explain">
-<strong>What this does:</strong> Reads the scraper.yaml file and returns the <code>scraper</code> section as a Python dictionary.
-</div>
-
-<div class="code-block"><span class="cm"># What scraper.yaml contains:</span>
-scraper:
-  headless: <span class="kw">false</span>
-  viewport_width: <span class="st">1280</span>
-  viewport_height: <span class="st">900</span>
-  user_agent: <span class="st">"Mozilla/5.0 ..."</span>
-  page_load_timeout: <span class="st">30</span>
-
-<span class="cm"># What this function returns (a Python dictionary):</span>
-{
-  <span class="st">"headless"</span>: <span class="kw">False</span>,
-  <span class="st">"viewport_width"</span>: <span class="st">1280</span>,
-  <span class="st">"viewport_height"</span>: <span class="st">900</span>,
-  <span class="st">"user_agent"</span>: <span class="st">"Mozilla/5.0 ..."</span>,
-  <span class="st">"page_load_timeout"</span>: <span class="st">30</span>
-}</div>
-
-<div class="explain">
-<strong>Why <code>["scraper"]</code>?</strong> The YAML file has a top-level key called <code>scraper:</code>. We only want the settings under it, not the whole file. <code>["scraper"]</code> extracts just that section.
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- SECTION 4: THE MAIN FUNCTION -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section"><span class="num">4</span> create_browser_context() — The main function (the entire file revolves around this)</div>
-
-<div class="code-block"><span class="kw">@asynccontextmanager</span>
-<span class="kw">async def</span> <span class="fn">create_browser_context</span>(config: dict | None = None):</div>
-
-<div class="explain">
-<strong>Line 1:</strong> <code>@asynccontextmanager</code> is a decorator that turns this function into a context manager — meaning it can be used with <code>async with</code>. Without this decorator, the <code>async with</code> pattern wouldn't work.
-</div>
-
-<div class="explain">
-<strong>Line 2:</strong> <code>async def</code> means this function uses <code>await</code> inside. <code>config: dict | None = None</code> means: optionally pass a settings dictionary. If you don't, it loads from the YAML file.
-</div>
-
-<!-- DOCSTRING -->
-<div class="code-block"><span class="kw">async def</span> <span class="fn">create_browser_context</span>(config: dict | None = None):
-    <span class="st">"""Launch headless Chromium and yield a fresh browser context.
-
-    Usage:
-        async with create_browser_context() as context:
-            page = await context.new_page()
-            await page.goto("https://google.com")
-    """</span></div>
-
-<div class="explain">
-<strong>The docstring:</strong> Shows how to use this function. The <code>Usage:</code> section is like a mini-tutorial — it shows the exact code you'd write to use this function.
-</div>
-
-<!-- CONFIG LOADING -->
-<div class="code-block">    cfg = config <span class="kw">or</span> load_scraper_config()</div>
-
-<div class="explain">
-<strong>What this does:</strong> If someone passed a config dictionary, use it. Otherwise, load settings from the YAML file.
-</div>
-
-<div class="code-block"><span class="cm"># This is shorthand for:</span>
-<span class="kw">if</span> config <span class="kw">is not</span> None:
-    cfg = config          <span class="cm"># Use what was passed</span>
-<span class="kw">else</span>:
-    cfg = load_scraper_config()  <span class="cm"># Load from file</span></div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- SECTION 5: LAUNCHING PLAYWRIGHT -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section"><span class="num">5</span> Step 1: Launch Playwright and open the browser</div>
-
-<div class="code-block">    <span class="kw">async with</span> async_playwright() <span class="kw">as</span> pw:
-        browser: Browser = <span class="kw">await</span> pw.chromium.launch(
-            headless=cfg.get(<span class="st">"headless"</span>, <span class="kw">True</span>),
-        )</div>
-
-<div class="explain">
-<strong>Line 1:</strong> <code>async with async_playwright() as pw:</code> — Starts the Playwright engine. <code>pw</code> is now the master controller. The <code>async with</code> ensures Playwright shuts down cleanly when we're done.
-</div>
-
-<div class="explain">
-<strong>Lines 2-4:</strong> <code>await pw.chromium.launch(headless=...)</code> — Launches the Chromium browser. <code>headless=False</code> means you'll SEE the browser window on your screen. <code>headless=True</code> means it runs invisible in the background.
-</div>
-
-<div class="code-block"><span class="cm"># From scraper.yaml:</span>
-headless: <span class="kw">false</span>       <span class="cm"># You can see the browser window</span>
-<span class="cm"># If set to true:</span>
-headless: <span class="kw">true</span>        <span class="cm"># Runs invisible, faster but can't watch it</span></div>
-
-<div class="concept">
-<h3>What does "headless" mean?</h3>
-<p><strong>Headless = no visible window.</strong> The browser runs entirely in the background — you can't see it. It's faster and uses less memory.</p>
-<p><strong>Headed = visible window.</strong> You can watch the browser open, navigate, and scrape. Great for demos and debugging.</p>
-<p>Right now we have <code>headless: false</code> so you can see it working when you run the scraper.</p>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- SECTION 6: CREATING CONTEXT -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section"><span class="num">6</span> Step 2: Create a browser context (Incognito window)</div>
-
-<div class="code-block">        context: BrowserContext = <span class="kw">await</span> browser.new_context(
-            viewport={
-                <span class="st">"width"</span>: cfg.get(<span class="st">"viewport_width"</span>, <span class="st">1280</span>),
-                <span class="st">"height"</span>: cfg.get(<span class="st">"viewport_height"</span>, <span class="st">900</span>),
-            },
-            user_agent=cfg.get(<span class="st">"user_agent"</span>),
-        )</div>
-
-<div class="explain">
-<strong>What this does:</strong> Creates an isolated browser session — like opening an Incognito window in Chrome. This context has its own cookies, history, and settings, separate from any other session.
-</div>
-
-<div class="code-block"><span class="cm"># From scraper.yaml, these settings get used:</span>
-viewport_width: <span class="st">1280</span>       <span class="cm"># Window width in pixels</span>
-viewport_height: <span class="st">900</span>       <span class="cm"># Window height in pixels</span>
-user_agent: <span class="st">"Mozilla/5.0 (Windows NT 10.0; Win64; x64)..."</span>
-                            <span class="cm"># Makes us look like a real Chrome browser</span></div>
-
-<div class="concept">
-<h3>What is a "user agent"?</h3>
-<p>When your browser visits a website, it sends a "user agent" string — a text that says "I'm Chrome 120 on Windows 10." Websites use this to detect bots.</p>
-<p>By setting a realistic user agent, Google Flights thinks we're a real person browsing, not a script. It's like wearing a disguise.</p>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- SECTION 7: TIMEOUT -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section"><span class="num">7</span> Step 3: Set the timeout</div>
-
-<div class="code-block">        context.set_default_timeout(cfg.get(<span class="st">"page_load_timeout"</span>, <span class="st">30</span>) * <span class="st">1000</span>)</div>
-
-<div class="explain">
-<strong>What this does:</strong> Sets the default timeout for all page operations to 30 seconds. If any action (like loading a page or finding an element) takes longer than 30 seconds, Playwright will throw an error instead of waiting forever.
-</div>
-
-<div class="code-block"><span class="cm"># From scraper.yaml:</span>
-page_load_timeout: <span class="st">30</span>       <span class="cm"># 30 seconds</span>
-
-<span class="cm"># The code multiplies by 1000 because Playwright uses milliseconds:</span>
-<span class="cm"># 30 seconds × 1000 = 30,000 milliseconds</span>
-
-<span class="cm"># Why? Because most web APIs use milliseconds, not seconds.</span>
-<span class="cm"># 30,000 ms = 30 s — same thing, different units.</span></div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- SECTION 8: YIELD + CLEANUP -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section"><span class="num">8</span> Step 4: Hand over the context + cleanup</div>
-
-<div class="code-block">        log.info(<span class="st">"Browser context created"</span>)
-        <span class="kw">try</span>:
-            <span class="kw">yield</span> context
-        <span class="kw">finally</span>:
-            <span class="kw">await</span> context.close()
-            <span class="kw">await</span> browser.close()
-            log.info(<span class="st">"Browser closed"</span>)</div>
-
-<div class="explain">
-<strong>This is the most important part of the file.</strong> Let's go line by line:
-</div>
-
-<div class="code-block"><span class="kw">yield</span> context   <span class="cm"># ← THE MAGIC LINE</span></div>
-
-<div class="concept">
-<h3>What does "yield" do here?</h3>
-<p><code>yield</code> is like saying: <strong>"Here's the browser context — go use it. I'll pause here and wait for you to finish."</strong></p>
-<p>After <code>yield</code>, the function <strong>pauses</strong>. The code that called this function now has the <code>context</code> and can create pages, navigate to URLs, scrape data — whatever it needs.</p>
-<p>When the caller is done (or crashes), execution <strong>resumes right after yield</strong> — and hits the <code>finally</code> block.</p>
-</div>
-
-<div class="explain">
-<strong>The try/finally pattern:</strong>
-</div>
-
-<div class="code-block"><span class="kw">try</span>:
-    <span class="kw">yield</span> context          <span class="cm"># Give context to the caller. Pause here.</span>
-                            <span class="cm"># ... caller does its work ...</span>
-                            <span class="cm"># ... could take 5 seconds or 5 minutes ...</span>
-
-<span class="kw">finally</span>:                   <span class="cm"># ← THIS ALWAYS RUNS</span>
-    <span class="kw">await</span> context.close()  <span class="cm"># Close all tabs</span>
-    <span class="kw">await</span> browser.close()  <span class="cm"># Close the browser</span>
-    log.info(<span class="st">"Browser closed"</span>)  <span class="cm"># Print confirmation</span></div>
-
-<div class="analogy">
-<h3>Analogy: A vending machine</h3>
-<p>• You put in money → machine gives you a snack (that's <code>yield</code>)</p>
-<p>• You eat the snack</p>
-<p>• When you walk away, the machine <strong>resets itself</strong> automatically (that's <code>finally</code>)</p>
-<p>Even if you trip and fall while eating, the machine still resets. The <code>finally</code> block is the automatic reset.</p>
-</div>
-
-<div class="warning">
-<h3>Why close context AND browser separately?</h3>
-<p><code>context.close()</code> = Closes all tabs/cookies in this session</p>
-<p><code>browser.close()</code> = Shuts down the Chromium process entirely</p>
-<p>You need to close both because the context is inside the browser. If you only close the context, the browser process keeps running in the background (eating RAM). Closing the browser kills the process completely.</p>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- FULL EXECUTION TIMELINE -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section"><span class="num">9</span> Full execution timeline — What happens when you run it</div>
-
-<div class="explain">
-<strong>When the scraper calls this function, here's the exact sequence:</strong>
-</div>
-
-<div class="timeline">
-<div class="tl-item active">
-<h4>1. Load config</h4>
-<p>Reads scraper.yaml. Gets headless, viewport, user_agent, timeout settings.</p>
-</div>
-<div class="tl-item active">
-<h4>2. Start Playwright</h4>
-<p><code>async_playwright()</code> starts the automation engine.</p>
-</div>
-<div class="tl-item active">
-<h4>3. Launch Chromium</h4>
-<p><code>pw.chromium.launch()</code> opens a Chromium browser window (visible since headless=false).</p>
-</div>
-<div class="tl-item active">
-<h4>4. Create context</h4>
-<p><code>browser.new_context()</code> creates an Incognito-like session with 1280×900 viewport and custom user agent.</p>
-</div>
-<div class="tl-item active">
-<h4>5. Set timeout</h4>
-<p>All page operations will timeout after 30 seconds.</p>
-</div>
-<div class="tl-item active">
-<h4>6. Log "Browser context created"</h4>
-<p>Prints confirmation to terminal.</p>
-</div>
-<div class="tl-item active">
-<h4>7. yield context → SCRAPER TAKES OVER</h4>
-<p>Function pauses. The scraper creates pages, visits Google Flights, scrapes data...</p>
-</div>
-<div class="tl-item cleanup">
-<h4>8. yield returns → BACK TO THIS FUNCTION</h4>
-<p>Scraper finishes (or crashes). Execution resumes here.</p>
-</div>
-<div class="tl-item cleanup">
-<h4>9. context.close()</h4>
-<p>Closes all tabs and the Incognito session.</p>
-</div>
-<div class="tl-item cleanup">
-<h4>10. browser.close()</h4>
-<p>Kills the Chromium process. Frees memory.</p>
-</div>
-<div class="tl-item cleanup">
-<h4>11. Log "Browser closed"</h4>
-<p>Prints confirmation. Done.</p>
-</div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- HOW OTHER CODE USES THIS -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section"><span class="num">10</span> How other code uses this file</div>
-
-<div class="explain">
-<strong>The scraper (google_flights.py) calls this function like this:</strong>
-</div>
-
-<div class="code-block"><span class="kw">from</span> src.scraper.driver <span class="kw">import</span> create_browser_context
-
-<span class="kw">async with</span> create_browser_context() <span class="kw">as</span> context:
-    page = <span class="kw">await</span> context.new_page()        <span class="cm"># Create a new tab</span>
-    <span class="kw">await</span> page.goto(<span class="st">"https://google.com"</span>)  <span class="cm"># Visit Google Flights</span>
-    <span class="cm"># ... scrape flight data ...</span>
-
-<span class="cm"># After the "async with" block ends, the browser is automatically closed.</span>
-<span class="cm"># You don't need to remember to close it — it's guaranteed.</span></div>
-
-<div class="concept">
-<h3>The full call chain</h3>
-<p>When you run <code>python src/test_scraper.py</code>:</p>
-<div class="code-block">test_scraper.py
-  → google_flights.py  (calls create_browser_context)
-    → driver.py        (opens browser)
-      → Chromium       (the actual browser)
-        → visits google.com/travel/flights
-        → scrapes aria-labels
-        → returns flight data
-      → driver.py      (closes browser)
-    → google_flights.py (saves to database)
-  → test_scraper.py    (prints results)</div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- SUMMARY -->
-<!-- ═══════════════════════════════════════════════════════════ -->
 <div class="card">
-<h2>Summary — Every line in plain English</h2>
-<table class="kw-table" style="width:100%;border-collapse:collapse;margin:12px 0;font-size:.9rem">
-<tr><th style="background:#f5f5f5;text-align:left;padding:8px 12px;color:var(--grey);font-size:.8rem;text-transform:uppercase">Line</th><th style="background:#f5f5f5;text-align:left;padding:8px 12px;color:var(--grey);font-size:.8rem;text-transform:uppercase">Code</th><th style="background:#f5f5f5;text-align:left;padding:8px 12px;color:var(--grey);font-size:.8rem;text-transform:uppercase">What it does</th></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue)">1</td><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-size:.85rem">import asyncio</td><td style="padding:8px 12px;border-top:1px solid #eee">Import async support</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue)">2</td><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-size:.85rem">import logging</td><td style="padding:8px 12px;border-top:1px solid #eee">Import logger</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue)">3</td><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-size:.85rem">from contextlib import asynccontextmanager</td><td style="padding:8px 12px;border-top:1px solid #eee">Import the auto-cleanup decorator</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue)">4</td><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-size:.85rem">from pathlib import Path</td><td style="padding:8px 12px;border-top:1px solid #eee">Import path helper</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue)">6</td><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-size:.85rem">import yaml</td><td style="padding:8px 12px;border-top:1px solid #eee">Import YAML reader</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue)">7</td><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-size:.85rem">from playwright.async_api import ...</td><td style="padding:8px 12px;border-top:1px solid #eee">Import Playwright browser automation</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue)">9</td><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-size:.85rem">CONFIG_PATH = Path(...)</td><td style="padding:8px 12px;border-top:1px solid #eee">Set path to scraper.yaml</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue)">10</td><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-size:.85rem">log = logging.getLogger(...)</td><td style="padding:8px 12px;border-top:1px solid #eee">Create a logger for this file</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue)">13</td><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-size:.85rem">def load_scraper_config()</td><td style="padding:8px 12px;border-top:1px solid #eee">Read settings from scraper.yaml</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue)">14-15</td><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-size:.85rem">with open(...) as f: return yaml.safe_load(...)</td><td style="padding:8px 12px;border-top:1px solid #eee">Open YAML file, parse, return scraper section</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue)">18</td><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-size:.85rem">@asynccontextmanager</td><td style="padding:8px 12px;border-top:1px solid #eee">Enable the async with pattern</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue)">19</td><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-size:.85rem">async def create_browser_context(...)</td><td style="padding:8px 12px;border-top:1px solid #eee">Define the browser launcher function</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue)">27</td><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-size:.85rem">cfg = config or load_scraper_config()</td><td style="padding:8px 12px;border-top:1px solid #eee">Load settings (passed or from file)</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue)">29</td><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-size:.85rem">async with async_playwright() as pw:</td><td style="padding:8px 12px;border-top:1px solid #eee">Start Playwright engine</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue)">30-32</td><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-size:.85rem">browser = await pw.chromium.launch(...)</td><td style="padding:8px 12px;border-top:1px solid #eee">Open Chromium (visible/hidden)</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue)">33-39</td><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-size:.85rem">context = await browser.new_context(...)</td><td style="padding:8px 12px;border-top:1px solid #eee">Create Incognito session with window size + user agent</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue)">40</td><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-size:.85rem">context.set_default_timeout(...)</td><td style="padding:8px 12px;border-top:1px solid #eee">Set 30s timeout for all operations</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue)">41</td><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-size:.85rem">log.info("Browser context created")</td><td style="padding:8px 12px;border-top:1px solid #eee">Print "ready" message</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue)">42-43</td><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-size:.85rem">try: yield context</td><td style="padding:8px 12px;border-top:1px solid #eee">Hand browser to caller, pause here</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue)">44-46</td><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-size:.85rem">finally: await context.close(); await browser.close()</td><td style="padding:8px 12px;border-top:1px solid #eee">ALWAYS close tabs + browser when done</td></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue)">47</td><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-size:.85rem">log.info("Browser closed")</td><td style="padding:8px 12px;border-top:1px solid #eee">Print "done" message</td></tr>
-</table>
+<h2>File Overview</h2>
+<p>Below is every line of this file with an explanation of what it does and why.</p>
 </div>
-
-<div class="summary">
-This 47-line file is the <strong>safety net</strong> for the entire scraper. It guarantees that no matter what happens — even if Google blocks us, or the page crashes, or your WiFi dies — the browser will always be closed cleanly. No zombie processes, no leaked memory. Just open, use, close.
+<div class="line-block">
+<div class="line-header">Line 1</div>
+<div class="line-code">import asyncio</div>
+<div class="line-explain">Python's built-in library for asynchronous programming. Lets us do network requests without blocking other operations.</div>
+</div><div class="line-block">
+<div class="line-header">Line 2</div>
+<div class="line-code">import logging</div>
+<div class="line-explain">Python's logging module. Used to print status messages, warnings, and errors in a structured way.</div>
+</div><div class="line-block">
+<div class="line-header">Line 3</div>
+<div class="line-code">from contextlib import asynccontextmanager</div>
+<div class="line-explain">Imports a decorator that creates <strong>async context managers</strong> — a pattern that guarantees setup and cleanup code run properly.</div>
+</div><div class="line-block">
+<div class="line-header">Line 4</div>
+<div class="line-code">from pathlib import Path</div>
+<div class="line-explain">Modern file path handling.</div>
+</div><div class="line-block">
+<div class="line-header">Line 5</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 6</div>
+<div class="line-code">import yaml</div>
+<div class="line-explain">Imports PyYAML for reading .yaml config files.</div>
+</div><div class="line-block">
+<div class="line-header">Line 7</div>
+<div class="line-code">from playwright.async_api import async_playwright, Browser, BrowserContext, Page</div>
+<div class="line-explain">Imports Playwright's async API: <code>async_playwright</code> launches browsers, <code>Browser</code>/<code>BrowserContext</code>/<code>Page</code> are type hints.</div>
+</div><div class="line-block">
+<div class="line-header">Line 8</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 9</div>
+<div class="line-code">CONFIG_PATH = Path(__file__).resolve().parent.parent.parent / "config" / "scraper.yaml"</div>
+<div class="line-explain">Calculates the path to <code>config/scraper.yaml</code>. <code>__file__</code> is this file, go up 3 levels to project root, then into config/.</div>
+</div><div class="line-block">
+<div class="line-header">Line 10</div>
+<div class="line-code">log = logging.getLogger(__name__)</div>
+<div class="line-explain">Creates a logger named after this module. Log messages will show 'src.scraper.driver' as the source.</div>
+</div><div class="line-block">
+<div class="line-header">Line 11</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 12</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 13</div>
+<div class="line-code">def load_scraper_config() -&gt; dict:</div>
+<div class="line-explain">A regular function (not async) that reads the scraper YAML config.</div>
+</div><div class="line-block">
+<div class="line-header">Line 14</div>
+<div class="line-code">    with open(CONFIG_PATH) as f:</div>
+<div class="line-explain">Opens the config file. <code>with</code> ensures the file is closed even if an error occurs.</div>
+</div><div class="line-block">
+<div class="line-header">Line 15</div>
+<div class="line-code">        return yaml.safe_load(f)["scraper"]</div>
+<div class="line-explain"><code>yaml.safe_load</code> parses YAML into a Python dictionary. <code>["scraper"]</code> extracts the 'scraper' section.</div>
+</div><div class="line-block">
+<div class="line-header">Line 16</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 17</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 18</div>
+<div class="line-code">@asynccontextmanager</div>
+<div class="line-explain">Decorator that turns this function into an async context manager. This enables the <code>async with</code> pattern.</div>
+</div><div class="line-block">
+<div class="line-header">Line 19</div>
+<div class="line-code">async def create_browser_context(config: dict | None = None):</div>
+<div class="line-explain">Async function that launches a browser and yields a context. <code>config</code> is optional.</div>
+</div><div class="line-block">
+<div class="line-header">Line 20</div>
+<div class="line-code">    """Launch headless Chromium and yield a fresh browser context.</div>
+<div class="line-explain">Docstring with usage example.</div>
+</div><div class="line-block">
+<div class="line-header">Line 21</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 22</div>
+<div class="line-code">    Usage:</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 23</div>
+<div class="line-code">        async with create_browser_context() as context:</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 24</div>
+<div class="line-code">            page = await context.new_page()</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 25</div>
+<div class="line-code">            await page.goto("https://google.com")</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 26</div>
+<div class="line-code">    """</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 27</div>
+<div class="line-code">    cfg = config or load_scraper_config()</div>
+<div class="line-explain">If no config was passed, load it from the YAML file.</div>
+</div><div class="line-block">
+<div class="line-header">Line 28</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 29</div>
+<div class="line-code">    async with async_playwright() as pw:</div>
+<div class="line-explain">Starts Playwright. <code>pw</code> is the Playwright instance. The <code>async with</code> ensures Playwright is properly shut down when done.</div>
+</div><div class="line-block">
+<div class="line-header">Line 30</div>
+<div class="line-code">        browser: Browser = await pw.chromium.launch(</div>
+<div class="line-explain">Launches a Chromium browser. Returns a Browser object.</div>
+</div><div class="line-block">
+<div class="line-header">Line 31</div>
+<div class="line-code">            headless=cfg.get("headless", True),</div>
+<div class="line-explain">Run without a visible window (default: True).</div>
+</div><div class="line-block">
+<div class="line-header">Line 32</div>
+<div class="line-code">        )</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 33</div>
+<div class="line-code">        context: BrowserContext = await browser.new_context(</div>
+<div class="line-explain">Creates an isolated browser session (like an incognito window).</div>
+</div><div class="line-block">
+<div class="line-header">Line 34</div>
+<div class="line-code">            viewport={</div>
+<div class="line-explain">Sets the browser window size.</div>
+</div><div class="line-block">
+<div class="line-header">Line 35</div>
+<div class="line-code">                "width": cfg.get("viewport_width", 1280),</div>
+<div class="line-explain">Width: 1280 pixels.</div>
+</div><div class="line-block">
+<div class="line-header">Line 36</div>
+<div class="line-code">                "height": cfg.get("viewport_height", 900),</div>
+<div class="line-explain">Height: 900 pixels.</div>
+</div><div class="line-block">
+<div class="line-header">Line 37</div>
+<div class="line-code">            },</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 38</div>
+<div class="line-code">            user_agent=cfg.get("user_agent"),</div>
+<div class="line-explain">Sets the user agent string so we look like a real browser.</div>
+</div><div class="line-block">
+<div class="line-header">Line 39</div>
+<div class="line-code">        )</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 40</div>
+<div class="line-code">        context.set_default_timeout(cfg.get("page_load_timeout", 30) * 1000)</div>
+<div class="line-explain">Default timeout for all page operations: 30 seconds (converted to milliseconds).</div>
+</div><div class="line-block">
+<div class="line-header">Line 41</div>
+<div class="line-code">        log.info("Browser context created")</div>
+<div class="line-explain">Log that the browser is ready.</div>
+</div><div class="line-block">
+<div class="line-header">Line 42</div>
+<div class="line-code">        try:</div>
+<div class="line-explain">Start try block for cleanup.</div>
+</div><div class="line-block">
+<div class="line-header">Line 43</div>
+<div class="line-code">            yield context</div>
+<div class="line-explain">This is the magic line: it gives the caller the browser context to use. Code pauses here until the caller is done.</div>
+</div><div class="line-block">
+<div class="line-header">Line 44</div>
+<div class="line-code">        finally:</div>
+<div class="line-explain">Cleanup code that runs no matter what.</div>
+</div><div class="line-block">
+<div class="line-header">Line 45</div>
+<div class="line-code">            await context.close()</div>
+<div class="line-explain">Close the browser context (all tabs).</div>
+</div><div class="line-block">
+<div class="line-header">Line 46</div>
+<div class="line-code">            await browser.close()</div>
+<div class="line-explain">Close the browser entirely.</div>
+</div><div class="line-block">
+<div class="line-header">Line 47</div>
+<div class="line-code">            log.info("Browser closed")</div>
+<div class="line-explain">Log that cleanup is complete.</div>
 </div>
-
+<div class="card">
+<h2>Summary</h2>
+<p>This file has <strong>47 lines</strong>.</p>
+</div>
 <div class="nav"><a href="09-base-py.html">&larr; Previous</a><a href="11-google-flights-py.html">Next &rarr;</a></div>
-
 </div>
 </body>
 </html>

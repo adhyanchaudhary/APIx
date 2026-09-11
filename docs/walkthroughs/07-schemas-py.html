@@ -213,32 +213,36 @@ header .sub{opacity:.75;margin-top:4px;font-size:.9rem}
 <div class="line-explain">The date of this index value (e.g., '2026-09-04').</div>
 </div><div class="line-block">
 <div class="line-header">Line 44</div>
+<div class="line-code">    lead_window_days: int</div>
+<div class="line-explain">Which advance-purchase window this entry belongs to (1, 7, or 30). Added in Phase 3 so each lead window gets its own index.</div>
+</div><div class="line-block">
+<div class="line-header">Line 45</div>
 <div class="line-code">    route: str</div>
 <div class="line-explain">Which route this index entry is for.</div>
 </div><div class="line-block">
-<div class="line-header">Line 45</div>
+<div class="line-header">Line 46</div>
 <div class="line-code">    weight: float</div>
 <div class="line-explain">This route's weight in the basket.</div>
 </div><div class="line-block">
-<div class="line-header">Line 46</div>
+<div class="line-header">Line 47</div>
 <div class="line-code">    route_price: float</div>
 <div class="line-explain">Lowest fare on this route on this date.</div>
 </div><div class="line-block">
-<div class="line-header">Line 47</div>
+<div class="line-header">Line 48</div>
 <div class="line-code">    route_index: float</div>
 <div class="line-explain">This route's index value (route_price / base_price * 100).</div>
 </div><div class="line-block">
-<div class="line-header">Line 48</div>
+<div class="line-header">Line 49</div>
 <div class="line-code">    aggregate_index: float</div>
 <div class="line-explain">The overall weighted index across all routes.</div>
 </div><div class="line-block">
-<div class="line-header">Line 49</div>
+<div class="line-header">Line 50</div>
 <div class="line-code">    base_period: str</div>
 <div class="line-explain">Which date was used as the base period (index=100).</div>
 </div>
 <div class="card">
 <h2>Summary</h2>
-<p>This file has <strong>49 lines</strong>.</p>
+<p>This file has <strong>50 lines</strong>.</p>
 </div>
 <div class="nav"><a href="06-indexer-yaml.html">&larr; Previous</a><a href="08-database-py.html">Next &rarr;</a></div>
 </div>

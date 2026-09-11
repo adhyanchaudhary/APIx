@@ -55,6 +55,7 @@ DAILY_INDEX = """
 CREATE TABLE IF NOT EXISTS daily_index (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     index_date TEXT NOT NULL,
+    lead_window_days INTEGER NOT NULL,
     route TEXT NOT NULL,
     weight REAL,
     route_price REAL,
@@ -68,6 +69,7 @@ WEEKLY_INDEX = """
 CREATE TABLE IF NOT EXISTS weekly_index (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     index_date TEXT NOT NULL,
+    lead_window_days INTEGER NOT NULL,
     route TEXT NOT NULL,
     weight REAL,
     route_price REAL,
@@ -81,6 +83,7 @@ MONTHLY_INDEX = """
 CREATE TABLE IF NOT EXISTS monthly_index (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     index_date TEXT NOT NULL,
+    lead_window_days INTEGER NOT NULL,
     route TEXT NOT NULL,
     weight REAL,
     route_price REAL,

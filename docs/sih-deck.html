@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>APIx - SIH Deck</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #f0f0f0; font-family: 'Segoe UI', Tahoma, sans-serif; color: #222; }
+  .slide {
+    width: 1440px; min-height: 810px; margin: 40px auto;
+    background: #fff; border: 1px solid #ccc;
+    padding: 44px 56px 40px; position: relative;
+    page-break-after: always;
+  }
+  .slide + .slide { margin-top: 48px; }
+  .slide-num {
+    position: absolute; top: 12px; right: 20px;
+    font-size: 11px; color: #999; font-weight: 600;
+  }
+  h2 {
+    font-size: 24px; font-weight: 700; margin-bottom: 4px;
+    border-bottom: 3px solid #222; display: inline-block;
+    padding-bottom: 2px;
+  }
+  h2 span { font-weight: 400; color: #555; font-size: 18px; margin-left: 8px; }
+  .sub { font-size: 13px; color: #666; margin-bottom: 24px; margin-top: 6px; }
+  h3 { font-size: 14px; font-weight: 700; margin-bottom: 6px; color: #333; }
+  p, li { font-size: 13px; line-height: 1.5; color: #333; }
+  ul { padding-left: 18px; }
+  li { margin-bottom: 3px; }
+  code {
+    font-family: 'Cascadia Code', Consolas, monospace;
+    font-size: 12px; background: #f5f5f5; padding: 1px 4px;
+    border: 1px solid #ddd;
+  }
+  pre {
+    font-family: 'Cascadia Code', Consolas, monospace;
+    font-size: 12px; background: #f9f9f9; border: 1px solid #ddd;
+    padding: 10px 12px; margin-top: 6px; line-height: 1.5;
+    overflow-x: auto; white-space: pre;
+  }
+  table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+    margin-top: 10px;
+  }
+  th, td {
+    border: 1px solid #ccc; padding: 7px 10px; text-align: left;
+  }
+  th { background: #f5f5f5; font-weight: 700; }
+  tr:nth-child(even) { background: #fafafa; }
+  .bold { font-weight: 700; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 20px 0; }
+  .note {
+    font-size: 12px; color: #888; font-style: italic; margin-top: 8px;
+  }
+
+  /* flow */
+  .flow {
+    display: flex; gap: 6px; align-items: stretch;
+  }
+  .flow-box {
+    flex: 1; border: 2px solid #555; border-radius: 6px;
+    padding: 12px 10px; position: relative; background: #fff;
+  }
+  .flow-box.narrow { flex: 0.7; }
+  .flow-box.wide { flex: 1.2; }
+  .flow-box-num {
+    position: absolute; top: -10px; left: 10px;
+    background: #333; color: #fff; font-size: 11px; font-weight: 700;
+    width: 20px; height: 20px; border-radius: 50%;
+    display: grid; place-items: center;
+  }
+  .flow-arrow {
+    flex: 0 0 28px; display: flex; align-items: center;
+    justify-content: center; font-size: 20px; color: #999;
+    user-select: none;
+  }
+  .flow-box h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .flow-box p, .flow-box li { font-size: 12px; }
+
+  /* constraint row */
+  .constraints {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px;
+  }
+  .c-tag {
+    font-size: 11px; font-weight: 600; background: #f0f0f0;
+    border: 1px solid #ccc; border-radius: 4px;
+    padding: 4px 9px; color: #444;
+  }
+  .c-tag.warn { background: #fff8e1; border-color: #ffe082; color: #795548; }
+  .c-tag.scale { background: #e8f5e9; border-color: #a5d6a7; color: #2e7d32; }
+
+  /* problem page */
+  .ps-cols { display: flex; gap: 24px; margin-top: 16px; }
+  .ps-col { flex: 1; }
+  .ps-col h3 { font-size: 16px; margin-bottom: 10px; border-bottom: 2px solid; padding-bottom: 4px; }
+  .ps-col.red h3 { border-color: #c62828; color: #c62828; }
+  .ps-col.green h3 { border-color: #2e7d32; color: #2e7d32; }
+  .ps-col ul { font-size: 13.5px; }
+  .ps-col li { margin-bottom: 8px; }
+  .ps-col strong { color: #000; }
+
+  .pipeline-row {
+    display: flex; align-items: center; gap: 0; margin-top: 20px;
+    background: #fafafa; border: 1px solid #ddd; border-radius: 4px;
+    padding: 14px 16px;
+  }
+  .pipeline-row .p-step {
+    flex: 1; text-align: center;
+  }
+  .pipeline-row .p-step strong { display: block; font-size: 13px; color: #333; }
+  .pipeline-row .p-step small { font-size: 11px; color: #999; }
+  .pipeline-row .p-arr { flex: 0 0 24px; text-align: center; color: #bbb; font-size: 16px; }
+</style>
+</head>
+<body>
+
+<!-- ========== SLIDE 0: PROBLEM + SOLUTION ========== -->
+<div class="slide">
+  <div class="slide-num">0 / 4</div>
+  <h2>Real-time Airfare Price Index <span>(APIx)</span></h2>
+  <p class="sub">SIH 2026 &mdash; Automated Airfare Data Collection, Indexing &amp; Prediction Platform</p>
+
+  <div class="ps-cols">
+    <div class="ps-col red">
+      <h3>Problem</h3>
+      <ul>
+        <li>MoSPI measures airfare inflation via <strong>manual price collection</strong> from limited physical ticketing outlets. Over <strong>90% of domestic fares</strong> are sold online.</li>
+        <li>Indian airfares swing <strong>200-400% within a single day</strong> due to dynamic pricing. Monthly CPI surveys cannot capture this.</li>
+        <li>RBI needs <strong>high-frequency, route-specific fare data</strong> for monetary policy. Current data is weeks old and unrepresentative.</li>
+        <li>The CPI airfare basket <strong>misses OTA-only deals, dynamic surcharges, and coupon-based pricing</strong> entirely.</li>
+      </ul>
+    </div>
+    <div class="ps-col green">
+      <h3>Our Solution</h3>
+      <ul>
+        <li><strong>Automated Playwright scraper</strong> pulls live prices from Google Flights daily &mdash; 12 city-pairs, 3 purchase windows (T+1, T+7, T+30).</li>
+        <li><strong>Pandas cleaning pipeline</strong> deduplicates, handles missing data, detects statistical outliers, scores data quality.</li>
+        <li><strong>APIx weighted basket index</strong> computed daily/weekly/monthly using DGCA traffic-share weights (Laspeyres-style, base period = 100).</li>
+        <li><strong>ML prediction layer (Phase 2):</strong> neural network trained on accumulated price history to forecast weekly fare movements per route.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pipeline-row">
+    <div class="p-step"><strong>Scrape</strong><small>Playwright</small></div>
+    <div class="p-arr">&rarr;</div>
+    <div class="p-step"><strong>Clean</strong><small>Pandas</small></div>
+    <div class="p-arr">&rarr;</div>
+    <div class="p-step"><strong>Index</strong><small>Weighted basket</small></div>
+    <div class="p-arr">&rarr;</div>
+    <div class="p-step"><strong>Dashboard</strong><small>Streamlit</small></div>
+    <div class="p-arr">&rarr;</div>
+    <div class="p-step"><strong>Predict</strong><small>Neural net</small></div>
+  </div>
+
+  <div style="margin-top: 18px; font-size: 12px; color: #666; line-height: 1.6;">
+    <strong>MVP scope:</strong> Google Flights as sole source &bull; 4 metro cities (DEL, BOM, BLR, MAA) &bull; 12 directional routes &bull; 3 lead-time windows &bull; SQLite storage &bull; Streamlit dashboard &bull; &le; 45 min daily full run &bull; MAE target &lt; 5% vs DGCA monthly data
+  </div>
+</div>
+
+<!-- ========== SLIDE 1: SCRAPING ========== -->
+<div class="slide">
+  <div class="slide-num">1 / 4</div>
+  <h2>Phase 1 <span>Data Extraction</span></h2>
+  <p class="sub">Google Flights &rarr; Playwright browser &rarr; aria-label parsing &rarr; raw_flights (SQLite)</p>
+
+  <div class="flow">
+    <div class="flow-box narrow">
+      <div class="flow-box-num">1</div>
+      <h3>Config</h3>
+      <p><code>routes.yaml</code> defines:</p>
+      <ul>
+        <li>12 directional routes</li>
+        <li>Lead windows: T+1, T+7, T+30</li>
+        <li>DGCA traffic-share weights</li>
+      </ul>
+    </div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box narrow">
+      <div class="flow-box-num">2</div>
+      <h3>Build URL</h3>
+      <p>Per route &times; window:</p>
+      <ul>
+        <li><code>travel = scrape + lead</code></li>
+        <li>Google query built from origin, dest, date</li>
+        <li>Currency forced to INR</li>
+      </ul>
+    </div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box">
+      <div class="flow-box-num">3</div>
+      <h3>Playwright Browser</h3>
+      <p>Opens real Chromium, loads Google Flights SPA:</p>
+      <ul>
+        <li>Waits for JS-rendered results (selectors: <code>li.pIav2d</code>)</li>
+        <li>Collects all aria-labels containing "rupees" + "flight" via <code>page.evaluate()</code></li>
+      </ul>
+    </div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box">
+      <div class="flow-box-num">4</div>
+      <h3>Parse aria-labels</h3>
+      <p>Regex extracts from raw label text:</p>
+      <ul>
+        <li>Price: <code>From ₹12,882</code></li>
+        <li>Carrier, departure/arrival time, stops, duration</li>
+        <li>Validated into Pydantic <code>FlightRecord</code></li>
+      </ul>
+    </div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box narrow">
+      <div class="flow-box-num">5</div>
+      <h3>Store</h3>
+      <p>Batch insert into <code>raw_flights</code> table via <code>executemany()</code>. Per-route failures logged, retries with backoff.</p>
+    </div>
+  </div>
+
+  <hr>
+  <p style="font-size: 12px; font-weight: 700; color: #555; margin-bottom: 6px;">CONSTRAINTS</p>
+  <div class="constraints">
+    <div class="c-tag">Max 60 requests / hour</div>
+    <div class="c-tag">Random delay 3&ndash;8 s between requests</div>
+    <div class="c-tag">3 retries, exponential backoff (3 &rarr; 6 &rarr; 12 s)</div>
+    <div class="c-tag">Page timeout 30 s, element wait 15 s</div>
+    <div class="c-tag">Human-like User-Agent, robots.txt-aware</div>
+    <div class="c-tag warn">Anti-bot risk: CAPTCHA, ToS changes</div>
+  </div>
+
+  <hr>
+  <p style="font-size: 12px; font-weight: 700; color: #555; margin-bottom: 6px;">SCALING POINT</p>
+  <div class="constraints">
+    <div class="c-tag scale">Schedule daily via APScheduler &mdash; data compounds automatically</div>
+    <div class="c-tag scale">Widen lead windows: add T+15, T+45 for richer time-series</div>
+    <div class="c-tag scale">Expand to 42+ DGCA city-pairs in Phase 2</div>
+  </div>
+
+  <p class="note" style="margin-top: 16px;">Full basket = 36 route &times; window combos per day; one full run fits well inside the 45-minute NFR budget.</p>
+</div>
+
+<!-- ========== SLIDE 2: CLEANING ========== -->
+<div class="slide">
+  <div class="slide-num">2 / 4</div>
+  <h2>Phase 2 <span>Data Cleaning</span></h2>
+  <p class="sub">raw_flights &rarr; dedup &rarr; outlier detection &rarr; quality scoring &rarr; cleaned_flights</p>
+
+  <div class="flow">
+    <div class="flow-box">
+      <div class="flow-box-num">1</div>
+      <h3>Deduplication</h3>
+      <p>MD5 hash computed on:</p>
+      <pre>route | carrier | depart_time
+| total_fare | lead_window_days</pre>
+      <p>Duplicate rows (same flight scraped twice) removed before any analysis.</p>
+    </div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box narrow">
+      <div class="flow-box-num">2</div>
+      <h3>Missing Fares</h3>
+      <p>Two strategies, configurable in <code>indexer.yaml</code>:</p>
+      <ul>
+        <li><code>drop</code> &mdash; delete rows with null <code>total_fare</code></li>
+        <li><code>forward_fill</code> &mdash; impute from same (route, lead) group using pandas <code>ffill()</code></li>
+      </ul>
+    </div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box">
+      <div class="flow-box-num">3</div>
+      <h3>Outlier Detection (IQR)</h3>
+      <p>Grouped by (route, lead_window_days):</p>
+      <pre>Q1 = 25th percentile
+Q3 = 75th percentile
+IQR = Q3 - Q1
+Lower bound = Q1 - 1.5 * IQR
+Upper bound = Q3 + 1.5 * IQR</pre>
+      <p>Fares outside bounds &rarr; <code>is_outlier = 1</code>, excluded from indexing.</p>
+    </div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box narrow">
+      <div class="flow-box-num">4</div>
+      <h3>Z-score (Alt.)</h3>
+      <p>Alternative method via <code>outlier_method: "zscore"</code>:</p>
+      <pre>z = (x - mu) / sigma
+|z| &gt; 3.0 &rarr; outlier</pre>
+      <p>Both methods use same <code>iqr_multiplier</code> / <code>zscore_threshold</code> config.</p>
+    </div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box">
+      <div class="flow-box-num">5</div>
+      <h3>Quality Score</h3>
+      <p>Every row starts at <strong>1.0</strong>. Deductions:</p>
+      <ul>
+        <li>-0.20 per missing core field (carrier, times, duration, fare)</li>
+        <li>-0.10 if stops not in {0, 1, 2}</li>
+        <li>Clamped to [0, 1]</li>
+      </ul>
+      <p>Rows below a quality threshold are excluded from indexing.</p>
+    </div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box narrow">
+      <div class="flow-box-num">6</div>
+      <h3>Write</h3>
+      <p>Appends to <code>cleaned_flights</code> with extra columns:</p>
+      <pre>quality_score
+is_outlier
+dedup_hash
+scrape_date</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ========== SLIDE 3: INDEX ========== -->
+<div class="slide">
+  <div class="slide-num">3 / 4</div>
+  <h2>Phase 3 <span>APIx Index Construction</span></h2>
+  <p class="sub">cleaned_flights &rarr; route averages &rarr; weighted basket &rarr; daily_index (single layer shown)</p>
+
+  <div class="flow">
+    <div class="flow-box wide">
+      <div class="flow-box-num">1</div>
+      <h3>Route Price per Day</h3>
+      <p>For each scrape_date and route, compute average fare (outliers excluded):</p>
+      <pre>route_price = AVG(total_fare)
+  WHERE is_outlier = 0
+  GROUP BY scrape_date, route</pre>
+      <p>Produces one price point per route per scrape day.</p>
+    </div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box">
+      <div class="flow-box-num">2</div>
+      <h3>Base Period</h3>
+      <p>First scrape date with data across all routes is the <strong>base day</strong>. Base period setting: <code>"first_available"</code>.</p>
+      <pre>base_price(route) =
+  AVG(total_fare on base_date)
+  WHERE route = X</pre>
+      <p>Base day: every route index = 100.</p>
+    </div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box">
+      <div class="flow-box-num">3</div>
+      <h3>Route Index</h3>
+      <p>Laspeyres-style price index per route, per day:</p>
+      <pre>route_index =
+  (route_price / base_price) * 100</pre>
+      <p>Measures how much that route's average fare has changed from the base period.</p>
+    </div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box narrow">
+      <div class="flow-box-num">4</div>
+      <h3>DGCA Weights</h3>
+      <p>City traffic-share weights (DGCA approx.):</p>
+      <pre>DEL  0.30
+BOM  0.25
+BLR  0.25
+MAA  0.20</pre>
+      <p>Route weight derived from origin + destination city weights.</p>
+    </div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box">
+      <div class="flow-box-num">5</div>
+      <h3>Aggregate Index</h3>
+      <p>Weighted average across all routes:</p>
+      <pre>aggregate_index =
+  SUM(route_index * weight)
+  / SUM(weight)</pre>
+      <p>Single composite number per day representing overall domestic airfare level. This is the APIx.</p>
+    </div>
+  </div>
+
+  <hr>
+
+  <div style="display: flex; gap: 24px;">
+    <div style="flex: 1;">
+      <h3 style="margin-bottom: 8px;">daily_index Schema</h3>
+      <table>
+        <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+        <tr><td><code>id</code></td><td>INTEGER PK</td><td>Auto-increment</td></tr>
+        <tr><td><code>index_date</code></td><td>TEXT</td><td>Scrape date, YYYY-MM-DD</td></tr>
+        <tr><td><code>route</code></td><td>TEXT</td><td>e.g. DEL-BOM</td></tr>
+        <tr><td><code>weight</code></td><td>REAL</td><td>DGCA traffic-share weight</td></tr>
+        <tr><td><code>route_price</code></td><td>REAL</td><td>Avg fare for route on this date</td></tr>
+        <tr><td><code>route_index</code></td><td>REAL</td><td>(route_price / base_price) * 100</td></tr>
+        <tr><td><code>aggregate_index</code></td><td>REAL</td><td>Weighted avg of all route indices</td></tr>
+        <tr><td><code>base_period</code></td><td>TEXT</td><td>"first_available"</td></tr>
+      </table>
+    </div>
+    <div style="flex: 0.6;">
+      <h3 style="margin-bottom: 8px;">Notes</h3>
+      <ul style="font-size: 12px; color: #555;">
+        <li>weekly_index and monthly_index follow the same schema, just grouped over wider windows</li>
+        <li><code>min_data_points: 30</code> &mdash; index is considered valid only after 30+ days of data</li>
+        <li>Same pipeline repeated at 3 frequencies</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SLIDE 4: NEURAL NETWORK ========== -->
+<div class="slide">
+  <div class="slide-num">4 / 4</div>
+  <h2>Phase 4 <span>Price Prediction Model</span></h2>
+  <p class="sub">Binary classifier &mdash; predicts <strong>P(price increases in upcoming week)</strong> per flight. Deep neural network with ReLU activations, dropout regularization, softmax output.</p>
+
+  <svg viewBox="0 0 1340 440" style="width: 100%; height: auto; margin-top: 8px; display: block;">
+    <!-- connections (lighter color) -->
+    <style>
+      .nnL { stroke: #cbd5e1; stroke-width: 1; stroke-opacity: 0.7; }
+      .nnTitle { font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 13px; font-weight: 700; fill: #444; text-anchor: middle; }
+      .nnSub { font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 10.5px; fill: #999; text-anchor: middle; }
+      .nnCardTitle { font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 10px; font-weight: 800; fill: #444; text-transform: uppercase; letter-spacing: 0.3px; }
+      .nnCardBody { font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 10.5px; fill: #555; }
+      .nnLabel { font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 10.5px; fill: #777; text-anchor: middle; }
+      .nnDrop { font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 10px; font-weight: 700; fill: #b71c1c; text-anchor: middle; }
+    </style>
+
+    <!-- feature cards -->
+    <rect x="8" y="84" width="178" height="46" rx="4" fill="#fff" stroke="#bbb" stroke-width="1"/>
+    <text x="16" y="100" class="nnCardTitle">Price Level</text>
+    <text x="16" y="117" class="nnCardBody">log_fare · fare_z (z-score vs route mean)</text>
+
+    <rect x="8" y="146" width="178" height="46" rx="4" fill="#fff" stroke="#bbb" stroke-width="1"/>
+    <text x="16" y="162" class="nnCardTitle">Purchase Timing</text>
+    <text x="16" y="179" class="nnCardBody">lead_window · hour · weekday · month</text>
+
+    <rect x="8" y="208" width="178" height="46" rx="4" fill="#fff" stroke="#bbb" stroke-width="1"/>
+    <text x="16" y="224" class="nnCardTitle">Identity (one-hot)</text>
+    <text x="16" y="241" class="nnCardBody">route (11) · carrier (5)</text>
+
+    <rect x="8" y="270" width="178" height="46" rx="4" fill="#fff" stroke="#bbb" stroke-width="1"/>
+    <text x="16" y="286" class="nnCardTitle">Momentum</text>
+    <text x="16" y="303" class="nnCardBody">route_7d_change · trend signal</text>
+
+    <g class="nnL">
+      <!-- cards → input -->
+      <line x1="186" y1="107" x2="300" y2="62"/>
+      <line x1="186" y1="107" x2="300" y2="109"/>
+      <line x1="186" y1="169" x2="300" y2="156"/>
+      <line x1="186" y1="169" x2="300" y2="203"/>
+      <line x1="186" y1="231" x2="300" y2="250"/>
+      <line x1="186" y1="231" x2="300" y2="297"/>
+      <line x1="186" y1="293" x2="300" y2="344"/>
+      <line x1="186" y1="293" x2="300" y2="391"/>
+      <!-- input → h1 -->
+      <line x1="300" y1="62"  x2="610" y2="62"/><line x1="300" y1="62"  x2="610" y2="109"/><line x1="300" y1="62"  x2="610" y2="156"/><line x1="300" y1="62"  x2="610" y2="203"/><line x1="300" y1="62"  x2="610" y2="250"/><line x1="300" y1="62"  x2="610" y2="297"/><line x1="300" y1="62"  x2="610" y2="344"/><line x1="300" y1="62"  x2="610" y2="391"/>
+      <line x1="300" y1="109" x2="610" y2="62"/><line x1="300" y1="109" x2="610" y2="109"/><line x1="300" y1="109" x2="610" y2="156"/><line x1="300" y1="109" x2="610" y2="203"/><line x1="300" y1="109" x2="610" y2="250"/><line x1="300" y1="109" x2="610" y2="297"/><line x1="300" y1="109" x2="610" y2="344"/><line x1="300" y1="109" x2="610" y2="391"/>
+      <line x1="300" y1="156" x2="610" y2="62"/><line x1="300" y1="156" x2="610" y2="109"/><line x1="300" y1="156" x2="610" y2="156"/><line x1="300" y1="156" x2="610" y2="203"/><line x1="300" y1="156" x2="610" y2="250"/><line x1="300" y1="156" x2="610" y2="297"/><line x1="300" y1="156" x2="610" y2="344"/><line x1="300" y1="156" x2="610" y2="391"/>
+      <line x1="300" y1="203" x2="610" y2="62"/><line x1="300" y1="203" x2="610" y2="109"/><line x1="300" y1="203" x2="610" y2="156"/><line x1="300" y1="203" x2="610" y2="203"/><line x1="300" y1="203" x2="610" y2="250"/><line x1="300" y1="203" x2="610" y2="297"/><line x1="300" y1="203" x2="610" y2="344"/><line x1="300" y1="203" x2="610" y2="391"/>
+      <line x1="300" y1="250" x2="610" y2="62"/><line x1="300" y1="250" x2="610" y2="109"/><line x1="300" y1="250" x2="610" y2="156"/><line x1="300" y1="250" x2="610" y2="203"/><line x1="300" y1="250" x2="610" y2="250"/><line x1="300" y1="250" x2="610" y2="297"/><line x1="300" y1="250" x2="610" y2="344"/><line x1="300" y1="250" x2="610" y2="391"/>
+      <line x1="300" y1="297" x2="610" y2="62"/><line x1="300" y1="297" x2="610" y2="109"/><line x1="300" y1="297" x2="610" y2="156"/><line x1="300" y1="297" x2="610" y2="203"/><line x1="300" y1="297" x2="610" y2="250"/><line x1="300" y1="297" x2="610" y2="297"/><line x1="300" y1="297" x2="610" y2="344"/><line x1="300" y1="297" x2="610" y2="391"/>
+      <line x1="300" y1="344" x2="610" y2="62"/><line x1="300" y1="344" x2="610" y2="109"/><line x1="300" y1="344" x2="610" y2="156"/><line x1="300" y1="344" x2="610" y2="203"/><line x1="300" y1="344" x2="610" y2="250"/><line x1="300" y1="344" x2="610" y2="297"/><line x1="300" y1="344" x2="610" y2="344"/><line x1="300" y1="344" x2="610" y2="391"/>
+      <line x1="300" y1="391" x2="610" y2="62"/><line x1="300" y1="391" x2="610" y2="109"/><line x1="300" y1="391" x2="610" y2="156"/><line x1="300" y1="391" x2="610" y2="203"/><line x1="300" y1="391" x2="610" y2="250"/><line x1="300" y1="391" x2="610" y2="297"/><line x1="300" y1="391" x2="610" y2="344"/><line x1="300" y1="391" x2="610" y2="391"/>
+      <!-- h1 → h2 -->
+      <line x1="610" y1="62"  x2="920" y2="100"/><line x1="610" y1="62"  x2="920" y2="170"/><line x1="610" y1="62"  x2="920" y2="240"/><line x1="610" y1="62"  x2="920" y2="310"/><line x1="610" y1="62"  x2="920" y2="380"/>
+      <line x1="610" y1="109" x2="920" y2="100"/><line x1="610" y1="109" x2="920" y2="170"/><line x1="610" y1="109" x2="920" y2="240"/><line x1="610" y1="109" x2="920" y2="310"/><line x1="610" y1="109" x2="920" y2="380"/>
+      <line x1="610" y1="156" x2="920" y2="100"/><line x1="610" y1="156" x2="920" y2="170"/><line x1="610" y1="156" x2="920" y2="240"/><line x1="610" y1="156" x2="920" y2="310"/><line x1="610" y1="156" x2="920" y2="380"/>
+      <line x1="610" y1="203" x2="920" y2="100"/><line x1="610" y1="203" x2="920" y2="170"/><line x1="610" y1="203" x2="920" y2="240"/><line x1="610" y1="203" x2="920" y2="310"/><line x1="610" y1="203" x2="920" y2="380"/>
+      <line x1="610" y1="250" x2="920" y2="100"/><line x1="610" y1="250" x2="920" y2="170"/><line x1="610" y1="250" x2="920" y2="240"/><line x1="610" y1="250" x2="920" y2="310"/><line x1="610" y1="250" x2="920" y2="380"/>
+      <line x1="610" y1="297" x2="920" y2="100"/><line x1="610" y1="297" x2="920" y2="170"/><line x1="610" y1="297" x2="920" y2="240"/><line x1="610" y1="297" x2="920" y2="310"/><line x1="610" y1="297" x2="920" y2="380"/>
+      <line x1="610" y1="344" x2="920" y2="100"/><line x1="610" y1="344" x2="920" y2="170"/><line x1="610" y1="344" x2="920" y2="240"/><line x1="610" y1="344" x2="920" y2="310"/><line x1="610" y1="344" x2="920" y2="380"/>
+      <line x1="610" y1="391" x2="920" y2="100"/><line x1="610" y1="391" x2="920" y2="170"/><line x1="610" y1="391" x2="920" y2="240"/><line x1="610" y1="391" x2="920" y2="310"/><line x1="610" y1="391" x2="920" y2="380"/>
+      <!-- h2 → output -->
+      <line x1="920" y1="100" x2="1230" y2="140"/><line x1="920" y1="100" x2="1230" y2="300"/>
+      <line x1="920" y1="170" x2="1230" y2="140"/><line x1="920" y1="170" x2="1230" y2="300"/>
+      <line x1="920" y1="240" x2="1230" y2="140"/><line x1="920" y1="240" x2="1230" y2="300"/>
+      <line x1="920" y1="310" x2="1230" y2="140"/><line x1="920" y1="310" x2="1230" y2="300"/>
+      <line x1="920" y1="380" x2="1230" y2="140"/><line x1="920" y1="380" x2="1230" y2="300"/>
+    </g>
+
+    <!-- input nodes -->
+    <g>
+      <circle cx="300" cy="62"  r="12" fill="#f5f5f5" stroke="#999" stroke-width="1.5"/>
+      <circle cx="300" cy="109" r="12" fill="#f5f5f5" stroke="#999" stroke-width="1.5"/>
+      <circle cx="300" cy="156" r="12" fill="#f5f5f5" stroke="#999" stroke-width="1.5"/>
+      <circle cx="300" cy="203" r="12" fill="#f5f5f5" stroke="#999" stroke-width="1.5"/>
+      <circle cx="300" cy="250" r="12" fill="#f5f5f5" stroke="#999" stroke-width="1.5"/>
+      <circle cx="300" cy="297" r="12" fill="#f5f5f5" stroke="#999" stroke-width="1.5"/>
+      <circle cx="300" cy="344" r="12" fill="#f5f5f5" stroke="#999" stroke-width="1.5"/>
+      <circle cx="300" cy="391" r="12" fill="#f5f5f5" stroke="#999" stroke-width="1.5"/>
+    </g>
+
+    <!-- hidden 1 nodes (ReLU) -->
+    <g>
+      <circle cx="610" cy="62"  r="12" fill="#e8eaf6" stroke="#5c6bc0" stroke-width="1.5"/>
+      <circle cx="610" cy="109" r="12" fill="#e8eaf6" stroke="#5c6bc0" stroke-width="1.5"/>
+      <circle cx="610" cy="156" r="12" fill="#e8eaf6" stroke="#5c6bc0" stroke-width="1.5"/>
+      <circle cx="610" cy="203" r="12" fill="#e8eaf6" stroke="#5c6bc0" stroke-width="1.5"/>
+      <circle cx="610" cy="250" r="12" fill="#e8eaf6" stroke="#5c6bc0" stroke-width="1.5"/>
+      <circle cx="610" cy="297" r="12" fill="#e8eaf6" stroke="#5c6bc0" stroke-width="1.5"/>
+      <circle cx="610" cy="344" r="12" fill="#e8eaf6" stroke="#5c6bc0" stroke-width="1.5"/>
+      <circle cx="610" cy="391" r="12" fill="#e8eaf6" stroke="#5c6bc0" stroke-width="1.5"/>
+    </g>
+
+    <!-- hidden 2 nodes (ReLU) -->
+    <g>
+      <circle cx="920" cy="100" r="12" fill="#ede7f6" stroke="#7e57c2" stroke-width="1.5"/>
+      <circle cx="920" cy="170" r="12" fill="#ede7f6" stroke="#7e57c2" stroke-width="1.5"/>
+      <circle cx="920" cy="240" r="12" fill="#ede7f6" stroke="#7e57c2" stroke-width="1.5"/>
+      <circle cx="920" cy="310" r="12" fill="#ede7f6" stroke="#7e57c2" stroke-width="1.5"/>
+      <circle cx="920" cy="380" r="12" fill="#ede7f6" stroke="#7e57c2" stroke-width="1.5"/>
+    </g>
+
+    <!-- output nodes (Softmax) -->
+    <circle cx="1230" cy="140" r="14" fill="#f5f5f5" stroke="#888" stroke-width="1.5"/>
+    <circle cx="1230" cy="300" r="14" fill="#e8f5e9" stroke="#43a047" stroke-width="1.5"/>
+
+    <!-- layer labels -->
+    <text x="300" y="30"  class="nnTitle">INPUT</text>
+    <text x="300" y="45"  class="nnSub">20 features</text>
+    <text x="610" y="30"  class="nnTitle">HIDDEN 1</text>
+    <text x="610" y="45"  class="nnSub">64 units · ReLU</text>
+    <text x="920" y="30"  class="nnTitle">HIDDEN 2</text>
+    <text x="920" y="45"  class="nnSub">32 units · ReLU</text>
+    <text x="1230" y="30" class="nnTitle">OUTPUT</text>
+    <text x="1230" y="45" class="nnSub">Softmax · 2 classes</text>
+
+    <!-- dropout tags -->
+    <rect x="572" y="414" width="76" height="18" rx="4" fill="#ffebee" stroke="#ef9a9a" stroke-width="0.8"/>
+    <text x="610" y="427" class="nnDrop">Dropout 0.3</text>
+    <rect x="882" y="414" width="76" height="18" rx="4" fill="#ffebee" stroke="#ef9a9a" stroke-width="0.8"/>
+    <text x="920" y="427" class="nnDrop">Dropout 0.3</text>
+
+    <!-- output labels -->
+    <text x="1230" y="170" class="nnLabel">No increase</text>
+    <text x="1230" y="330" class="nnLabel" fill="#43a047" font-weight="600">Increase</text>
+
+    <!-- legend -->
+    <circle cx="24" cy="405" r="6" fill="#f5f5f5" stroke="#999" stroke-width="1.2"/>
+    <text x="36" y="409" class="nnCardBody">Input</text>
+    <circle cx="100" cy="405" r="6" fill="#e8eaf6" stroke="#5c6bc0" stroke-width="1.2"/>
+    <text x="112" y="409" class="nnCardBody">ReLU hidden</text>
+    <circle cx="210" cy="405" r="6" fill="#f5f5f5" stroke="#888" stroke-width="1.2"/>
+    <text x="222" y="409" class="nnCardBody">No increase (out)</text>
+    <circle cx="360" cy="405" r="6" fill="#e8f5e9" stroke="#43a047" stroke-width="1.2"/>
+    <text x="372" y="409" class="nnCardBody">Increase (out)</text>
+  </svg>
+
+  <hr>
+
+  <div style="display: flex; gap: 28px;">
+    <div style="flex: 1;">
+      <h3 style="margin-bottom: 6px;">Training Setup</h3>
+      <table>
+        <tr><th>Component</th><th>Choice</th></tr>
+        <tr><td>Optimizer</td><td>Adam (mini-batch gradient descent), lr = 1e-3</td></tr>
+        <tr><td>Loss</td><td>Binary cross-entropy</td></tr>
+        <tr><td>Regularization</td><td>Dropout 0.3 between hidden layers</td></tr>
+        <tr><td>Early stopping</td><td>Patience 5 epochs, restore best validation weights</td></tr>
+        <tr><td>Class imbalance</td><td>Class weights (weighted BCE loss)</td></tr>
+        <tr><td>Feature scaling</td><td>StandardScaler on continuous features (mean=0, std=1)</td></tr>
+      </table>
+    </div>
+    <div style="flex: 1;">
+      <h3 style="margin-bottom: 6px;">Data Split &amp; Constraints</h3>
+      <table>
+        <tr><th>Constraint</th><th>Details</th></tr>
+        <tr><td>Train/val split</td><td>By scrape date, never random &mdash; prevents time leakage</td></tr>
+        <tr><td>Flight identity</td><td>(route, carrier, depart_time) &mdash; flight_no not available</td></tr>
+        <tr><td>Label construction</td><td>Same flight observed scrape day X vs X+7, fare delta &gt; 0 &rarr; label 1</td></tr>
+        <tr><td>Features source</td><td>cleaned_flights only &mdash; index tables excluded</td></tr>
+        <tr><td>Current data</td><td>0 labels yet &mdash; need ~7 days of daily scraping before first train</td></tr>
+        <tr><td>Scaling plan</td><td>Start shallow, grow depth as labeled data accumulates</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>

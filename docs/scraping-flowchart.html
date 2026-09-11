@@ -126,7 +126,7 @@ header p{opacity:.8;margin-top:6px;font-size:.92rem}
 <!-- START -->
 <div class="node start">
 <div class="node-inner">
-<h3>You type: python src/test_scraper.py</h3>
+<h3>You type: python -m src.scraper.run_smoke</h3>
 <p>This is the entry point. Everything starts here.</p>
 </div>
 </div>
@@ -423,7 +423,7 @@ header p{opacity:.8;margin-top:6px;font-size:.92rem}
 <h2 style="color:var(--purple)">Which file does what?</h2>
 <table style="width:100%;border-collapse:collapse;font-size:.9rem">
 <tr style="background:#f5f5f5"><th style="text-align:left;padding:8px 12px;color:var(--grey);font-size:.8rem;text-transform:uppercase">File</th><th style="text-align:left;padding:8px 12px;color:var(--grey);font-size:.8rem;text-transform:uppercase">Role in the flow</th><th style="text-align:left;padding:8px 12px;color:var(--grey);font-size:.8rem;text-transform:uppercase">Lines of code</th></tr>
-<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap">test_scraper.py</td><td style="padding:8px 12px;border-top:1px solid #eee">Entry point — calls the scraper for 1 route</td><td style="padding:8px 12px;border-top:1px solid #eee">37</td></tr>
+<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap">src/scraper/run_smoke.py</td><td style="padding:8px 12px;border-top:1px solid #eee">Entry point — manual smoke test, calls the scraper for 1 route</td><td style="padding:8px 12px;border-top:1px solid #eee">41</td></tr>
 <tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap">run_scrape.py</td><td style="padding:8px 12px;border-top:1px solid #eee">Orchestrator — loops all routes × windows, inserts to DB</td><td style="padding:8px 12px;border-top:1px solid #eee">118</td></tr>
 <tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap">google_flights.py</td><td style="padding:8px 12px;border-top:1px solid #eee">Core scraper — URL builder, page loader, aria-label parser</td><td style="padding:8px 12px;border-top:1px solid #eee">302</td></tr>
 <tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap">driver.py</td><td style="padding:8px 12px;border-top:1px solid #eee">Browser manager — opens/closes Chromium safely</td><td style="padding:8px 12px;border-top:1px solid #eee">47</td></tr>
