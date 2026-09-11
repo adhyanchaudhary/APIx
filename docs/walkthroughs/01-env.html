@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Walkthrough 1: .env</title>
+<style>
+:root{--bg:#F08080;--card:rgba(255,255,255,0.92);--blue:#0D47A1;--blue-mid:#1565C0;--blue-light:#BBDEFB;--green:#1B5E20;--green-light:#C8E6C9;--red:#B71C1C;--red-light:#FFCDD2;--black:#1A1A2E;--grey:#546E7A}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--black);line-height:1.7}
+.wrap{max-width:900px;margin:0 auto;padding:20px}
+header{background:var(--blue);color:#fff;padding:24px 32px;border-radius:14px;margin-bottom:24px}
+header h1{font-size:1.6rem}
+header .sub{opacity:.75;margin-top:4px;font-size:.9rem}
+.card{background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:20px;border-left:6px solid var(--blue-mid)}
+.card h2{color:var(--blue);font-size:1.2rem;margin-bottom:8px}
+.line-block{margin:14px 0;border-radius:8px;overflow:hidden;border:1px solid #ddd}
+.line-header{background:var(--blue);color:#fff;padding:6px 14px;font-size:.85rem;font-weight:600}
+.line-code{background:#263238;color:#80CBC4;padding:10px 16px;font-family:'Courier New',monospace;font-size:.85rem;white-space:pre;overflow-x:auto}
+.line-explain{background:#E8F5E9;padding:10px 16px;font-size:.9rem;border-top:1px solid #C8E6C9}
+.line-explain strong{color:var(--green)}
+.line-explain code{background:#C8E6C9;padding:1px 5px;border-radius:3px;font-family:'Courier New',monospace;font-size:.85rem}
+.nav{display:flex;justify-content:space-between;margin:20px 0}
+.nav a{background:var(--blue);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem}
+.nav a:hover{background:var(--blue-mid)}
+.note{background:var(--blue-light);border-left:4px solid var(--blue);padding:10px 14px;border-radius:6px;margin:10px 0;font-size:.9rem}
+.summary{background:var(--green-light);border-left:4px solid var(--green);padding:12px 16px;border-radius:6px;margin:14px 0;color:var(--green)}
+.summary::before{content:"Key takeaway: ";font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Walkthrough 1: .env</h1>
+<div class="sub">.env</div>
+</header>
+<div class="nav"><span></span><a href="02-gitignore.html">Next &rarr;</a></div>
+<div class="card">
+<h2>File Overview</h2>
+<p>Below is every line of this file with an explanation of what it does and why.</p>
+</div>
+<div class="line-block">
+<div class="line-header">Line 1</div>
+<div class="line-code"># Playwright browser storage location</div>
+<div class="line-explain">A comment line. The <code>#</code> symbol means this line is ignored by the computer. It's just a note for humans reading the file.</div>
+</div><div class="line-block">
+<div class="line-header">Line 2</div>
+<div class="line-code">PLAYWRIGHT_BROWSERS_PATH=0</div>
+<div class="line-explain">Tells Playwright where to store browser files. The value <code>0</code> means 'use the default location inside the project folder.' This way the browser files live with your project, not scattered across your system.</div>
+</div><div class="line-block">
+<div class="line-header">Line 3</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line. Used to separate sections for readability.</div>
+</div><div class="line-block">
+<div class="line-header">Line 4</div>
+<div class="line-code"># Logging level: DEBUG, INFO, WARNING, ERROR</div>
+<div class="line-explain">Comment explaining the possible values for the next setting. Logging level controls how much detail the program prints while running.</div>
+</div><div class="line-block">
+<div class="line-header">Line 5</div>
+<div class="line-code">LOG_LEVEL=INFO</div>
+<div class="line-explain">Sets the program to print <strong>Info-level</strong> messages: things like 'scrape started,' '120 flights saved.' <code>DEBUG</code> would be much more verbose. <code>WARNING</code> would only show problems.</div>
+</div><div class="line-block">
+<div class="line-header">Line 6</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line separating sections.</div>
+</div><div class="line-block">
+<div class="line-header">Line 7</div>
+<div class="line-code"># Scraper settings</div>
+<div class="line-explain">Comment labeling the scraper configuration section.</div>
+</div><div class="line-block">
+<div class="line-header">Line 8</div>
+<div class="line-code">MAX_REQUESTS_PER_HOUR=60</div>
+<div class="line-explain">Speed limit: the scraper will make <strong>at most 60 requests per hour</strong> to Google Flights. That's one every minute. This prevents Google from blocking us.</div>
+</div><div class="line-block">
+<div class="line-header">Line 9</div>
+<div class="line-code">REQUEST_DELAY_MIN=3</div>
+<div class="line-explain">Minimum wait time (in seconds) between consecutive requests. The scraper will wait at least 3 seconds.</div>
+</div><div class="line-block">
+<div class="line-header">Line 10</div>
+<div class="line-code">REQUEST_DELAY_MAX=8</div>
+<div class="line-explain">Maximum wait time between requests. The scraper picks a <strong>random</strong> delay between 3 and 8 seconds to look like a human.</div>
+</div><div class="line-block">
+<div class="line-header">Line 11</div>
+<div class="line-code">MAX_RETRIES=3</div>
+<div class="line-explain">If a request fails (page doesn't load), the scraper will try up to <strong>3 times</strong> before giving up on that route.</div>
+</div>
+<div class="card">
+<h2>Summary</h2>
+<p>This file has <strong>11 lines</strong>.</p>
+</div>
+<div class="nav"><span></span><a href="02-gitignore.html">Next &rarr;</a></div>
+</div>
+</body>
+</html>
