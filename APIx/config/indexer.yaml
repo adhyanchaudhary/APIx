@@ -1,0 +1,28 @@
+# ── Index Builder Settings ──
+index:
+  base_period: "first_available"   # index = 100 on first day with data
+  round_to: 2                      # decimal places for index value
+  min_data_points: 1               # index written from the first day with data
+
+  # ── Route basket weights (DGCA traffic share approximation) ──
+  # Normalised to sum 1.0 at load time. One per directional route.
+  weights:
+    DEL-BOM: 0.10
+    BOM-DEL: 0.10
+    DEL-BLR: 0.09
+    BLR-DEL: 0.09
+    DEL-MAA: 0.06
+    MAA-DEL: 0.06
+    BOM-BLR: 0.10
+    BLR-BOM: 0.10
+    BOM-MAA: 0.08
+    MAA-BOM: 0.08
+    BLR-MAA: 0.07
+    MAA-BLR: 0.07
+
+# ── Outlier Detection ──
+cleaning:
+  outlier_method: "iqr"            # "iqr" or "zscore"
+  iqr_multiplier: 1.5             # Q1 - 1.5*IQR to Q3 + 1.5*IQR
+  zscore_threshold: 3.0           # used only if method = "zscore"
+  null_fare_action: "drop"        # "drop" or "forward_fill"

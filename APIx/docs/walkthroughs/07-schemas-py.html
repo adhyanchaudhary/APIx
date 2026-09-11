@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Walkthrough 7: src/models/schemas.py</title>
+<style>
+:root{--bg:#F08080;--card:rgba(255,255,255,0.92);--blue:#0D47A1;--blue-mid:#1565C0;--blue-light:#BBDEFB;--green:#1B5E20;--green-light:#C8E6C9;--red:#B71C1C;--red-light:#FFCDD2;--black:#1A1A2E;--grey:#546E7A}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--black);line-height:1.7}
+.wrap{max-width:900px;margin:0 auto;padding:20px}
+header{background:var(--blue);color:#fff;padding:24px 32px;border-radius:14px;margin-bottom:24px}
+header h1{font-size:1.6rem}
+header .sub{opacity:.75;margin-top:4px;font-size:.9rem}
+.card{background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:20px;border-left:6px solid var(--blue-mid)}
+.card h2{color:var(--blue);font-size:1.2rem;margin-bottom:8px}
+.line-block{margin:14px 0;border-radius:8px;overflow:hidden;border:1px solid #ddd}
+.line-header{background:var(--blue);color:#fff;padding:6px 14px;font-size:.85rem;font-weight:600}
+.line-code{background:#263238;color:#80CBC4;padding:10px 16px;font-family:'Courier New',monospace;font-size:.85rem;white-space:pre;overflow-x:auto}
+.line-explain{background:#E8F5E9;padding:10px 16px;font-size:.9rem;border-top:1px solid #C8E6C9}
+.line-explain strong{color:var(--green)}
+.line-explain code{background:#C8E6C9;padding:1px 5px;border-radius:3px;font-family:'Courier New',monospace;font-size:.85rem}
+.nav{display:flex;justify-content:space-between;margin:20px 0}
+.nav a{background:var(--blue);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem}
+.nav a:hover{background:var(--blue-mid)}
+.note{background:var(--blue-light);border-left:4px solid var(--blue);padding:10px 14px;border-radius:6px;margin:10px 0;font-size:.9rem}
+.summary{background:var(--green-light);border-left:4px solid var(--green);padding:12px 16px;border-radius:6px;margin:14px 0;color:var(--green)}
+.summary::before{content:"Key takeaway: ";font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Walkthrough 7: src/models/schemas.py</h1>
+<div class="sub">src/models/schemas.py</div>
+</header>
+<div class="nav"><a href="06-indexer-yaml.html">&larr; Previous</a><a href="08-database-py.html">Next &rarr;</a></div>
+<div class="card">
+<h2>File Overview</h2>
+<p>Below is every line of this file with an explanation of what it does and why.</p>
+</div>
+<div class="line-block">
+<div class="line-header">Line 1</div>
+<div class="line-code">from datetime import datetime</div>
+<div class="line-explain">Imports Python's <code>datetime</code> class, which handles dates and times. We'll use it for departure/arrival times and scrape timestamps.</div>
+</div><div class="line-block">
+<div class="line-header">Line 2</div>
+<div class="line-code">from pydantic import BaseModel, Field</div>
+<div class="line-explain"><code>BaseModel</code> is the parent class for all our data models. <code>Field</code> lets us add validation rules to each field (like 'must be positive').</div>
+</div><div class="line-block">
+<div class="line-header">Line 3</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 4</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 5</div>
+<div class="line-code">class FlightRecord(BaseModel):</div>
+<div class="line-explain">Defines a new class called <code>FlightRecord</code> that inherits from Pydantic's <code>BaseModel</code>. Every scraped flight must match this shape.</div>
+</div><div class="line-block">
+<div class="line-header">Line 6</div>
+<div class="line-code">    """One scraped flight - the raw unit of data we collect."""</div>
+<div class="line-explain">A docstring: explains what this class represents. Triple quotes <code>"""</code> denote multi-line comments in Python.</div>
+</div><div class="line-block">
+<div class="line-header">Line 7</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 8</div>
+<div class="line-code">    route: str = Field(..., description="e.g. DEL-BOM")</div>
+<div class="line-explain"><code>route</code> is a string like 'DEL-BOM'. The <code>...</code> means it's <strong>required</strong> (no default value).</div>
+</div><div class="line-block">
+<div class="line-header">Line 9</div>
+<div class="line-code">    origin: str = Field(..., min_length=3, max_length=3)</div>
+<div class="line-explain">Origin airport code. Must be exactly 3 characters (like 'DEL'). Pydantic enforces this automatically.</div>
+</div><div class="line-block">
+<div class="line-header">Line 10</div>
+<div class="line-code">    dest: str = Field(..., min_length=3, max_length=3)</div>
+<div class="line-explain">Destination airport code. Same 3-character validation.</div>
+</div><div class="line-block">
+<div class="line-header">Line 11</div>
+<div class="line-code">    carrier: str = Field(..., description="e.g. IndiGo")</div>
+<div class="line-explain">Airline name. Required string.</div>
+</div><div class="line-block">
+<div class="line-header">Line 12</div>
+<div class="line-code">    flight_no: str = Field(..., description="e.g. 6E-201")</div>
+<div class="line-explain">Flight number. Required string.</div>
+</div><div class="line-block">
+<div class="line-header">Line 13</div>
+<div class="line-code">    depart_time: datetime</div>
+<div class="line-explain">Departure time. Required datetime value.</div>
+</div><div class="line-block">
+<div class="line-header">Line 14</div>
+<div class="line-code">    arrive_time: datetime</div>
+<div class="line-explain">Arrival time. Required datetime value.</div>
+</div><div class="line-block">
+<div class="line-header">Line 15</div>
+<div class="line-code">    duration_mins: int = Field(..., ge=0)</div>
+<div class="line-explain">Flight duration in minutes. Must be an integer >= 0 (can't be negative).</div>
+</div><div class="line-block">
+<div class="line-header">Line 16</div>
+<div class="line-code">    stops: int = Field(..., ge=0, le=5)</div>
+<div class="line-explain">Number of stops. Must be between 0 and 5. A flight can't have negative stops or more than 5.</div>
+</div><div class="line-block">
+<div class="line-header">Line 17</div>
+<div class="line-code">    base_fare: float = Field(default=0.0, ge=0)</div>
+<div class="line-explain">Base fare before taxes. Defaults to 0.0 if not available. Must be >= 0.</div>
+</div><div class="line-block">
+<div class="line-header">Line 18</div>
+<div class="line-code">    taxes: float = Field(default=0.0, ge=0)</div>
+<div class="line-explain">Tax amount. Defaults to 0.0. Must be >= 0.</div>
+</div><div class="line-block">
+<div class="line-header">Line 19</div>
+<div class="line-code">    total_fare: float = Field(..., gt=0)</div>
+<div class="line-explain">Total price the passenger pays. Required and must be <strong>greater than 0</strong> (a free flight doesn't make sense for our index).</div>
+</div><div class="line-block">
+<div class="line-header">Line 20</div>
+<div class="line-code">    currency: str = Field(default="INR", max_length=3)</div>
+<div class="line-explain">Currency code. Defaults to 'INR' (Indian Rupee). Max 3 characters per ISO standard.</div>
+</div><div class="line-block">
+<div class="line-header">Line 21</div>
+<div class="line-code">    lead_window_days: int = Field(..., ge=1, le=90)</div>
+<div class="line-explain">How many days before departure this fare is for. Must be between 1 and 90 days.</div>
+</div><div class="line-block">
+<div class="line-header">Line 22</div>
+<div class="line-code">    scrape_timestamp: datetime = Field(default_factory=datetime.now)</div>
+<div class="line-explain">When this record was scraped. <code>default_factory=datetime.now</code> means: if not provided, automatically use the current time.</div>
+</div><div class="line-block">
+<div class="line-header">Line 23</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 24</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 25</div>
+<div class="line-code">class RouteConfig(BaseModel):</div>
+<div class="line-explain">A simpler model representing one flight route.</div>
+</div><div class="line-block">
+<div class="line-header">Line 26</div>
+<div class="line-code">    """One route from routes.yaml."""</div>
+<div class="line-explain">Docstring.</div>
+</div><div class="line-block">
+<div class="line-header">Line 27</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 28</div>
+<div class="line-code">    origin: str</div>
+<div class="line-explain">Origin city code.</div>
+</div><div class="line-block">
+<div class="line-header">Line 29</div>
+<div class="line-code">    dest: str</div>
+<div class="line-explain">Destination city code.</div>
+</div><div class="line-block">
+<div class="line-header">Line 30</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 31</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 32</div>
+<div class="line-code">class CityConfig(BaseModel):</div>
+<div class="line-explain">Model for a city entry from routes.yaml.</div>
+</div><div class="line-block">
+<div class="line-header">Line 33</div>
+<div class="line-code">    """One city from routes.yaml."""</div>
+<div class="line-explain">Docstring.</div>
+</div><div class="line-block">
+<div class="line-header">Line 34</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 35</div>
+<div class="line-code">    name: str</div>
+<div class="line-explain">City's full name (e.g., 'New Delhi').</div>
+</div><div class="line-block">
+<div class="line-header">Line 36</div>
+<div class="line-code">    code: str</div>
+<div class="line-explain">Airport code (e.g., 'DEL').</div>
+</div><div class="line-block">
+<div class="line-header">Line 37</div>
+<div class="line-code">    weight: float = Field(..., ge=0, le=1)</div>
+<div class="line-explain">Traffic weight. Required. Must be between 0 and 1 (representing a percentage).</div>
+</div><div class="line-block">
+<div class="line-header">Line 38</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 39</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 40</div>
+<div class="line-code">class IndexEntry(BaseModel):</div>
+<div class="line-explain">Model for one row in the daily/weekly/monthly index tables.</div>
+</div><div class="line-block">
+<div class="line-header">Line 41</div>
+<div class="line-code">    """One row in the daily_index / weekly_index / monthly_index tables."""</div>
+<div class="line-explain">Docstring.</div>
+</div><div class="line-block">
+<div class="line-header">Line 42</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 43</div>
+<div class="line-code">    index_date: str</div>
+<div class="line-explain">The date of this index value (e.g., '2026-09-04').</div>
+</div><div class="line-block">
+<div class="line-header">Line 44</div>
+<div class="line-code">    lead_window_days: int</div>
+<div class="line-explain">Which advance-purchase window this entry belongs to (1, 7, or 30). Added in Phase 3 so each lead window gets its own index.</div>
+</div><div class="line-block">
+<div class="line-header">Line 45</div>
+<div class="line-code">    route: str</div>
+<div class="line-explain">Which route this index entry is for.</div>
+</div><div class="line-block">
+<div class="line-header">Line 46</div>
+<div class="line-code">    weight: float</div>
+<div class="line-explain">This route's weight in the basket.</div>
+</div><div class="line-block">
+<div class="line-header">Line 47</div>
+<div class="line-code">    route_price: float</div>
+<div class="line-explain">Lowest fare on this route on this date.</div>
+</div><div class="line-block">
+<div class="line-header">Line 48</div>
+<div class="line-code">    route_index: float</div>
+<div class="line-explain">This route's index value (route_price / base_price * 100).</div>
+</div><div class="line-block">
+<div class="line-header">Line 49</div>
+<div class="line-code">    aggregate_index: float</div>
+<div class="line-explain">The overall weighted index across all routes.</div>
+</div><div class="line-block">
+<div class="line-header">Line 50</div>
+<div class="line-code">    base_period: str</div>
+<div class="line-explain">Which date was used as the base period (index=100).</div>
+</div>
+<div class="card">
+<h2>Summary</h2>
+<p>This file has <strong>50 lines</strong>.</p>
+</div>
+<div class="nav"><a href="06-indexer-yaml.html">&larr; Previous</a><a href="08-database-py.html">Next &rarr;</a></div>
+</div>
+</body>
+</html>

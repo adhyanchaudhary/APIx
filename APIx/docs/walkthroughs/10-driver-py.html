@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Walkthrough 10: src/scraper/driver.py</title>
+<style>
+:root{--bg:#F08080;--card:rgba(255,255,255,0.92);--blue:#0D47A1;--blue-mid:#1565C0;--blue-light:#BBDEFB;--green:#1B5E20;--green-light:#C8E6C9;--red:#B71C1C;--red-light:#FFCDD2;--black:#1A1A2E;--grey:#546E7A}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--black);line-height:1.7}
+.wrap{max-width:900px;margin:0 auto;padding:20px}
+header{background:var(--blue);color:#fff;padding:24px 32px;border-radius:14px;margin-bottom:24px}
+header h1{font-size:1.6rem}
+header .sub{opacity:.75;margin-top:4px;font-size:.9rem}
+.card{background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:20px;border-left:6px solid var(--blue-mid)}
+.card h2{color:var(--blue);font-size:1.2rem;margin-bottom:8px}
+.line-block{margin:14px 0;border-radius:8px;overflow:hidden;border:1px solid #ddd}
+.line-header{background:var(--blue);color:#fff;padding:6px 14px;font-size:.85rem;font-weight:600}
+.line-code{background:#263238;color:#80CBC4;padding:10px 16px;font-family:'Courier New',monospace;font-size:.85rem;white-space:pre;overflow-x:auto}
+.line-explain{background:#E8F5E9;padding:10px 16px;font-size:.9rem;border-top:1px solid #C8E6C9}
+.line-explain strong{color:var(--green)}
+.line-explain code{background:#C8E6C9;padding:1px 5px;border-radius:3px;font-family:'Courier New',monospace;font-size:.85rem}
+.nav{display:flex;justify-content:space-between;margin:20px 0}
+.nav a{background:var(--blue);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem}
+.nav a:hover{background:var(--blue-mid)}
+.note{background:var(--blue-light);border-left:4px solid var(--blue);padding:10px 14px;border-radius:6px;margin:10px 0;font-size:.9rem}
+.summary{background:var(--green-light);border-left:4px solid var(--green);padding:12px 16px;border-radius:6px;margin:14px 0;color:var(--green)}
+.summary::before{content:"Key takeaway: ";font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Walkthrough 10: src/scraper/driver.py</h1>
+<div class="sub">src/scraper/driver.py</div>
+</header>
+<div class="nav"><a href="09-base-py.html">&larr; Previous</a><a href="11-google-flights-py.html">Next &rarr;</a></div>
+<div class="card">
+<h2>File Overview</h2>
+<p>Below is every line of this file with an explanation of what it does and why.</p>
+</div>
+<div class="line-block">
+<div class="line-header">Line 1</div>
+<div class="line-code">import asyncio</div>
+<div class="line-explain">Python's built-in library for asynchronous programming. Lets us do network requests without blocking other operations.</div>
+</div><div class="line-block">
+<div class="line-header">Line 2</div>
+<div class="line-code">import logging</div>
+<div class="line-explain">Python's logging module. Used to print status messages, warnings, and errors in a structured way.</div>
+</div><div class="line-block">
+<div class="line-header">Line 3</div>
+<div class="line-code">from contextlib import asynccontextmanager</div>
+<div class="line-explain">Imports a decorator that creates <strong>async context managers</strong> — a pattern that guarantees setup and cleanup code run properly.</div>
+</div><div class="line-block">
+<div class="line-header">Line 4</div>
+<div class="line-code">from pathlib import Path</div>
+<div class="line-explain">Modern file path handling.</div>
+</div><div class="line-block">
+<div class="line-header">Line 5</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 6</div>
+<div class="line-code">import yaml</div>
+<div class="line-explain">Imports PyYAML for reading .yaml config files.</div>
+</div><div class="line-block">
+<div class="line-header">Line 7</div>
+<div class="line-code">from playwright.async_api import async_playwright, Browser, BrowserContext, Page</div>
+<div class="line-explain">Imports Playwright's async API: <code>async_playwright</code> launches browsers, <code>Browser</code>/<code>BrowserContext</code>/<code>Page</code> are type hints.</div>
+</div><div class="line-block">
+<div class="line-header">Line 8</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 9</div>
+<div class="line-code">CONFIG_PATH = Path(__file__).resolve().parent.parent.parent / "config" / "scraper.yaml"</div>
+<div class="line-explain">Calculates the path to <code>config/scraper.yaml</code>. <code>__file__</code> is this file, go up 3 levels to project root, then into config/.</div>
+</div><div class="line-block">
+<div class="line-header">Line 10</div>
+<div class="line-code">log = logging.getLogger(__name__)</div>
+<div class="line-explain">Creates a logger named after this module. Log messages will show 'src.scraper.driver' as the source.</div>
+</div><div class="line-block">
+<div class="line-header">Line 11</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 12</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 13</div>
+<div class="line-code">def load_scraper_config() -&gt; dict:</div>
+<div class="line-explain">A regular function (not async) that reads the scraper YAML config.</div>
+</div><div class="line-block">
+<div class="line-header">Line 14</div>
+<div class="line-code">    with open(CONFIG_PATH) as f:</div>
+<div class="line-explain">Opens the config file. <code>with</code> ensures the file is closed even if an error occurs.</div>
+</div><div class="line-block">
+<div class="line-header">Line 15</div>
+<div class="line-code">        return yaml.safe_load(f)["scraper"]</div>
+<div class="line-explain"><code>yaml.safe_load</code> parses YAML into a Python dictionary. <code>["scraper"]</code> extracts the 'scraper' section.</div>
+</div><div class="line-block">
+<div class="line-header">Line 16</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 17</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 18</div>
+<div class="line-code">@asynccontextmanager</div>
+<div class="line-explain">Decorator that turns this function into an async context manager. This enables the <code>async with</code> pattern.</div>
+</div><div class="line-block">
+<div class="line-header">Line 19</div>
+<div class="line-code">async def create_browser_context(config: dict | None = None):</div>
+<div class="line-explain">Async function that launches a browser and yields a context. <code>config</code> is optional.</div>
+</div><div class="line-block">
+<div class="line-header">Line 20</div>
+<div class="line-code">    """Launch headless Chromium and yield a fresh browser context.</div>
+<div class="line-explain">Docstring with usage example.</div>
+</div><div class="line-block">
+<div class="line-header">Line 21</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 22</div>
+<div class="line-code">    Usage:</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 23</div>
+<div class="line-code">        async with create_browser_context() as context:</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 24</div>
+<div class="line-code">            page = await context.new_page()</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 25</div>
+<div class="line-code">            await page.goto("https://google.com")</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 26</div>
+<div class="line-code">    """</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 27</div>
+<div class="line-code">    cfg = config or load_scraper_config()</div>
+<div class="line-explain">If no config was passed, load it from the YAML file.</div>
+</div><div class="line-block">
+<div class="line-header">Line 28</div>
+<div class="line-code"></div>
+<div class="line-explain">Empty line.</div>
+</div><div class="line-block">
+<div class="line-header">Line 29</div>
+<div class="line-code">    async with async_playwright() as pw:</div>
+<div class="line-explain">Starts Playwright. <code>pw</code> is the Playwright instance. The <code>async with</code> ensures Playwright is properly shut down when done.</div>
+</div><div class="line-block">
+<div class="line-header">Line 30</div>
+<div class="line-code">        browser: Browser = await pw.chromium.launch(</div>
+<div class="line-explain">Launches a Chromium browser. Returns a Browser object.</div>
+</div><div class="line-block">
+<div class="line-header">Line 31</div>
+<div class="line-code">            headless=cfg.get("headless", True),</div>
+<div class="line-explain">Run without a visible window (default: True).</div>
+</div><div class="line-block">
+<div class="line-header">Line 32</div>
+<div class="line-code">        )</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 33</div>
+<div class="line-code">        context: BrowserContext = await browser.new_context(</div>
+<div class="line-explain">Creates an isolated browser session (like an incognito window).</div>
+</div><div class="line-block">
+<div class="line-header">Line 34</div>
+<div class="line-code">            viewport={</div>
+<div class="line-explain">Sets the browser window size.</div>
+</div><div class="line-block">
+<div class="line-header">Line 35</div>
+<div class="line-code">                "width": cfg.get("viewport_width", 1280),</div>
+<div class="line-explain">Width: 1280 pixels.</div>
+</div><div class="line-block">
+<div class="line-header">Line 36</div>
+<div class="line-code">                "height": cfg.get("viewport_height", 900),</div>
+<div class="line-explain">Height: 900 pixels.</div>
+</div><div class="line-block">
+<div class="line-header">Line 37</div>
+<div class="line-code">            },</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 38</div>
+<div class="line-code">            user_agent=cfg.get("user_agent"),</div>
+<div class="line-explain">Sets the user agent string so we look like a real browser.</div>
+</div><div class="line-block">
+<div class="line-header">Line 39</div>
+<div class="line-code">        )</div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 40</div>
+<div class="line-code">        context.set_default_timeout(cfg.get("page_load_timeout", 30) * 1000)</div>
+<div class="line-explain">Default timeout for all page operations: 30 seconds (converted to milliseconds).</div>
+</div><div class="line-block">
+<div class="line-header">Line 41</div>
+<div class="line-code">        log.info("Browser context created")</div>
+<div class="line-explain">Log that the browser is ready.</div>
+</div><div class="line-block">
+<div class="line-header">Line 42</div>
+<div class="line-code">        try:</div>
+<div class="line-explain">Start try block for cleanup.</div>
+</div><div class="line-block">
+<div class="line-header">Line 43</div>
+<div class="line-code">            yield context</div>
+<div class="line-explain">This is the magic line: it gives the caller the browser context to use. Code pauses here until the caller is done.</div>
+</div><div class="line-block">
+<div class="line-header">Line 44</div>
+<div class="line-code">        finally:</div>
+<div class="line-explain">Cleanup code that runs no matter what.</div>
+</div><div class="line-block">
+<div class="line-header">Line 45</div>
+<div class="line-code">            await context.close()</div>
+<div class="line-explain">Close the browser context (all tabs).</div>
+</div><div class="line-block">
+<div class="line-header">Line 46</div>
+<div class="line-code">            await browser.close()</div>
+<div class="line-explain">Close the browser entirely.</div>
+</div><div class="line-block">
+<div class="line-header">Line 47</div>
+<div class="line-code">            log.info("Browser closed")</div>
+<div class="line-explain">Log that cleanup is complete.</div>
+</div>
+<div class="card">
+<h2>Summary</h2>
+<p>This file has <strong>47 lines</strong>.</p>
+</div>
+<div class="nav"><a href="09-base-py.html">&larr; Previous</a><a href="11-google-flights-py.html">Next &rarr;</a></div>
+</div>
+</body>
+</html>

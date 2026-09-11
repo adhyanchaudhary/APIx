@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Scraping Process Flowchart</title>
+<style>
+:root{--bg:#F08080;--card:rgba(255,255,255,0.92);--blue:#0D47A1;--blue-mid:#1565C0;--blue-light:#BBDEFB;--green:#1B5E20;--green-light:#C8E6C9;--red:#B71C1C;--red-light:#FFCDD2;--black:#1A1A2E;--grey:#546E7A;--orange:#E65100;--orange-light:#FFE0B2;--purple:#4A148C;--purple-light:#E1BEE7;--teal:#00695C;--teal-light:#B2DFDB}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--black);line-height:1.6}
+.wrap{max-width:1000px;margin:0 auto;padding:20px}
+header{background:var(--blue);color:#fff;padding:28px 34px;border-radius:14px;margin-bottom:28px}
+header h1{font-size:1.7rem}
+header p{opacity:.8;margin-top:6px;font-size:.92rem}
+.nav{display:flex;justify-content:space-between;margin:20px 0}
+.nav a{background:var(--blue);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem}
+.nav a:hover{background:var(--blue-mid)}
+
+/* Flow container */
+.flow{display:flex;flex-direction:column;align-items:center;gap:0;margin:24px 0;position:relative}
+.flow::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:4px;background:var(--blue-mid);transform:translateX(-50%);z-index:0}
+
+/* Node types */
+.node{position:relative;z-index:1;margin:6px 0;width:100%;max-width:700px}
+.node-inner{padding:16px 22px;border-radius:12px;border:3px solid;position:relative}
+.node-inner h3{font-size:1rem;margin-bottom:4px}
+.node-inner p{font-size:.88rem;opacity:.85}
+.node-inner .file{font-family:'Courier New',monospace;font-size:.8rem;background:rgba(0,0,0,0.08);padding:2px 8px;border-radius:4px;display:inline-block;margin-top:6px}
+.node-inner .file-path{color:var(--blue);font-weight:600}
+
+/* Start/End */
+.node.start .node-inner{background:#1A237E;color:#fff;border-color:#1A237E;text-align:center}
+.node.start .node-inner h3{font-size:1.2rem}
+.node.end .node-inner{background:#1B5E20;color:#fff;border-color:#1B5E20;text-align:center}
+.node.end .node-inner h3{font-size:1.2rem}
+
+/* Process */
+.node.process .node-inner{background:var(--card);border-color:var(--blue-mid)}
+.node.process .node-inner h3{color:var(--blue)}
+
+/* Decision */
+.node.decision .node-inner{background:#FFF8E1;border-color:var(--orange);transform:rotate(0deg);border-radius:12px}
+.node.decision .node-inner h3{color:var(--orange)}
+
+/* Browser */
+.node.browser .node-inner{background:var(--red-light);border-color:var(--red)}
+.node.browser .node-inner h3{color:var(--red)}
+
+/* Parse */
+.node.parse .node-inner{background:var(--purple-light);border-color:var(--purple)}
+.node.parse .node-inner h3{color:var(--purple)}
+
+/* Database */
+.node.database .node-inner{background:var(--teal-light);border-color:var(--teal)}
+.node.database .node-inner h3{color:var(--teal)}
+
+/* Config */
+.node.config .node-inner{background:var(--blue-light);border-color:var(--blue)}
+.node.config .node-inner h3{color:var(--blue)}
+
+/* Connector */
+.connector{text-align:center;z-index:1;position:relative;font-size:1.4rem;color:var(--blue-mid);padding:2px 0;font-weight:700}
+
+/* Branch */
+.branch{display:flex;gap:16px;align-items:flex-start;width:100%;max-width:800px;z-index:1;position:relative}
+.branch-left,.branch-right{flex:1}
+.branch-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;text-align:center;margin-bottom:6px;padding:3px 10px;border-radius:6px;display:inline-block;width:100%}
+.branch-label.yes{background:#C8E6C9;color:var(--green)}
+.branch-label.no{background:#FFCDD2;color:var(--red)}
+
+/* Side note */
+.side-note{position:absolute;right:-220px;top:50%;transform:translateY(-50%);width:200px;background:var(--card);border:2px dashed var(--grey);border-radius:8px;padding:10px 12px;font-size:.8rem;color:var(--grey);text-align:center}
+
+/* Sub-steps */
+.sub-steps{margin-top:8px;padding-left:16px;border-left:3px solid rgba(0,0,0,0.1)}
+.sub-steps li{font-size:.85rem;margin-bottom:3px;list-style:none}
+.sub-steps li::before{content:'→ ';color:var(--blue);font-weight:700}
+
+/* Loop indicator */
+.loop-box{border:3px dashed var(--orange);border-radius:16px;padding:20px;margin:16px 0;width:100%;max-width:800px;position:relative;z-index:1}
+.loop-label{position:absolute;top:-12px;left:20px;background:var(--orange);color:#fff;padding:2px 12px;border-radius:8px;font-size:.8rem;font-weight:700}
+
+/* Legend */
+.legend{background:var(--card);border-radius:14px;padding:20px 24px;margin:24px 0;border-left:6px solid var(--blue-mid)}
+.legend h2{color:var(--blue);font-size:1.1rem;margin-bottom:12px}
+.legend-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:.88rem}
+.legend-dot{width:16px;height:16px;border-radius:4px;border:2px solid;flex-shrink:0}
+
+/* Summary */
+.summary{background:var(--green-light);border-left:4px solid var(--green);padding:16px 20px;border-radius:8px;margin:16px 0;color:var(--green)}
+.summary::before{content:"Key takeaway: ";font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+<h1>Scraping Process Flowchart</h1>
+<p>How the code flows from your terminal command to saved flight data in the database.</p>
+</header>
+
+<div class="nav"><a href="../index.html">← Back to Index</a><a href="11-google-flights-py.html">Google Flights Scraper →</a></div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- LEGEND -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="legend">
+<h2>Color Legend</h2>
+<div class="legend-grid">
+<div class="legend-item"><div class="legend-dot" style="background:#1A237E;border-color:#1A237E"></div> Start / End</div>
+<div class="legend-item"><div class="legend-dot" style="background:var(--card);border-color:var(--blue-mid)"></div> Python code runs</div>
+<div class="legend-item"><div class="legend-dot" style="background:var(--blue-light);border-color:var(--blue)"></div> Config file read</div>
+<div class="legend-item"><div class="legend-dot" style="background:#FFF8E1;border-color:var(--orange)"></div> Decision point</div>
+<div class="legend-item"><div class="legend-dot" style="background:var(--red-light);border-color:var(--red)"></div> Browser action</div>
+<div class="legend-item"><div class="legend-dot" style="background:var(--purple-light);border-color:var(--purple)"></div> Parse / Extract</div>
+<div class="legend-item"><div class="legend-dot" style="background:var(--teal-light);border-color:var(--teal)"></div> Database write</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- FLOWCHART -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="flow">
+
+<!-- START -->
+<div class="node start">
+<div class="node-inner">
+<h3>You type: python -m src.scraper.run_smoke</h3>
+<p>This is the entry point. Everything starts here.</p>
+</div>
+</div>
+<div class="connector">▼</div>
+
+<!-- STEP 1: INIT DB -->
+<div class="node process">
+<div class="node-inner">
+<h3>Step 1: Initialize Database</h3>
+<p>Create the SQLite file and all 5 tables if they don't exist.</p>
+<div class="file"><span class="file-path">database.py</span> → init_db()</div>
+<ul class="sub-steps">
+<li>Creates <code>data/apix.db</code> file</li>
+<li>Creates tables: raw_flights, cleaned_flights, daily/weekly/monthly_index</li>
+</ul>
+</div>
+</div>
+<div class="connector">▼</div>
+
+<!-- STEP 2: LOAD CONFIG -->
+<div class="node config">
+<div class="node-inner">
+<h3>Step 2: Load Scraper Config</h3>
+<p>Read settings from YAML files.</p>
+<div class="file"><span class="file-path">driver.py</span> → load_scraper_config()</div>
+<ul class="sub-steps">
+<li>Reads <code>config/scraper.yaml</code></li>
+<li>Gets: headless, viewport size, user agent, timeouts, rate limits</li>
+</ul>
+</div>
+</div>
+<div class="connector">▼</div>
+
+<!-- STEP 3: CREATE SCRAPER -->
+<div class="node process">
+<div class="node-inner">
+<h3>Step 3: Create GoogleFlightsScraper</h3>
+<p>Instantiate the scraper object with config settings.</p>
+<div class="file"><span class="file-path">google_flights.py</span> → GoogleFlightsScraper()</div>
+<ul class="sub-steps">
+<li>Stores rate limit settings (60 req/hour, 3-8s delay)</li>
+<li>Stores retry settings (3 retries, 2x backoff)</li>
+</ul>
+</div>
+</div>
+<div class="connector">▼</div>
+
+<!-- STEP 4: CALL FETCH -->
+<div class="node process">
+<div class="node-inner">
+<h3>Step 4: Call fetch_flights()</h3>
+<p>Request flights for one route: DEL → BOM, 7 days ahead.</p>
+<div class="file"><span class="file-path">google_flights.py</span> → fetch_flights("DEL", "BOM", travel_date, 7)</div>
+</div>
+</div>
+<div class="connector">▼</div>
+
+<!-- RATE LIMIT CHECK -->
+<div class="node decision">
+<div class="node-inner">
+<h3>Rate Limit Check</h3>
+<p>Have we made 60+ requests this hour? If yes, wait 60 seconds.</p>
+<div class="file"><span class="file-path">google_flights.py</span> → _respect_rate_limit()</div>
+</div>
+</div>
+<div class="connector">▼</div>
+
+<!-- RETRY LOOP -->
+<div class="loop-box">
+<div class="loop-label">Retry Loop (up to 3 attempts)</div>
+
+<!-- STEP 5: OPEN BROWSER -->
+<div class="node browser">
+<div class="node-inner">
+<h3>Step 5: Open Chromium Browser</h3>
+<p>Launch a visible browser window via Playwright.</p>
+<div class="file"><span class="file-path">driver.py</span> → create_browser_context()</div>
+<ul class="sub-steps">
+<li>Starts Playwright engine</li>
+<li>Launches Chromium (headless=false → you see the window)</li>
+<li>Creates Incognito-like context (1280×900, custom user agent)</li>
+<li>Sets 30-second timeout</li>
+</ul>
+</div>
+</div>
+<div class="connector">▼</div>
+
+<!-- STEP 6: BUILD URL -->
+<div class="node process">
+<div class="node-inner">
+<h3>Step 6: Build Google Flights URL</h3>
+<p>Construct the search URL from route and date.</p>
+<div class="file"><span class="file-path">google_flights.py</span> → _build_url()</div>
+<ul class="sub-steps">
+<li>Input: origin="DEL", dest="BOM", date=2026-09-11</li>
+<li>Looks up city names: DEL → "New Delhi", BOM → "Mumbai"</li>
+<li>Builds: <code>google.com/travel/flights?q=Flights from New Delhi to Mumbai on 2026-09-11</code></li>
+</ul>
+</div>
+</div>
+<div class="connector">▼</div>
+
+<!-- STEP 7: NAVIGATE -->
+<div class="node browser">
+<div class="node-inner">
+<h3>Step 7: Navigate to Google Flights</h3>
+<p>Browser loads the page. This is where you see the window open and navigate.</p>
+<div class="file"><span class="file-path">google_flights.py</span> → page.goto(url)</div>
+<ul class="sub-steps">
+<li>Browser waits for page to load (DOM ready)</li>
+<li>Google Flights runs JavaScript to fetch flight data</li>
+</ul>
+</div>
+</div>
+<div class="connector">▼</div>
+
+<!-- STEP 8: WAIT FOR RESULTS -->
+<div class="node browser">
+<div class="node-inner">
+<h3>Step 8: Wait for Flight Cards to Appear</h3>
+<p>Try multiple CSS selectors until flight results load.</p>
+<div class="file"><span class="file-path">google_flights.py</span> → _wait_for_results()</div>
+<ul class="sub-steps">
+<li>Tries: <code>li.pIav2d</code> → <code>div[role=link]</code> → <code>li[class*=pIav2d]</code> → <code>ul[role=list] > li</code></li>
+<li>Each selector waits up to 15 seconds</li>
+<li>If none match → logs warning, continues anyway</li>
+</ul>
+</div>
+</div>
+<div class="connector">▼</div>
+
+<!-- STEP 9: COLLECT LABELS -->
+<div class="node browser">
+<div class="node-inner">
+<h3>Step 9: Collect aria-labels from Flight Cards</h3>
+<p>Run JavaScript in the browser to extract all aria-label text.</p>
+<div class="file"><span class="file-path">google_flights.py</span> → _collect_aria_labels()</div>
+<ul class="sub-steps">
+<li>Runs JS via <code>page.evaluate()</code> — directly in the browser</li>
+<li>Finds all elements with <code>aria-label</code> attribute</li>
+<li>Filters: keeps only labels containing "rupees" AND "flight"</li>
+<li>Returns array of strings like: <code>"Nonstop flight with IndiGo. Leaves New Delhi at 8:45 AM. Arrives Mumbai at 11:00 AM. Total duration 2 hr 15 min. From 12882 Indian rupees."</code></li>
+</ul>
+</div>
+</div>
+<div class="connector">▼</div>
+
+<!-- LOOP: FOR EACH LABEL -->
+<div class="loop-box">
+<div class="loop-label">For Each aria-label (100-120 labels)</div>
+
+<!-- STEP 10: PARSE LABEL -->
+<div class="node parse">
+<div class="node-inner">
+<h3>Step 10: Parse the aria-label string</h3>
+<p>Extract structured data from the plain English text using regex.</p>
+<div class="file"><span class="file-path">google_flights.py</span> → _parse_aria_label()</div>
+</div>
+</div>
+<div class="connector">▼</div>
+
+<!-- SUB-STEPS: EXTRACTORS -->
+<div style="max-width:700px;width:100%;z-index:1;position:relative">
+<div class="node parse" style="margin:4px 0">
+<div class="node-inner" style="padding:10px 16px">
+<h3 style="font-size:.9rem">Extract Price</h3>
+<p style="font-size:.82rem"><code>_extract_price_from_label()</code> — Regex: <code>"From 12882 Indian rupees"</code> → <strong>12882</strong></p>
+</div>
+</div>
+<div class="node parse" style="margin:4px 0">
+<div class="node-inner" style="padding:10px 16px">
+<h3 style="font-size:.9rem">Extract Carrier</h3>
+<p style="font-size:.82rem"><code>_extract_carrier_from_label()</code> — Regex: <code>"with IndiGo"</code> → <strong>"IndiGo"</strong></p>
+</div>
+</div>
+<div class="node parse" style="margin:4px 0">
+<div class="node-inner" style="padding:10px 16px">
+<h3 style="font-size:.9rem">Extract Stops</h3>
+<p style="font-size:.82rem"><code>_extract_stops_from_label()</code> — Checks: "nonstop" → <strong>0</strong>, "1 stop" → <strong>1</strong></p>
+</div>
+</div>
+<div class="node parse" style="margin:4px 0">
+<div class="node-inner" style="padding:10px 16px">
+<h3 style="font-size:.9rem">Extract Times</h3>
+<p style="font-size:.82rem"><code>_extract_time_from_label()</code> — Regex finds "at 8:45 AM" and "at 11:00 AM" → <strong>departure</strong> and <strong>arrival</strong></p>
+</div>
+</div>
+<div class="node parse" style="margin:4px 0">
+<div class="node-inner" style="padding:10px 16px">
+<h3 style="font-size:.9rem">Extract Duration</h3>
+<p style="font-size:.82rem"><code>_extract_duration_from_label()</code> — Regex: "2 hr 15 min" → <strong>135 minutes</strong></p>
+</div>
+</div>
+</div>
+<div class="connector">▼</div>
+
+<!-- DECISION: VALID FLIGHT? -->
+<div class="node decision">
+<div class="node-inner">
+<h3>Valid Flight?</h3>
+<p>Must have: price, carrier, departure time, and (arrival time OR duration).</p>
+<ul class="sub-steps">
+<li>Missing price or carrier → <strong>skip</strong></li>
+<li>Missing departure time → <strong>skip</strong></li>
+<li>Missing both arrival time AND duration → <strong>skip</strong></li>
+</ul>
+</div>
+</div>
+<div class="connector">▼</div>
+
+<!-- CREATE FLIGHTRECORD -->
+<div class="node process">
+<div class="node-inner">
+<h3>Create FlightRecord Object</h3>
+<p>Package all extracted data into a Pydantic model.</p>
+<div class="file"><span class="file-path">schemas.py</span> → FlightRecord(...)</div>
+<ul class="sub-steps">
+<li>Computes arrival time: if arrival parsed, use it; else departure + duration</li>
+<li>Fixes next-day: if arrival < departure → adds 1 day</li>
+<li>Timestamps the record with current time</li>
+</ul>
+</div>
+</div>
+
+</div><!-- end inner loop -->
+
+<div class="connector">▼</div>
+
+<!-- STEP 11: RETURN RECORDS -->
+<div class="node process">
+<div class="node-inner">
+<h3>Step 11: Return List of FlightRecords</h3>
+<p>All valid flights from this page are returned as a list. (Typically 100-120 records)</p>
+<div class="file"><span class="file-path">google_flights.py</span> → return records</div>
+</div>
+</div>
+
+</div><!-- end retry loop -->
+<div class="connector">▼</div>
+
+<!-- STEP 12: INSERT INTO DB -->
+<div class="node database">
+<div class="node-inner">
+<h3>Step 12: Insert into Database</h3>
+<p>Write all FlightRecords to the raw_flights table in SQLite.</p>
+<div class="file"><span class="file-path">run_scrape.py</span> → _insert_records()</div>
+<ul class="sub-steps">
+<li>Opens connection to <code>data/apix.db</code></li>
+<li>Converts each FlightRecord to a tuple of 16 values</li>
+<li>Batch inserts with <code>executemany()</code> — one SQL query for all rows</li>
+<li>Commits (saves) to disk</li>
+</ul>
+</div>
+</div>
+<div class="connector">▼</div>
+
+<!-- STEP 13: CLOSE BROWSER -->
+<div class="node browser">
+<div class="node-inner">
+<h3>Step 13: Close Browser</h3>
+<p>The <code>finally</code> block runs automatically — closes tabs, then kills Chromium.</p>
+<div class="file"><span class="file-path">driver.py</span> → context.close() → browser.close()</div>
+</div>
+</div>
+<div class="connector">▼</div>
+
+<!-- DECISION: MORE ROUTES? -->
+<div class="node decision">
+<div class="node-inner">
+<h3>More routes × windows to scrape?</h3>
+<p>12 routes × 3 windows = 36 combinations. If more remain, go back to Step 4.</p>
+<ul class="sub-steps">
+<li>Route loop: DEL→BOM, DEL→BLR, DEL→MAA, BOM→DEL, BOM→BLR, ...</li>
+<li>Window loop: T+1, T+7, T+30 for each route</li>
+</ul>
+</div>
+</div>
+<div class="connector">▼</div>
+
+<!-- END -->
+<div class="node end">
+<div class="node-inner">
+<h3>Done! All flights saved to raw_flights.</h3>
+<p>120 rows in the database. Ready for cleaning (Phase 2).</p>
+</div>
+</div>
+
+</div><!-- end flow -->
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- FILE MAP -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="legend" style="border-left-color:var(--purple)">
+<h2 style="color:var(--purple)">Which file does what?</h2>
+<table style="width:100%;border-collapse:collapse;font-size:.9rem">
+<tr style="background:#f5f5f5"><th style="text-align:left;padding:8px 12px;color:var(--grey);font-size:.8rem;text-transform:uppercase">File</th><th style="text-align:left;padding:8px 12px;color:var(--grey);font-size:.8rem;text-transform:uppercase">Role in the flow</th><th style="text-align:left;padding:8px 12px;color:var(--grey);font-size:.8rem;text-transform:uppercase">Lines of code</th></tr>
+<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap">src/scraper/run_smoke.py</td><td style="padding:8px 12px;border-top:1px solid #eee">Entry point — manual smoke test, calls the scraper for 1 route</td><td style="padding:8px 12px;border-top:1px solid #eee">41</td></tr>
+<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap">run_scrape.py</td><td style="padding:8px 12px;border-top:1px solid #eee">Orchestrator — loops all routes × windows, inserts to DB</td><td style="padding:8px 12px;border-top:1px solid #eee">118</td></tr>
+<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap">google_flights.py</td><td style="padding:8px 12px;border-top:1px solid #eee">Core scraper — URL builder, page loader, aria-label parser</td><td style="padding:8px 12px;border-top:1px solid #eee">302</td></tr>
+<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap">driver.py</td><td style="padding:8px 12px;border-top:1px solid #eee">Browser manager — opens/closes Chromium safely</td><td style="padding:8px 12px;border-top:1px solid #eee">47</td></tr>
+<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap">base.py</td><td style="padding:8px 12px;border-top:1px solid #eee">Abstract interface — contract every scraper must follow</td><td style="padding:8px 12px;border-top:1px solid #eee">15</td></tr>
+<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap">schemas.py</td><td style="padding:8px 12px;border-top:1px solid #eee">Data models — FlightRecord definition</td><td style="padding:8px 12px;border-top:1px solid #eee">49</td></tr>
+<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap">database.py</td><td style="padding:8px 12px;border-top:1px solid #eee">DB layer — table creation, connections</td><td style="padding:8px 12px;border-top:1px solid #eee">117</td></tr>
+<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap">scraper.yaml</td><td style="padding:8px 12px;border-top:1px solid #eee">Config — headless, viewport, timeouts, rate limits</td><td style="padding:8px 12px;border-top:1px solid #eee">21</td></tr>
+<tr><td style="padding:8px 12px;border-top:1px solid #eee;font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap">routes.yaml</td><td style="padding:8px 12px;border-top:1px solid #eee">Config — cities, routes, lead windows, weights</td><td style="padding:8px 12px;border-top:1px solid #eee">59</td></tr>
+</table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- DATA TRANSFORMATION -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="legend" style="border-left-color:var(--orange)">
+<h2 style="color:var(--orange)">How data transforms along the way</h2>
+
+<div style="margin:12px 0">
+<div style="font-size:.88rem;font-weight:600;color:var(--grey);margin-bottom:6px">1. Raw aria-label from Google Flights (plain English string)</div>
+<div style="background:#263238;color:#80CBC4;padding:12px 16px;border-radius:8px;font-family:'Courier New',monospace;font-size:.85rem;white-space:pre;overflow-x:auto">"Nonstop flight with IndiGo. Leaves New Delhi at 8:45 AM. Arrives Mumbai at 11:00 AM. Total duration 2 hr 15 min. From 12882 Indian rupees."</div>
+</div>
+
+<div style="text-align:center;font-size:1.5rem;color:var(--orange);margin:8px 0">↓ regex extraction ↓</div>
+
+<div style="margin:12px 0">
+<div style="font-size:.88rem;font-weight:600;color:var(--grey);margin-bottom:6px">2. Extracted fields (Python dictionary)</div>
+<div style="background:#263238;color:#80CBC4;padding:12px 16px;border-radius:8px;font-family:'Courier New',monospace;font-size:.85rem;white-space:pre;overflow-x:auto">{ price: 12882, carrier: "IndiGo", stops: 0, dep: "8:45 AM", arr: "11:00 AM", duration: 135 }</div>
+</div>
+
+<div style="text-align:center;font-size:1.5rem;color:var(--orange);margin:8px 0">↓ FlightRecord model ↓</div>
+
+<div style="margin:12px 0">
+<div style="font-size:.88rem;font-weight:600;color:var(--grey);margin-bottom:6px">3. FlightRecord object (typed, validated)</div>
+<div style="background:#263238;color:#80CBC4;padding:12px 16px;border-radius:8px;font-family:'Courier New',monospace;font-size:.85rem;white-space:pre;overflow-x:auto">FlightRecord(route="DEL-BOM", origin="DEL", dest="BOM", carrier="IndiGo",
+  depart_time=datetime(2026,9,11,8,45), arrive_time=datetime(2026,9,11,11,0),
+  duration_mins=135, stops=0, total_fare=12882.0, ...)</div>
+</div>
+
+<div style="text-align:center;font-size:1.5rem;color:var(--orange);margin:8px 0">↓ SQL INSERT ↓</div>
+
+<div style="margin:12px 0">
+<div style="font-size:.88rem;font-weight:600;color:var(--grey);margin-bottom:6px">4. Row in raw_flights table (SQLite)</div>
+<div style="background:#263238;color:#80CBC4;padding:12px 16px;border-radius:8px;font-family:'Courier New',monospace;font-size:.85rem;white-space:pre;overflow-x:auto">| id=1 | scrape_date=2026-09-04 | route=DEL-BOM | carrier=IndiGo |
+| dep=2026-09-11 08:45 | arr=2026-09-11 11:00 | dur=135 | stops=0 |
+| fare=12882.0 | currency=INR | window=7 | scraped=2026-09-04 15:30:00 |</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SUMMARY -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="summary">
+One command → browser opens → visits Google Flights → reads 120 aria-labels → regex extracts price/times/carrier → packages into FlightRecords → saves to SQLite → browser closes. 13 steps, ~15 seconds, 120 flights scraped.
+</div>
+
+<div class="nav"><a href="../index.html">← Back to Index</a><a href="11-google-flights-py.html">Google Flights Scraper →</a></div>
+
+</div>
+</body>
+</html>
