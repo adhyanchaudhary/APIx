@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Walkthrough 23: src/indexer/estimators.py</title>
+<style>
+:root{--bg:#F08080;--card:rgba(255,255,255,0.92);--blue:#0D47A1;--blue-mid:#1565C0;--blue-light:#BBDEFB;--green:#1B5E20;--green-light:#C8E6C9;--red:#B71C1C;--red-light:#FFCDD2;--black:#1A1A2E;--grey:#546E7A}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--black);line-height:1.7}
+.wrap{max-width:900px;margin:0 auto;padding:20px}
+header{background:var(--blue);color:#fff;padding:24px 32px;border-radius:14px;margin-bottom:24px}
+header h1{font-size:1.6rem}
+header .sub{opacity:.75;margin-top:4px;font-size:.9rem}
+.card{background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:20px;border-left:6px solid var(--blue-mid)}
+.card h2{color:var(--blue);font-size:1.2rem;margin-bottom:8px}
+.line-block{margin:14px 0;border-radius:8px;overflow:hidden;border:1px solid #ddd}
+.line-header{background:var(--blue);color:#fff;padding:6px 14px;font-size:.85rem;font-weight:600}
+.line-code{background:#263238;color:#80CBC4;padding:10px 16px;font-family:'Courier New',monospace;font-size:.85rem;white-space:pre;overflow-x:auto}
+.line-explain{background:#E8F5E9;padding:10px 16px;font-size:.9rem;border-top:1px solid #C8E6C9}
+.line-explain strong{color:var(--green)}
+.line-explain code{background:#C8E6C9;padding:1px 5px;border-radius:3px;font-family:'Courier New',monospace;font-size:.85rem}
+.nav{display:flex;justify-content:space-between;margin:20px 0}
+.nav a{background:var(--blue);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem}
+.nav a:hover{background:var(--blue-mid)}
+.note{background:var(--blue-light);border-left:4px solid var(--blue);padding:10px 14px;border-radius:6px;margin:10px 0;font-size:.9rem}
+.summary{background:var(--green-light);border-left:4px solid var(--green);padding:12px 16px;border-radius:6px;margin:14px 0;color:var(--green)}
+.summary::before{content:"Key takeaway: ";font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Walkthrough 23: src/indexer/estimators.py</h1>
+<div class="sub">src/indexer/estimators.py</div>
+</header>
+<div class="nav"><a href="22-test-indexer-py.html">&larr; Previous</a><a href="24-synthetic-py.html">Next &rarr;</a></div>
+<div class="card">
+<h2>File Overview</h2>
+<p>Every line of this file is explained in plain English below. Code shown is read directly from the current file on disk.</p>
+</div>
+<div class="line-block">
+<div class="line-header">Line 1</div>
+<div class="line-code">"""Robust aggregation estimators for the APIx headline index.</div>
+<div class="line-explain">Module docstring: the robust aggregation estimators behind the APIx headline.</div>
+</div><div class="line-block">
+<div class="line-header">Line 2</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 3</div>
+<div class="line-code">Three ways to combine route indices (and theirs weights) into a single daily</div>
+<div class="line-explain">Docstring: three ways to combine route indices (and their weights)...</div>
+</div><div class="line-block">
+<div class="line-header">Line 4</div>
+<div class="line-code">headline number, selectable by string name in config/indexer.yaml:</div>
+<div class="line-explain">...into a single daily headline, selected by name in config/indexer.yaml.</div>
+</div><div class="line-block">
+<div class="line-header">Line 5</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 6</div>
+<div class="line-code">    weighted_mean            — current Laspeyres behaviour: Σ(v·w) / Σw.</div>
+<div class="line-explain">weighted_mean — the classic Laspeyres behaviour: sum(v·w) / sum(w).</div>
+</div><div class="line-block">
+<div class="line-header">Line 7</div>
+<div class="line-code">    weighted_trimmed_mean    — shave ``trim_frac`` of weight from each tail,</div>
+<div class="line-explain">weighted_trimmed_mean — shave trim_frac of weight from each tail...</div>
+</div><div class="line-block">
+<div class="line-header">Line 8</div>
+<div class="line-code">                               then re-balance and average the survivors.</div>
+<div class="line-explain">...then re-balance and average the survivors.</div>
+</div><div class="line-block">
+<div class="line-header">Line 9</div>
+<div class="line-code">    weighted_median          — the value at which cumulative weight crosses 0.5.</div>
+<div class="line-explain">weighted_median — the value at which cumulative weight crosses 0.5.</div>
+</div><div class="line-block">
+<div class="line-header">Line 10</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 11</div>
+<div class="line-code">Trimming is measured in WEIGHT MASS, not route count: cheap/costly extremes</div>
+<div class="line-explain">Docstring: trimming is measured in WEIGHT MASS, not route count...</div>
+</div><div class="line-block">
+<div class="line-header">Line 12</div>
+<div class="line-code">are removed until the desired share of the basket is set aside, so a small</div>
+<div class="line-explain">...cheap/costly extremes are removed until the desired share is set aside...</div>
+</div><div class="line-block">
+<div class="line-header">Line 13</div>
+<div class="line-code">route is fully eaten while a big route is only partially shaved.</div>
+<div class="line-explain">...so a small route is fully eaten while a big route is only partially shaved.</div>
+</div><div class="line-block">
+<div class="line-header">Line 14</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 15</div>
+<div class="line-code">All functions take parallel ``values`` / ``weights`` array-likes and return a</div>
+<div class="line-explain">Docstring: all functions take parallel values/weights array-likes and return a float...</div>
+</div><div class="line-block">
+<div class="line-header">Line 16</div>
+<div class="line-code">float; a single surviving value (or NaN for degenerate input) is returned as-is.</div>
+<div class="line-explain">...a single surviving value (or NaN for degenerate input) is returned as-is.</div>
+</div><div class="line-block">
+<div class="line-header">Line 17</div>
+<div class="line-code">"""</div>
+<div class="line-explain">Closes the docstring.</div>
+</div><div class="line-block">
+<div class="line-header">Line 18</div>
+<div class="line-code">from __future__ import annotations</div>
+<div class="line-explain">Enables forward type annotations.</div>
+</div><div class="line-block">
+<div class="line-header">Line 19</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 20</div>
+<div class="line-code">from typing import Callable, Sequence</div>
+<div class="line-explain">Typing: Callable for the registry, Sequence for inputs.</div>
+</div><div class="line-block">
+<div class="line-header">Line 21</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 22</div>
+<div class="line-code">import numpy as np</div>
+<div class="line-explain">Imports numpy for all array arithmetic.</div>
+</div><div class="line-block">
+<div class="line-header">Line 23</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 24</div>
+<div class="line-code">DEFAULT_TRIM_FRAC: float = 0.10</div>
+<div class="line-explain">DEFAULT_TRIM_FRAC: the 10% default trim used everywhere.</div>
+</div><div class="line-block">
+<div class="line-header">Line 25</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 26</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 27</div>
+<div class="line-code">def _as_arrays(values: Sequence[float], weights: Sequence[float]) -&gt; tuple[np.ndarray, np.ndarray]:</div>
+<div class="line-explain">Defines _as_arrays: validates and converts inputs to aligned float arrays.</div>
+</div><div class="line-block">
+<div class="line-header">Line 28</div>
+<div class="line-code">    """Validate and convert inputs to aligned float arrays."""</div>
+<div class="line-explain">Docstring.</div>
+</div><div class="line-block">
+<div class="line-header">Line 29</div>
+<div class="line-code">    v = np.asarray(values, dtype=float)</div>
+<div class="line-explain">Converts values to a float array.</div>
+</div><div class="line-block">
+<div class="line-header">Line 30</div>
+<div class="line-code">    w = np.asarray(weights, dtype=float)</div>
+<div class="line-explain">Converts weights to a float array.</div>
+</div><div class="line-block">
+<div class="line-header">Line 31</div>
+<div class="line-code">    if v.ndim != 1 or w.ndim != 1:</div>
+<div class="line-explain">Both must be 1-D...</div>
+</div><div class="line-block">
+<div class="line-header">Line 32</div>
+<div class="line-code">        raise ValueError("values and weights must be 1-D arrays")</div>
+<div class="line-explain">...else raise a clear error.</div>
+</div><div class="line-block">
+<div class="line-header">Line 33</div>
+<div class="line-code">    if v.shape != w.shape:</div>
+<div class="line-explain">Both must have the same length...</div>
+</div><div class="line-block">
+<div class="line-header">Line 34</div>
+<div class="line-code">        raise ValueError("values and weights must have the same length")</div>
+<div class="line-explain">...else raise.</div>
+</div><div class="line-block">
+<div class="line-header">Line 35</div>
+<div class="line-code">    return v, w</div>
+<div class="line-explain">Returns the two aligned arrays.</div>
+</div><div class="line-block">
+<div class="line-header">Line 36</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 37</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 38</div>
+<div class="line-code">def weighted_mean(values: Sequence[float], weights: Sequence[float]) -&gt; float:</div>
+<div class="line-explain">Defines weighted_mean: the classic Laspeyres weighted average.</div>
+</div><div class="line-block">
+<div class="line-header">Line 39</div>
+<div class="line-code">    """Weighted arithmetic mean of values — the classic Laspeyres aggregate."""</div>
+<div class="line-explain">Docstring.</div>
+</div><div class="line-block">
+<div class="line-header">Line 40</div>
+<div class="line-code">    v, w = _as_arrays(values, weights)</div>
+<div class="line-explain">Validates and aligns the inputs.</div>
+</div><div class="line-block">
+<div class="line-header">Line 41</div>
+<div class="line-code">    total = float(w.sum())</div>
+<div class="line-explain">Total weight.</div>
+</div><div class="line-block">
+<div class="line-header">Line 42</div>
+<div class="line-code">    if total &lt;= 0:</div>
+<div class="line-explain">Non-positive total means nothing to weight...</div>
+</div><div class="line-block">
+<div class="line-header">Line 43</div>
+<div class="line-code">        return float("nan")</div>
+<div class="line-explain">...so return NaN.</div>
+</div><div class="line-block">
+<div class="line-header">Line 44</div>
+<div class="line-code">    return float((v * w).sum() / total)</div>
+<div class="line-explain">Σ(v·w) / Σw.</div>
+</div><div class="line-block">
+<div class="line-header">Line 45</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 46</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 47</div>
+<div class="line-code">def weighted_trimmed_mean(</div>
+<div class="line-explain">Defines weighted_trimmed_mean: weight-trimmed mean.</div>
+</div><div class="line-block">
+<div class="line-header">Line 48</div>
+<div class="line-code">    values: Sequence[float],</div>
+<div class="line-explain">Parameter: values.</div>
+</div><div class="line-block">
+<div class="line-header">Line 49</div>
+<div class="line-code">    weights: Sequence[float],</div>
+<div class="line-explain">Parameter: weights.</div>
+</div><div class="line-block">
+<div class="line-header">Line 50</div>
+<div class="line-code">    trim_frac: float = DEFAULT_TRIM_FRAC,</div>
+<div class="line-explain">Parameter: trim fraction (defaults to DEFAULT_TRIM_FRAC).</div>
+</div><div class="line-block">
+<div class="line-header">Line 51</div>
+<div class="line-code">) -&gt; float:</div>
+<div class="line-explain">Return type.</div>
+</div><div class="line-block">
+<div class="line-header">Line 52</div>
+<div class="line-code">    """Weighted mean with ``trim_frac`` of weight cut from each tail.</div>
+<div class="line-explain">Docstring (first part).</div>
+</div><div class="line-block">
+<div class="line-header">Line 53</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 54</div>
+<div class="line-code">    Values are sorted ascending; each element's weight is clipped so that the</div>
+<div class="line-explain">Docstring: values are sorted ascending; each element's weight is clipped...</div>
+</div><div class="line-block">
+<div class="line-header">Line 55</div>
+<div class="line-code">    cumulative weight stays inside [trim_frac·total, (1-trim_frac)·total].</div>
+<div class="line-explain">...so the cumulative weight stays inside [trim_frac·total, (1-trim_frac)·total].</div>
+</div><div class="line-block">
+<div class="line-header">Line 56</div>
+<div class="line-code">    Returns NaN if nothing survives the trim (e.g. trim_frac &gt;= 0.5).</div>
+<div class="line-explain">Docstring: returns NaN if nothing survives the trim (trim_frac >= 0.5).</div>
+</div><div class="line-block">
+<div class="line-header">Line 57</div>
+<div class="line-code">    """</div>
+<div class="line-explain">Closes the docstring.</div>
+</div><div class="line-block">
+<div class="line-header">Line 58</div>
+<div class="line-code">    v, w = _as_arrays(values, weights)</div>
+<div class="line-explain">Validates and aligns the inputs.</div>
+</div><div class="line-block">
+<div class="line-header">Line 59</div>
+<div class="line-code">    total = float(w.sum())</div>
+<div class="line-explain">Total weight.</div>
+</div><div class="line-block">
+<div class="line-header">Line 60</div>
+<div class="line-code">    if total &lt;= 0:</div>
+<div class="line-explain">Non-positive total: NaN.</div>
+</div><div class="line-block">
+<div class="line-header">Line 61</div>
+<div class="line-code">        return float("nan")</div>
+<div class="line-explain">Returns NaN.</div>
+</div><div class="line-block">
+<div class="line-header">Line 62</div>
+<div class="line-code">    if len(v) == 1:</div>
+<div class="line-explain">Single value passes through unchanged.</div>
+</div><div class="line-block">
+<div class="line-header">Line 63</div>
+<div class="line-code">        return float(v[0])</div>
+<div class="line-explain">Returns it.</div>
+</div><div class="line-block">
+<div class="line-header">Line 64</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 65</div>
+<div class="line-code">    order = np.argsort(v)</div>
+<div class="line-explain">Sorts values ascending.</div>
+</div><div class="line-block">
+<div class="line-header">Line 66</div>
+<div class="line-code">    v = v[order]</div>
+<div class="line-explain">Reorders v...</div>
+</div><div class="line-block">
+<div class="line-header">Line 67</div>
+<div class="line-code">    w = w[order]</div>
+<div class="line-explain">...and w to match.</div>
+</div><div class="line-block">
+<div class="line-header">Line 68</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 69</div>
+<div class="line-code">    if trim_frac is None:</div>
+<div class="line-explain">trim_frac None falls back to the default.</div>
+</div><div class="line-block">
+<div class="line-header">Line 70</div>
+<div class="line-code">        trim_frac = DEFAULT_TRIM_FRAC</div>
+<div class="line-explain">Resets trim_frac to DEFAULT_TRIM_FRAC.</div>
+</div><div class="line-block">
+<div class="line-header">Line 71</div>
+<div class="line-code">    trim_frac = max(0.0, min(float(trim_frac), 0.5))</div>
+<div class="line-explain">Clamps trim_frac into [0.0, 0.5].</div>
+</div><div class="line-block">
+<div class="line-header">Line 72</div>
+<div class="line-code">    lower = trim_frac * total</div>
+<div class="line-explain">Lower weight boundary.</div>
+</div><div class="line-block">
+<div class="line-header">Line 73</div>
+<div class="line-code">    upper = total - lower</div>
+<div class="line-explain">Upper weight boundary.</div>
+</div><div class="line-block">
+<div class="line-header">Line 74</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 75</div>
+<div class="line-code">    cum = np.cumsum(w)</div>
+<div class="line-explain">Cumulative weight array.</div>
+</div><div class="line-block">
+<div class="line-header">Line 76</div>
+<div class="line-code">    # Overlap of each element's weight interval [cum-w, cum] with [lower, upper].</div>
+<div class="line-explain">Comment: overlap of each element's weight interval [cum-w, cum] with [lower, upper].</div>
+</div><div class="line-block">
+<div class="line-header">Line 77</div>
+<div class="line-code">    w_kept = np.maximum(0.0, np.minimum(cum, upper) - np.maximum(cum - w, lower))</div>
+<div class="line-explain">Per-element surviving weight after the trim.</div>
+</div><div class="line-block">
+<div class="line-header">Line 78</div>
+<div class="line-code">    kept_total = float(w_kept.sum())</div>
+<div class="line-explain">Total surviving weight.</div>
+</div><div class="line-block">
+<div class="line-header">Line 79</div>
+<div class="line-code">    if kept_total &lt;= 0:</div>
+<div class="line-explain">Nothing survived...</div>
+</div><div class="line-block">
+<div class="line-header">Line 80</div>
+<div class="line-code">        return weighted_median(v, w)</div>
+<div class="line-explain">...fall back to the weighted median.</div>
+</div><div class="line-block">
+<div class="line-header">Line 81</div>
+<div class="line-code">    return float((v * w_kept).sum() / kept_total)</div>
+<div class="line-explain">Weighted average of the surviving values.</div>
+</div><div class="line-block">
+<div class="line-header">Line 82</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 83</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 84</div>
+<div class="line-code">def weighted_median(values: Sequence[float], weights: Sequence[float]) -&gt; float:</div>
+<div class="line-explain">Defines weighted_median: the weighted median of values.</div>
+</div><div class="line-block">
+<div class="line-header">Line 85</div>
+<div class="line-code">    """Weighted median of values.</div>
+<div class="line-explain">Docstring (first line).</div>
+</div><div class="line-block">
+<div class="line-header">Line 86</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 87</div>
+<div class="line-code">    Returns the value at which cumulative weight reaches 0.5·total; when the</div>
+<div class="line-explain">Docstring: returns the value at which cumulative weight reaches 0.5·total...</div>
+</div><div class="line-block">
+<div class="line-header">Line 88</div>
+<div class="line-code">    halfway point falls exactly on a boundary, averages the two neighbours.</div>
+<div class="line-explain">...when the halfway point falls exactly on a boundary, averages the two neighbours.</div>
+</div><div class="line-block">
+<div class="line-header">Line 89</div>
+<div class="line-code">    """</div>
+<div class="line-explain">Closes the docstring.</div>
+</div><div class="line-block">
+<div class="line-header">Line 90</div>
+<div class="line-code">    v, w = _as_arrays(values, weights)</div>
+<div class="line-explain">Validates and aligns the inputs.</div>
+</div><div class="line-block">
+<div class="line-header">Line 91</div>
+<div class="line-code">    total = float(w.sum())</div>
+<div class="line-explain">Total weight.</div>
+</div><div class="line-block">
+<div class="line-header">Line 92</div>
+<div class="line-code">    if total &lt;= 0:</div>
+<div class="line-explain">Non-positive total: NaN.</div>
+</div><div class="line-block">
+<div class="line-header">Line 93</div>
+<div class="line-code">        return float("nan")</div>
+<div class="line-explain">Returns NaN.</div>
+</div><div class="line-block">
+<div class="line-header">Line 94</div>
+<div class="line-code">    if len(v) == 1:</div>
+<div class="line-explain">Single value passes through.</div>
+</div><div class="line-block">
+<div class="line-header">Line 95</div>
+<div class="line-code">        return float(v[0])</div>
+<div class="line-explain">Returns it.</div>
+</div><div class="line-block">
+<div class="line-header">Line 96</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 97</div>
+<div class="line-code">    order = np.argsort(v)</div>
+<div class="line-explain">Sorts values ascending.</div>
+</div><div class="line-block">
+<div class="line-header">Line 98</div>
+<div class="line-code">    v = v[order]</div>
+<div class="line-explain">Reorders v...</div>
+</div><div class="line-block">
+<div class="line-header">Line 99</div>
+<div class="line-code">    w = w[order]</div>
+<div class="line-explain">...and w.</div>
+</div><div class="line-block">
+<div class="line-header">Line 100</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 101</div>
+<div class="line-code">    half = 0.5 * total</div>
+<div class="line-explain">Half the total weight.</div>
+</div><div class="line-block">
+<div class="line-header">Line 102</div>
+<div class="line-code">    cum = np.cumsum(w)</div>
+<div class="line-explain">Cumulative weight array.</div>
+</div><div class="line-block">
+<div class="line-header">Line 103</div>
+<div class="line-code">    idx = int(np.searchsorted(cum, half, side="right"))</div>
+<div class="line-explain">Finds the index where cumulative weight first exceeds half.</div>
+</div><div class="line-block">
+<div class="line-header">Line 104</div>
+<div class="line-code">    if idx == 0:</div>
+<div class="line-explain">Index 0...</div>
+</div><div class="line-block">
+<div class="line-header">Line 105</div>
+<div class="line-code">        return float(v[0])</div>
+<div class="line-explain">...return the smallest value.</div>
+</div><div class="line-block">
+<div class="line-header">Line 106</div>
+<div class="line-code">    if idx &gt;= len(v):</div>
+<div class="line-explain">Index past the end...</div>
+</div><div class="line-block">
+<div class="line-header">Line 107</div>
+<div class="line-code">        return float(v[-1])</div>
+<div class="line-explain">...return the largest value.</div>
+</div><div class="line-block">
+<div class="line-header">Line 108</div>
+<div class="line-code">    # Exact boundary: cumulative weight equals half exactly → average neighbours.</div>
+<div class="line-explain">Comment: exact boundary — cumulative weight equals half → average the neighbours.</div>
+</div><div class="line-block">
+<div class="line-header">Line 109</div>
+<div class="line-code">    if cum[idx - 1] == half:</div>
+<div class="line-explain">The boundary case...</div>
+</div><div class="line-block">
+<div class="line-header">Line 110</div>
+<div class="line-code">        return float((v[idx - 1] + v[idx]) / 2.0)</div>
+<div class="line-explain">...returns the midpoint of the two neighbours.</div>
+</div><div class="line-block">
+<div class="line-header">Line 111</div>
+<div class="line-code">    return float(v[idx])</div>
+<div class="line-explain">Otherwise return the value at idx.</div>
+</div><div class="line-block">
+<div class="line-header">Line 112</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 113</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 114</div>
+<div class="line-code">ESTIMATORS: dict[str, Callable] = {</div>
+<div class="line-explain">ESTIMATORS: the name-to-function registry used by aggregate.</div>
+</div><div class="line-block">
+<div class="line-header">Line 115</div>
+<div class="line-code">    "weighted_mean": weighted_mean,</div>
+<div class="line-explain">Registers weighted_mean.</div>
+</div><div class="line-block">
+<div class="line-header">Line 116</div>
+<div class="line-code">    "weighted_trimmed_mean": weighted_trimmed_mean,</div>
+<div class="line-explain">Registers weighted_trimmed_mean.</div>
+</div><div class="line-block">
+<div class="line-header">Line 117</div>
+<div class="line-code">    "weighted_median": weighted_median,</div>
+<div class="line-explain">Registers weighted_median.</div>
+</div><div class="line-block">
+<div class="line-header">Line 118</div>
+<div class="line-code">}</div>
+<div class="line-explain">Closes the registry dict.</div>
+</div><div class="line-block">
+<div class="line-header">Line 119</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 120</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 121</div>
+<div class="line-code">def aggregate(</div>
+<div class="line-explain">Defines aggregate: dispatches to the named estimator with a uniform signature.</div>
+</div><div class="line-block">
+<div class="line-header">Line 122</div>
+<div class="line-code">    values: Sequence[float],</div>
+<div class="line-explain">Parameter: values.</div>
+</div><div class="line-block">
+<div class="line-header">Line 123</div>
+<div class="line-code">    weights: Sequence[float],</div>
+<div class="line-explain">Parameter: weights.</div>
+</div><div class="line-block">
+<div class="line-header">Line 124</div>
+<div class="line-code">    estimator: str = "weighted_mean",</div>
+<div class="line-explain">Parameter: estimator name.</div>
+</div><div class="line-block">
+<div class="line-header">Line 125</div>
+<div class="line-code">    trim_frac: float = DEFAULT_TRIM_FRAC,</div>
+<div class="line-explain">Parameter: trim fraction.</div>
+</div><div class="line-block">
+<div class="line-header">Line 126</div>
+<div class="line-code">) -&gt; float:</div>
+<div class="line-explain">Return type.</div>
+</div><div class="line-block">
+<div class="line-header">Line 127</div>
+<div class="line-code">    """Dispatch to the named estimator with a uniform signature."""</div>
+<div class="line-explain">Docstring.</div>
+</div><div class="line-block">
+<div class="line-header">Line 128</div>
+<div class="line-code">    if estimator not in ESTIMATORS:</div>
+<div class="line-explain">Unknown estimator name...</div>
+</div><div class="line-block">
+<div class="line-header">Line 129</div>
+<div class="line-code">        raise ValueError(</div>
+<div class="line-explain">...raise...</div>
+</div><div class="line-block">
+<div class="line-header">Line 130</div>
+<div class="line-code">            f"Unknown estimator '{estimator}'. Choose from {sorted(ESTIMATORS)}"</div>
+<div class="line-explain">...a ValueError listing the choices.</div>
+</div><div class="line-block">
+<div class="line-header">Line 131</div>
+<div class="line-code">        )</div>
+<div class="line-explain">Closes the raise call.</div>
+</div><div class="line-block">
+<div class="line-header">Line 132</div>
+<div class="line-code">    if estimator == "weighted_trimmed_mean":</div>
+<div class="line-explain">weighted_trimmed_mean needs the trim fraction...</div>
+</div><div class="line-block">
+<div class="line-header">Line 133</div>
+<div class="line-code">        return weighted_trimmed_mean(values, weights, trim_frac)</div>
+<div class="line-explain">...pass it through explicitly.</div>
+</div><div class="line-block">
+<div class="line-header">Line 134</div>
+<div class="line-code">    return ESTIMATORS[estimator](values, weights)</div>
+<div class="line-explain">All other estimators dispatch directly.</div>
+</div>
+<div class="card">
+<h2>Summary</h2>
+<p>This file has <strong>134 lines</strong>, each explained above.</p>
+</div>
+<div class="nav"><a href="22-test-indexer-py.html">&larr; Previous</a><a href="24-synthetic-py.html">Next &rarr;</a></div>
+</div>
+</body>
+</html>

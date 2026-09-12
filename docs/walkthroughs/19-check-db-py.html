@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Walkthrough 19: src/cleaner/check_db.py</title>
+<style>
+:root{--bg:#F08080;--card:rgba(255,255,255,0.92);--blue:#0D47A1;--blue-mid:#1565C0;--blue-light:#BBDEFB;--green:#1B5E20;--green-light:#C8E6C9;--red:#B71C1C;--red-light:#FFCDD2;--black:#1A1A2E;--grey:#546E7A}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--black);line-height:1.7}
+.wrap{max-width:900px;margin:0 auto;padding:20px}
+header{background:var(--blue);color:#fff;padding:24px 32px;border-radius:14px;margin-bottom:24px}
+header h1{font-size:1.6rem}
+header .sub{opacity:.75;margin-top:4px;font-size:.9rem}
+.card{background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:20px;border-left:6px solid var(--blue-mid)}
+.card h2{color:var(--blue);font-size:1.2rem;margin-bottom:8px}
+.line-block{margin:14px 0;border-radius:8px;overflow:hidden;border:1px solid #ddd}
+.line-header{background:var(--blue);color:#fff;padding:6px 14px;font-size:.85rem;font-weight:600}
+.line-code{background:#263238;color:#80CBC4;padding:10px 16px;font-family:'Courier New',monospace;font-size:.85rem;white-space:pre;overflow-x:auto}
+.line-explain{background:#E8F5E9;padding:10px 16px;font-size:.9rem;border-top:1px solid #C8E6C9}
+.line-explain strong{color:var(--green)}
+.line-explain code{background:#C8E6C9;padding:1px 5px;border-radius:3px;font-family:'Courier New',monospace;font-size:.85rem}
+.nav{display:flex;justify-content:space-between;margin:20px 0}
+.nav a{background:var(--blue);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem}
+.nav a:hover{background:var(--blue-mid)}
+.note{background:var(--blue-light);border-left:4px solid var(--blue);padding:10px 14px;border-radius:6px;margin:10px 0;font-size:.9rem}
+.summary{background:var(--green-light);border-left:4px solid var(--green);padding:12px 16px;border-radius:6px;margin:14px 0;color:var(--green)}
+.summary::before{content:"Key takeaway: ";font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Walkthrough 19: src/cleaner/check_db.py</h1>
+<div class="sub">src/cleaner/check_db.py</div>
+</header>
+<div class="nav"><a href="18-mock-data-py.html">&larr; Previous</a><a href="20-test-run-py.html">Next &rarr;</a></div>
+<div class="card">
+<h2>File Overview</h2>
+<p>Every line of this file is explained in plain English below. Code shown is read directly from the current file on disk.</p>
+</div>
+<div class="line-block">
+<div class="line-header">Line 1</div>
+<div class="line-code">import sqlite3</div>
+<div class="line-explain">Imports sqlite3 for direct database access.</div>
+</div><div class="line-block">
+<div class="line-header">Line 2</div>
+<div class="line-code">import pandas as pd</div>
+<div class="line-explain">Imports pandas for SQL query execution.</div>
+</div><div class="line-block">
+<div class="line-header">Line 3</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 4</div>
+<div class="line-code">db_path = "flights.db"</div>
+<div class="line-explain">Opens the default flights.db database.</div>
+</div><div class="line-block">
+<div class="line-header">Line 5</div>
+<div class="line-code">conn = sqlite3.connect(db_path)</div>
+<div class="line-explain">Creates a persistent connection.</div>
+</div><div class="line-block">
+<div class="line-header">Line 6</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 7</div>
+<div class="line-code">print("--- 1. RECORD COUNT COMPARISON ---")</div>
+<div class="line-explain">Prints the header for the record count comparison.</div>
+</div><div class="line-block">
+<div class="line-header">Line 8</div>
+<div class="line-code">count_df = pd.read_sql_query("""</div>
+<div class="line-explain">Runs a SQL query comparing raw and cleaned row counts.</div>
+</div><div class="line-block">
+<div class="line-header">Line 9</div>
+<div class="line-code">    SELECT </div>
+<div class="line-explain">SELECT keyword.</div>
+</div><div class="line-block">
+<div class="line-header">Line 10</div>
+<div class="line-code">        (SELECT COUNT(*) FROM raw_flights) AS raw_count,</div>
+<div class="line-explain">Subquery: count of raw_flights rows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 11</div>
+<div class="line-code">        (SELECT COUNT(*) FROM cleaned_flights) AS cleaned_count,</div>
+<div class="line-explain">Subquery: count of cleaned_flights rows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 12</div>
+<div class="line-code">        (SELECT COUNT(*) FROM raw_flights) - (SELECT COUNT(*) FROM cleaned_flights) AS removed_records</div>
+<div class="line-explain">Subquery: difference between raw and cleaned counts.</div>
+</div><div class="line-block">
+<div class="line-header">Line 13</div>
+<div class="line-code">""", conn)</div>
+<div class="line-explain">Closes the SQL string and passes the connection.</div>
+</div><div class="line-block">
+<div class="line-header">Line 14</div>
+<div class="line-code">print(count_df.to_string(index=False))</div>
+<div class="line-explain">Prints the count comparison table.</div>
+</div><div class="line-block">
+<div class="line-header">Line 15</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 16</div>
+<div class="line-code">print("\n--- 2. OUTLIER CHECK (cleaned_flights) ---")</div>
+<div class="line-explain">Prints the header for the outlier check.</div>
+</div><div class="line-block">
+<div class="line-header">Line 17</div>
+<div class="line-code">outlier_df = pd.read_sql_query("""</div>
+<div class="line-explain">Runs a query counting rows by is_outlier flag.</div>
+</div><div class="line-block">
+<div class="line-header">Line 18</div>
+<div class="line-code">    SELECT is_outlier, COUNT(*) as record_count </div>
+<div class="line-explain">Selects is_outlier and its count.</div>
+</div><div class="line-block">
+<div class="line-header">Line 19</div>
+<div class="line-code">    FROM cleaned_flights </div>
+<div class="line-explain">From the cleaned_flights table.</div>
+</div><div class="line-block">
+<div class="line-header">Line 20</div>
+<div class="line-code">    GROUP BY is_outlier</div>
+<div class="line-explain">Groups by the is_outlier column.</div>
+</div><div class="line-block">
+<div class="line-header">Line 21</div>
+<div class="line-code">""", conn)</div>
+<div class="line-explain">Closes the SQL string.</div>
+</div><div class="line-block">
+<div class="line-header">Line 22</div>
+<div class="line-code">print(outlier_df.to_string(index=False))</div>
+<div class="line-explain">Prints the outlier distribution.</div>
+</div><div class="line-block">
+<div class="line-header">Line 23</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 24</div>
+<div class="line-code">print("\n--- 3. NULL / MISSING VALUES AUDIT ---")</div>
+<div class="line-explain">Prints the header for the null-values audit.</div>
+</div><div class="line-block">
+<div class="line-header">Line 25</div>
+<div class="line-code">cleaned_data = pd.read_sql_query("SELECT * FROM cleaned_flights", conn)</div>
+<div class="line-explain">Loads the entire cleaned_flights table into a DataFrame.</div>
+</div><div class="line-block">
+<div class="line-header">Line 26</div>
+<div class="line-code">null_counts = cleaned_data.isnull().sum().reset_index()</div>
+<div class="line-explain">Counts null values per column.</div>
+</div><div class="line-block">
+<div class="line-header">Line 27</div>
+<div class="line-code">null_counts.columns = ['column_name', 'null_count']</div>
+<div class="line-explain">Renames columns for readability.</div>
+</div><div class="line-block">
+<div class="line-header">Line 28</div>
+<div class="line-code">print(null_counts.to_string(index=False))</div>
+<div class="line-explain">Prints the null-count table.</div>
+</div><div class="line-block">
+<div class="line-header">Line 29</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 30</div>
+<div class="line-code">print("\n--- 4. FARE SUMMARY COMPARISON ---")</div>
+<div class="line-explain">Prints the header for the fare summary comparison.</div>
+</div><div class="line-block">
+<div class="line-header">Line 31</div>
+<div class="line-code">price_summary = pd.read_sql_query("""</div>
+<div class="line-explain">Runs a UNION ALL query comparing raw vs cleaned fare statistics.</div>
+</div><div class="line-block">
+<div class="line-header">Line 32</div>
+<div class="line-code">    SELECT 'raw' AS table_name, AVG(total_fare) AS avg_fare, MIN(total_fare) AS min_fare, MAX(total_fare) AS max_fare FROM raw_flights</div>
+<div class="line-explain">Raw table stats: average, min, max fare.</div>
+</div><div class="line-block">
+<div class="line-header">Line 33</div>
+<div class="line-code">    UNION ALL</div>
+<div class="line-explain">UNION ALL separator.</div>
+</div><div class="line-block">
+<div class="line-header">Line 34</div>
+<div class="line-code">    SELECT 'cleaned' AS table_name, AVG(total_fare) AS avg_fare, MIN(total_fare) AS min_fare, MAX(total_fare) AS max_fare FROM cleaned_flights</div>
+<div class="line-explain">Cleaned table stats: average, min, max fare.</div>
+</div><div class="line-block">
+<div class="line-header">Line 35</div>
+<div class="line-code">""", conn)</div>
+<div class="line-explain">Closes the SQL string.</div>
+</div><div class="line-block">
+<div class="line-header">Line 36</div>
+<div class="line-code">print(price_summary.to_string(index=False))</div>
+<div class="line-explain">Prints the fare comparison table.</div>
+</div><div class="line-block">
+<div class="line-header">Line 37</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 38</div>
+<div class="line-code">conn.close()</div>
+<div class="line-explain">Closes the database connection.</div>
+</div>
+<div class="card">
+<h2>Summary</h2>
+<p>This file has <strong>38 lines</strong>, each explained above.</p>
+</div>
+<div class="nav"><a href="18-mock-data-py.html">&larr; Previous</a><a href="20-test-run-py.html">Next &rarr;</a></div>
+</div>
+</body>
+</html>

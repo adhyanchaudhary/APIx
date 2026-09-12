@@ -37,56 +37,56 @@ header .sub{opacity:.75;margin-top:4px;font-size:.9rem}
 <div class="nav"><a href="02-gitignore.html">&larr; Previous</a><a href="04-routes-yaml.html">Next &rarr;</a></div>
 <div class="card">
 <h2>File Overview</h2>
-<p>Below is every line of this file with an explanation of what it does and why.</p>
+<p>Every line of this file is explained in plain English below. Code shown is read directly from the current file on disk.</p>
 </div>
 <div class="line-block">
 <div class="line-header">Line 1</div>
 <div class="line-code">playwright&gt;=1.40.0</div>
-<div class="line-explain"><strong>Playwright</strong> - the browser automation library. It lets our Python code control a real Chrome browser: open pages, click buttons, read text. The <code>>=1.40.0</code> means 'version 1.40.0 or newer.'</div>
+<div class="line-explain"><strong>Playwright</strong> — browser automation. Lets Python drive a real Chromium browser: navigate, wait, read the DOM. <code>&gt;=1.40.0</code> means version 1.40 or newer.</div>
 </div><div class="line-block">
 <div class="line-header">Line 2</div>
 <div class="line-code">pandas&gt;=2.1.0</div>
-<div class="line-explain"><strong>Pandas</strong> - the data cleaning and analysis library. Think of it as Excel for Python. We'll use it to clean scraped flight data, remove duplicates, handle missing values.</div>
+<div class="line-explain"><strong>Pandas</strong> — tabular data (Python's Excel). Used heavily in the cleaner and indexer.</div>
 </div><div class="line-block">
 <div class="line-header">Line 3</div>
 <div class="line-code">numpy&gt;=1.26.0</div>
-<div class="line-explain"><strong>NumPy</strong> - math library for numerical operations. Pandas is built on top of NumPy. We'll use it for statistical calculations like outlier detection.</div>
+<div class="line-explain"><strong>NumPy</strong> — numerical computation. Pandas is built on top of it.</div>
 </div><div class="line-block">
 <div class="line-header">Line 4</div>
 <div class="line-code">pydantic&gt;=2.5.0</div>
-<div class="line-explain"><strong>Pydantic</strong> - data validation library. It defines 'schemas' (templates) that our data must match. If a scraped flight record is missing the price, Pydantic rejects it before it enters our database.</div>
+<div class="line-explain"><strong>Pydantic</strong> — runtime validation of data against schemas. Rejects malformed flight records before they reach the database.</div>
 </div><div class="line-block">
 <div class="line-header">Line 5</div>
 <div class="line-code">pyyaml&gt;=6.0</div>
-<div class="line-explain"><strong>PyYAML</strong> - reads YAML config files. Our <code>routes.yaml</code>, <code>scraper.yaml</code>, and <code>indexer.yaml</code> are all YAML files that this library parses into Python dictionaries.</div>
+<div class="line-explain"><strong>PyYAML</strong> — reads the .yaml config files (routes, scraper, indexer) into Python dicts.</div>
 </div><div class="line-block">
 <div class="line-header">Line 6</div>
 <div class="line-code">apscheduler&gt;=3.10.0</div>
-<div class="line-explain"><strong>APScheduler</strong> - runs code on a schedule. We'll use it to trigger the scraper automatically every day at a set time (like 6 AM).</div>
+<div class="line-explain"><strong>APScheduler</strong> — scheduling library (PRD plans it to trigger the daily scrape).</div>
 </div><div class="line-block">
 <div class="line-header">Line 7</div>
 <div class="line-code">streamlit&gt;=1.29.0</div>
-<div class="line-explain"><strong>Streamlit</strong> - creates web dashboards using only Python. No HTML/CSS/JS needed. We'll use it to display charts of flight price trends.</div>
+<div class="line-explain"><strong>Streamlit</strong> — Python-only web dashboard framework (planned for Phase 4).</div>
 </div><div class="line-block">
 <div class="line-header">Line 8</div>
 <div class="line-code">plotly&gt;=5.18.0</div>
-<div class="line-explain"><strong>Plotly</strong> - makes interactive charts (zoom, hover, click). Streamlit uses Plotly for its graphing. We'll make line charts, heatmaps, and bar charts.</div>
+<div class="line-explain"><strong>Plotly</strong> — interactive charts (zoom/hover) rendered inside Streamlit.</div>
 </div><div class="line-block">
 <div class="line-header">Line 9</div>
 <div class="line-code">python-dotenv&gt;=1.0.0</div>
-<div class="line-explain"><strong>python-dotenv</strong> - reads our <code>.env</code> file and loads the settings into Python. Without this, our <code>.env</code> values wouldn't be accessible in code.</div>
+<div class="line-explain"><strong>python-dotenv</strong> — loads the .env file into environment variables at runtime.</div>
 </div><div class="line-block">
 <div class="line-header">Line 10</div>
 <div class="line-code">pytest&gt;=7.4.0</div>
-<div class="line-explain"><strong>pytest</strong> - the testing framework. We write test functions that verify our code works correctly. <code>pytest</code> runs them all and reports which passed/failed.</div>
+<div class="line-explain"><strong>pytest</strong> — the test framework used for tests/test_indexer.py.</div>
 </div><div class="line-block">
 <div class="line-header">Line 11</div>
 <div class="line-code">pytest-cov&gt;=4.1.0</div>
-<div class="line-explain"><strong>pytest-cov</strong> - a pytest plugin that measures <strong>code coverage</strong>: what percentage of our code was exercised by tests. Helps ensure we're testing enough.</div>
+<div class="line-explain"><strong>pytest-cov</strong> — pytest plugin that reports code-coverage percentages.</div>
 </div>
 <div class="card">
 <h2>Summary</h2>
-<p>This file has <strong>11 lines</strong>.</p>
+<p>This file has <strong>11 lines</strong>, each explained above.</p>
 </div>
 <div class="nav"><a href="02-gitignore.html">&larr; Previous</a><a href="04-routes-yaml.html">Next &rarr;</a></div>
 </div>

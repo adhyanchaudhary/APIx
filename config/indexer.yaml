@@ -4,6 +4,43 @@ index:
   round_to: 2                      # decimal places for index value
   min_data_points: 1               # index written from the first day with data
 
+  # ── Active lead windows ──
+  # The daily/weekly/monthly indices are built ONLY for these advance-purchase
+  # windows, even though raw/cleaned data may span the full scrape horizon.
+  active_windows: [1, 7, 30]
+
+  # ── Aggregation estimator (daily headline) ──
+  # How the 12 route indices are blended into the daily aggregate index.
+  #   weighted_mean           — classic Laspeyres
+  #   weighted_trimmed_mean   — shaves `aggregation_trim_frac` weight off each tail (default; CPI-style trimmed mean)
+  #   weighted_median         — value at cumulative weight 0.5
+  aggregation_estimator: "weighted_trimmed_mean"
+  aggregation_trim_frac: 0.10
+
+  # ── Rolling estimator (weekly/monthly smoothing) ──
+  # How the last 7 (or 30) daily values are averaged into weekly/monthly.
+  #   mean          — rolling arithmetic mean (default)
+  #   trimmed_mean  — rolling mean with `rolling_trim_frac` off each tail
+  #   median        — rolling median
+  rolling_estimator: "mean"
+  rolling_trim_frac: 0.10
+
+  # ── Route price aggregation ──
+  # Multiple scraped fares per (route, window, date) are collapsed to one cell
+  # price.  "median" (default) is robust against a single ultra-cheap fare
+  # dragging the cell down; "min" keeps classic lowest-fare behaviour.
+  route_price_method: "median"
+
+  # ── 36-cell basket: advance-purchase (booking lead-time) shares ──
+  # Each cell = route × lead window.  Cell weight = route weight × window
+  # share, so the composite headline blends how frequently each travel
+  # horizon is booked.  The composite is a SINGLE headline number per date
+  # (not one per window).
+  window_weights:
+    1: 0.20     # 20 % of bookings are last-minute
+    7: 0.30     # 30 % are ~1 week ahead
+    30: 0.50    # 50 % are ~1 month ahead
+
   # ── Route basket weights (DGCA traffic share approximation) ──
   # Normalised to sum 1.0 at load time. One per directional route.
   weights:

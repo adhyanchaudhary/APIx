@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Walkthrough 20: src/cleaner/test_run.py</title>
+<style>
+:root{--bg:#F08080;--card:rgba(255,255,255,0.92);--blue:#0D47A1;--blue-mid:#1565C0;--blue-light:#BBDEFB;--green:#1B5E20;--green-light:#C8E6C9;--red:#B71C1C;--red-light:#FFCDD2;--black:#1A1A2E;--grey:#546E7A}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--black);line-height:1.7}
+.wrap{max-width:900px;margin:0 auto;padding:20px}
+header{background:var(--blue);color:#fff;padding:24px 32px;border-radius:14px;margin-bottom:24px}
+header h1{font-size:1.6rem}
+header .sub{opacity:.75;margin-top:4px;font-size:.9rem}
+.card{background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:20px;border-left:6px solid var(--blue-mid)}
+.card h2{color:var(--blue);font-size:1.2rem;margin-bottom:8px}
+.line-block{margin:14px 0;border-radius:8px;overflow:hidden;border:1px solid #ddd}
+.line-header{background:var(--blue);color:#fff;padding:6px 14px;font-size:.85rem;font-weight:600}
+.line-code{background:#263238;color:#80CBC4;padding:10px 16px;font-family:'Courier New',monospace;font-size:.85rem;white-space:pre;overflow-x:auto}
+.line-explain{background:#E8F5E9;padding:10px 16px;font-size:.9rem;border-top:1px solid #C8E6C9}
+.line-explain strong{color:var(--green)}
+.line-explain code{background:#C8E6C9;padding:1px 5px;border-radius:3px;font-family:'Courier New',monospace;font-size:.85rem}
+.nav{display:flex;justify-content:space-between;margin:20px 0}
+.nav a{background:var(--blue);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem}
+.nav a:hover{background:var(--blue-mid)}
+.note{background:var(--blue-light);border-left:4px solid var(--blue);padding:10px 14px;border-radius:6px;margin:10px 0;font-size:.9rem}
+.summary{background:var(--green-light);border-left:4px solid var(--green);padding:12px 16px;border-radius:6px;margin:14px 0;color:var(--green)}
+.summary::before{content:"Key takeaway: ";font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Walkthrough 20: src/cleaner/test_run.py</h1>
+<div class="sub">src/cleaner/test_run.py</div>
+</header>
+<div class="nav"><a href="19-check-db-py.html">&larr; Previous</a><a href="21-test-scraper-py.html">Next &rarr;</a></div>
+<div class="card">
+<h2>File Overview</h2>
+<p>Every line of this file is explained in plain English below. Code shown is read directly from the current file on disk.</p>
+</div>
+<div class="line-block">
+<div class="line-header">Line 1</div>
+<div class="line-code">import pandas as pd</div>
+<div class="line-explain">Imports pandas for DataFrame operations.</div>
+</div><div class="line-block">
+<div class="line-header">Line 2</div>
+<div class="line-code">from sqlalchemy import create_engine</div>
+<div class="line-explain">Imports sqlalchemy create_engine for database access.</div>
+</div><div class="line-block">
+<div class="line-header">Line 3</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 4</div>
+<div class="line-code">from mock_data import build_mock_db</div>
+<div class="line-explain">Imports build_mock_db from the local mock_data module.</div>
+</div><div class="line-block">
+<div class="line-header">Line 5</div>
+<div class="line-code">from pipeline import clean_flights, write_cleaned</div>
+<div class="line-explain">Imports clean_flights and write_cleaned from the local pipeline module.</div>
+</div><div class="line-block">
+<div class="line-header">Line 6</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 7</div>
+<div class="line-code">DB_PATH = "flights.db"</div>
+<div class="line-explain">Target database path for the mock database.</div>
+</div><div class="line-block">
+<div class="line-header">Line 8</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 9</div>
+<div class="line-code"># 1. Initialize or reset mock database</div>
+<div class="line-explain">Step 1 comment: initialise or reset the mock database.</div>
+</div><div class="line-block">
+<div class="line-header">Line 10</div>
+<div class="line-code">build_mock_db(DB_PATH)</div>
+<div class="line-explain">Creates a fresh flights.db with synthetic raw_flights data.</div>
+</div><div class="line-block">
+<div class="line-header">Line 11</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 12</div>
+<div class="line-code"># 2. Extract raw data using a context manager to prevent connection leaks</div>
+<div class="line-explain">Step 2 comment: extract raw data using a context manager.</div>
+</div><div class="line-block">
+<div class="line-header">Line 13</div>
+<div class="line-code">engine = create_engine(f"sqlite:///{DB_PATH}")</div>
+<div class="line-explain">Creates a SQLAlchemy engine.</div>
+</div><div class="line-block">
+<div class="line-header">Line 14</div>
+<div class="line-code">with engine.connect() as conn:</div>
+<div class="line-explain">Opens a connection via context manager.</div>
+</div><div class="line-block">
+<div class="line-header">Line 15</div>
+<div class="line-code">    raw_df = pd.read_sql_table("raw_flights", conn)</div>
+<div class="line-explain">Reads the entire raw_flights table into a DataFrame.</div>
+</div><div class="line-block">
+<div class="line-header">Line 16</div>
+<div class="line-code">engine.dispose()</div>
+<div class="line-explain">Disposes the engine to close the pool.</div>
+</div><div class="line-block">
+<div class="line-header">Line 17</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 18</div>
+<div class="line-code"># 3. Clean raw records via Phase 2 pipeline</div>
+<div class="line-explain">Step 3 comment: clean raw records via the Phase 2 pipeline.</div>
+</div><div class="line-block">
+<div class="line-header">Line 19</div>
+<div class="line-code">raw_count = len(raw_df)</div>
+<div class="line-explain">Records the raw row count.</div>
+</div><div class="line-block">
+<div class="line-header">Line 20</div>
+<div class="line-code">cleaned_df = clean_flights(raw_df)</div>
+<div class="line-explain">Runs the full cleaning pipeline on the raw DataFrame.</div>
+</div><div class="line-block">
+<div class="line-header">Line 21</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 22</div>
+<div class="line-code"># 4. Save cleaned output to SQLite database</div>
+<div class="line-explain">Step 4 comment: save cleaned output to SQLite.</div>
+</div><div class="line-block">
+<div class="line-header">Line 23</div>
+<div class="line-code">write_cleaned(cleaned_df, DB_PATH)</div>
+<div class="line-explain">Writes cleaned_flights to the database.</div>
+</div><div class="line-block">
+<div class="line-header">Line 24</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 25</div>
+<div class="line-code"># 5. Define deduplication keys (includes depart_time to handle flight_no = "N/A")</div>
+<div class="line-explain">Step 5 comment: define deduplication keys for the audit.</div>
+</div><div class="line-block">
+<div class="line-header">Line 26</div>
+<div class="line-code">dedup_keys = ["route", "carrier", "flight_no", "date"]</div>
+<div class="line-explain">Base dedup keys: route, carrier, flight_no, date.</div>
+</div><div class="line-block">
+<div class="line-header">Line 27</div>
+<div class="line-code">if "depart_time" in cleaned_df.columns:</div>
+<div class="line-explain">Checks if depart_time is present in the cleaned data.</div>
+</div><div class="line-block">
+<div class="line-header">Line 28</div>
+<div class="line-code">    dedup_keys.append("depart_time")</div>
+<div class="line-explain">Appends depart_time to the dedup key list if present.</div>
+</div><div class="line-block">
+<div class="line-header">Line 29</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 30</div>
+<div class="line-code"># 6. Audit &amp; log execution summary</div>
+<div class="line-explain">Step 6 comment: audit and log the execution summary.</div>
+</div><div class="line-block">
+<div class="line-header">Line 31</div>
+<div class="line-code">print("=== PIPELINE VALIDATION SUMMARY ===")</div>
+<div class="line-explain">Prints the summary header.</div>
+</div><div class="line-block">
+<div class="line-header">Line 32</div>
+<div class="line-code">print(f"raw rows:                   {raw_count}")</div>
+<div class="line-explain">Prints the raw row count.</div>
+</div><div class="line-block">
+<div class="line-header">Line 33</div>
+<div class="line-code">print(f"cleaned rows:               {len(cleaned_df)}")</div>
+<div class="line-explain">Prints the cleaned row count.</div>
+</div><div class="line-block">
+<div class="line-header">Line 34</div>
+<div class="line-code">print(f"rows removed:               {raw_count - len(cleaned_df)}")</div>
+<div class="line-explain">Prints the number of rows removed.</div>
+</div><div class="line-block">
+<div class="line-header">Line 35</div>
+<div class="line-code">print(f"outliers flagged:           {int(cleaned_df['is_outlier'].sum())}")</div>
+<div class="line-explain">Prints the number of outliers flagged.</div>
+</div><div class="line-block">
+<div class="line-header">Line 36</div>
+<div class="line-code">print(f"remaining null fares:       {int(cleaned_df['total_fare'].isna().sum())}")</div>
+<div class="line-explain">Prints remaining null fares.</div>
+</div><div class="line-block">
+<div class="line-header">Line 37</div>
+<div class="line-code">print(f"remaining duplicates:       {int(cleaned_df.duplicated(dedup_keys).sum())}")</div>
+<div class="line-explain">Prints remaining duplicates based on dedup keys.</div>
+</div><div class="line-block">
+<div class="line-header">Line 38</div>
+<div class="line-code">print(f"remaining sold_out:         {int((cleaned_df['status'] == 'sold_out').sum())}")</div>
+<div class="line-explain">Prints remaining sold-out rows (should be 0 after filtering).</div>
+</div><div class="line-block">
+<div class="line-header">Line 39</div>
+<div class="line-code">print(f"remaining cancellations:    {int(cleaned_df['is_cancellation'].sum())}")</div>
+<div class="line-explain">Prints remaining cancellations (should be 0 after filtering).</div>
+</div><div class="line-block">
+<div class="line-header">Line 40</div>
+<div class="line-code">print(f"routes in cleaned data:     {cleaned_df['route'].nunique()}")</div>
+<div class="line-explain">Prints the number of unique routes in cleaned data.</div>
+</div><div class="line-block">
+<div class="line-header">Line 41</div>
+<div class="line-code">print(f"\ndtypes:\n{cleaned_df.dtypes}")</div>
+<div class="line-explain">Prints the dtypes of all cleaned columns for verification.</div>
+</div>
+<div class="card">
+<h2>Summary</h2>
+<p>This file has <strong>41 lines</strong>, each explained above.</p>
+</div>
+<div class="nav"><a href="19-check-db-py.html">&larr; Previous</a><a href="21-test-scraper-py.html">Next &rarr;</a></div>
+</div>
+</body>
+</html>

@@ -1,1171 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>APIx — Project Overview</title>
-  <style>
-    :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --card-alt: #334155;
-      --accent: #38bdf8;
-      --accent2: #818cf8;
-      --accent3: #34d399;
-      --accent4: #fb923c;
-      --danger: #f87171;
-      --text: #e2e8f0;
-      --muted: #94a3b8;
-      --border: #475569;
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.7;
-      padding: 0 20px;
-    }
-
-    .container { max-width: 1100px; margin: 0 auto; padding: 40px 0 80px; }
-
-    /* ── Hero ── */
-    .hero {
-      text-align: center;
-      padding: 60px 20px 40px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 50px;
-    }
-    .hero h1 {
-      font-size: 3rem;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 8px;
-    }
-    .hero .subtitle {
-      font-size: 1.15rem;
-      color: var(--muted);
-      max-width: 650px;
-      margin: 0 auto 20px;
-    }
-    .badge {
-      display: inline-block;
-      padding: 4px 14px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      margin: 4px;
-    }
-    .badge-blue { background: rgba(56,189,248,0.15); color: var(--accent); border: 1px solid rgba(56,189,248,0.3); }
-    .badge-green { background: rgba(52,211,153,0.15); color: var(--accent3); border: 1px solid rgba(52,211,153,0.3); }
-    .badge-orange { background: rgba(251,146,60,0.15); color: var(--accent4); border: 1px solid rgba(251,146,60,0.3); }
-
-    /* ── Section ── */
-    section { margin-bottom: 50px; }
-    section > h2 {
-      font-size: 1.6rem;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid var(--accent);
-      display: inline-block;
-    }
-    section > h3 {
-      font-size: 1.2rem;
-      color: var(--accent2);
-      margin: 24px 0 12px;
-    }
-    p, li { color: var(--text); font-size: 0.95rem; }
-    p + p { margin-top: 12px; }
-
-    /* ── Problem Cards ── */
-    .problem-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 16px;
-      margin-top: 16px;
-    }
-    .problem-card {
-      background: var(--card);
-      border-left: 4px solid var(--danger);
-      border-radius: 8px;
-      padding: 20px;
-    }
-    .problem-card h4 {
-      color: var(--danger);
-      margin-bottom: 8px;
-      font-size: 1rem;
-    }
-
-    /* ── Solution Cards ── */
-    .solution-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-top: 16px;
-    }
-    .solution-card {
-      background: var(--card);
-      border-radius: 10px;
-      padding: 24px 18px;
-      text-align: center;
-      border: 1px solid var(--border);
-      transition: transform 0.2s, border-color 0.2s;
-    }
-    .solution-card:hover { transform: translateY(-3px); border-color: var(--accent); }
-    .solution-card .icon { font-size: 2.2rem; margin-bottom: 10px; }
-    .solution-card h4 { margin-bottom: 6px; color: var(--accent); }
-    .solution-card p { color: var(--muted); font-size: 0.85rem; }
-
-    /* ── Pipeline ── */
-    .pipeline {
-      display: flex;
-      align-items: stretch;
-      gap: 0;
-      margin: 24px 0;
-      overflow-x: auto;
-      padding-bottom: 10px;
-    }
-    .pipeline-step {
-      flex: 1;
-      min-width: 180px;
-      background: var(--card);
-      padding: 20px 16px;
-      text-align: center;
-      position: relative;
-      border: 1px solid var(--border);
-    }
-    .pipeline-step:first-child { border-radius: 10px 0 0 10px; }
-    .pipeline-step:last-child { border-radius: 0 10px 10px 0; }
-    .pipeline-step .step-num {
-      display: inline-block;
-      width: 32px; height: 32px;
-      line-height: 32px;
-      border-radius: 50%;
-      font-weight: 700;
-      font-size: 0.85rem;
-      margin-bottom: 10px;
-    }
-    .pipeline-step:nth-child(1) .step-num { background: var(--accent); color: var(--bg); }
-    .pipeline-step:nth-child(2) .step-num { background: var(--accent2); color: var(--bg); }
-    .pipeline-step:nth-child(3) .step-num { background: var(--accent3); color: var(--bg); }
-    .pipeline-step:nth-child(4) .step-num { background: var(--accent4); color: var(--bg); }
-    .pipeline-step:nth-child(5) .step-num { background: var(--danger); color: var(--bg); }
-    .pipeline-step h4 { font-size: 0.95rem; margin-bottom: 6px; }
-    .pipeline-step p { font-size: 0.8rem; color: var(--muted); }
-    .pipeline-arrow {
-      display: flex;
-      align-items: center;
-      font-size: 1.4rem;
-      color: var(--accent);
-      padding: 0 4px;
-      flex-shrink: 0;
-    }
-
-    /* ── Status Table ── */
-    .status-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 16px;
-      font-size: 0.9rem;
-    }
-    .status-table th, .status-table td {
-      padding: 12px 16px;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-    }
-    .status-table th {
-      background: var(--card);
-      color: var(--accent);
-      font-weight: 600;
-      position: sticky;
-      top: 0;
-    }
-    .status-table tr:hover { background: rgba(56,189,248,0.04); }
-    .dot {
-      display: inline-block;
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      margin-right: 8px;
-    }
-    .dot-done { background: var(--accent3); }
-    .dot-wip { background: var(--accent4); }
-    .dot-todo { background: var(--muted); }
-
-    /* ── Route Cards ── */
-    .route-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-    }
-    .route-chip {
-      background: var(--card);
-      border: 1px solid var(--border);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 500;
-    }
-
-    /* ── Tech Stack ── */
-    .tech-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 12px;
-      margin-top: 16px;
-    }
-    .tech-item {
-      background: var(--card);
-      border-radius: 8px;
-      padding: 16px;
-      text-align: center;
-      border: 1px solid var(--border);
-    }
-    .tech-item .name { font-weight: 600; margin-bottom: 4px; }
-    .tech-item .role { font-size: 0.8rem; color: var(--muted); }
-
-    /* ── Formula Box ── */
-    .formula-box {
-      background: var(--card);
-      border: 1px solid var(--accent2);
-      border-radius: 10px;
-      padding: 24px;
-      margin-top: 16px;
-      text-align: center;
-    }
-    .formula-box code {
-      font-size: 1.2rem;
-      color: var(--accent);
-      background: var(--bg);
-      padding: 8px 20px;
-      border-radius: 6px;
-      display: inline-block;
-      margin: 10px 0;
-    }
-    .formula-box p { color: var(--muted); font-size: 0.85rem; margin-top: 8px; }
-
-    /* ── Collapsible ── */
-    details {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      margin-top: 12px;
-      overflow: hidden;
-    }
-    details summary {
-      padding: 14px 18px;
-      cursor: pointer;
-      font-weight: 600;
-      color: var(--accent);
-      list-style: none;
-    }
-    details summary::before { content: "▸ "; }
-    details[open] summary::before { content: "▾ "; }
-    details > div { padding: 0 18px 18px; }
-    details ul { padding-left: 20px; }
-    details li { margin-bottom: 6px; }
-
-    /* ── Progress Bar ── */
-    .progress-wrap { margin-top: 16px; }
-    .progress-bar-bg {
-      background: var(--card-alt);
-      border-radius: 8px;
-      height: 28px;
-      overflow: hidden;
-      position: relative;
-    }
-    .progress-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--accent3));
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--bg);
-      transition: width 1s ease;
-    }
-    .progress-label {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 8px;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-
-    /* ── City Weights ── */
-    .weight-bars { margin-top: 16px; }
-    .weight-row {
-      display: flex;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    .weight-label { width: 130px; font-weight: 600; font-size: 0.9rem; }
-    .weight-track {
-      flex: 1;
-      background: var(--card);
-      border-radius: 6px;
-      height: 24px;
-      overflow: hidden;
-    }
-    .weight-fill {
-      height: 100%;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      padding-left: 10px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--bg);
-    }
-
-    /* ── Index Explainer ── */
-    .step-list { counter-reset: istep; margin: 20px 0; }
-    .step-list .istep {
-      display: flex;
-      gap: 18px;
-      padding: 18px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      margin-bottom: 14px;
-    }
-    .step-list .num {
-      counter-increment: istep;
-      flex-shrink: 0;
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: var(--bg);
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-    }
-    .step-list .num::before { content: counter(istep); }
-    .step-list h4 { color: var(--accent); margin-bottom: 5px; }
-    .step-list p, .step-list li { font-size: 0.9rem; color: var(--text); }
-    .step-list ul { padding-left: 20px; }
-
-    .example-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 12px;
-      font-size: 0.85rem;
-    }
-    .example-table th, .example-table td {
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      text-align: center;
-    }
-    .example-table th { background: var(--card-alt); color: var(--accent); }
-    .example-table tr:nth-child(even) { background: rgba(56,189,248,0.04); }
-    .hl { color: var(--accent3); font-weight: 700; }
-
-    /* ── Risks ── */
-    .risk-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 14px;
-      margin-top: 16px;
-    }
-    .risk-card {
-      background: var(--card);
-      border-radius: 8px;
-      padding: 18px;
-      border-left: 4px solid var(--accent4);
-    }
-    .risk-card h4 { color: var(--accent4); margin-bottom: 6px; font-size: 0.9rem; }
-    .risk-card p { font-size: 0.85rem; color: var(--muted); }
-
-    /* ── Footer ── */
-    footer {
-      text-align: center;
-      padding: 30px 0;
-      border-top: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 0.8rem;
-      margin-top: 40px;
-    }
-
-    @media (max-width: 700px) {
-      .hero h1 { font-size: 2rem; }
-      .pipeline { flex-direction: column; }
-      .pipeline-arrow { transform: rotate(90deg); justify-content: center; padding: 4px 0; }
-      .pipeline-step { border-radius: 8px !important; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>APIx — Airfare Price Index | Project Overview</title>
+<style>
+:root{--bg:#F08080;--card:rgba(255,255,255,0.94);--blue:#0D47A1;--blue-mid:#1565C0;--blue-light:#BBDEFB;--green:#1B5E20;--green-light:#C8E6C9;--orange:#E65100;--orange-light:#FFE0B2;--black:#1A1A2E;--grey:#546E7A}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--black);line-height:1.75}
+.wrap{max-width:960px;margin:0 auto;padding:24px}
+header{background:var(--blue);color:#fff;padding:30px 36px;border-radius:16px;margin-bottom:26px}
+header h1{font-size:2.1rem;letter-spacing:.5px}
+header .sub{opacity:.82;margin-top:6px;font-size:1rem}
+.nav{display:flex;justify-content:space-between;margin:18px 0;gap:10px;flex-wrap:wrap}
+.nav a{background:var(--blue);color:#fff;padding:9px 20px;border-radius:9px;text-decoration:none;font-weight:600;font-size:.92rem}
+.nav a:hover{background:var(--blue-mid)}
+.card{background:var(--card);border-radius:16px;padding:26px 30px;margin-bottom:22px;border-left:6px solid var(--blue-mid);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.card h2{color:var(--blue);font-size:1.35rem;margin-bottom:12px}
+.card h3{color:var(--green);font-size:1.05rem;margin:16px 0 8px}
+p{margin-bottom:10px}
+code{background:var(--blue-light);padding:1px 6px;border-radius:4px;font-family:'Courier New',monospace;font-size:.9em}
+pre{background:#263238;color:#80CBC4;padding:16px 18px;border-radius:10px;overflow-x:auto;font-family:'Courier New',monospace;font-size:.85rem;margin:10px 0;white-space:pre}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.92rem}
+th{background:var(--blue);color:#fff;text-align:left;padding:10px 14px;font-size:.8rem;text-transform:uppercase;letter-spacing:.5px}
+td{padding:10px 14px;border-bottom:1px solid #eee}
+tr:nth-child(even) td{background:#FAFAFA}
+.mono{font-family:'Courier New',monospace;color:var(--blue);font-weight:600}
+.pill{display:inline-block;background:var(--blue-light);color:var(--blue);padding:2px 10px;border-radius:12px;font-size:.78rem;font-weight:700;margin:2px 2px}
+.pill.g{background:var(--green-light);color:var(--green)}
+.formula{background:var(--green-light);border-left:5px solid var(--green);padding:16px 20px;border-radius:10px;margin:14px 0;font-family:'Courier New',monospace;font-size:.95rem;color:var(--green)}
+.note{background:var(--orange-light);border-left:4px solid var(--orange);padding:12px 16px;border-radius:8px;margin:12px 0;font-size:.92rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:14px 0}
+.stat{background:#F5F5F5;border-radius:12px;padding:16px;text-align:center;border:1px solid #eee}
+.stat .num{font-size:1.5rem;font-weight:700;color:var(--blue)}
+.stat .lbl{font-size:.8rem;color:var(--grey)}
+.pipeline{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:14px 0}
+.pipe{background:var(--blue);color:#fff;border-radius:10px;padding:12px 16px;text-align:center;font-weight:600;font-size:.88rem;flex:1;min-width:120px}
+.pipe small{display:block;font-weight:400;opacity:.8;font-size:.75rem}
+.arrow{color:var(--blue);font-weight:700;font-size:1.3rem}
+</style>
 </head>
 <body>
-<div class="container">
+<div class="wrap">
+<header>
+<h1>APIx — Airfare Price Index</h1>
+<div class="sub">A data-driven price index for India's busiest metro air routes · Smart India Hackathon 2026</div>
+</header>
 
-  <!-- ═══════ HERO ═══════ -->
-  <div class="hero">
-    <h1>APIx Platform</h1>
-    <p class="subtitle">
-      Real-time Airfare Price Index — An automated platform to scrape, clean, and index
-      domestic airfare data for India's statistical offices.
-    </p>
-    <span class="badge badge-blue">Smart India Hackathon 2026</span>
-    <span class="badge badge-green">Ministry of Statistics (MoSPI)</span>
-    <span class="badge badge-orange">~40% Complete</span>
-  </div>
+<div class="nav">
+<a href="walkthroughs/index.html">&rarr; Line-by-line Walkthroughs</a>
+<a href="implementation-plan.html">Implementation Plan</a>
+<a href="sih-deck.html">Pitch Deck</a>
+</div>
 
-  <!-- ═══════ THE PROBLEM ═══════ -->
-  <section>
-    <h2>1. The Problem — Why This Matters</h2>
-    <p>
-      The Indian government tracks inflation through the <strong>Consumer Price Index (CPI)</strong>.
-      One component of CPI is airfare inflation — how much flight ticket prices change over time.
-      Today, this is measured by <strong>manually collecting prices</strong> from a handful of ticketing counters.
-    </p>
-    <p>That's a broken process. Here's why:</p>
+<div class="card">
+<h2>1. The Problem</h2>
+<p>Airfares on India's metro routes are volatile and opaque. Travelers have no objective way to know whether a fare is <em>high, normal, or cheap</em>, and policy teams lack a single official number that tracks how the cost of domestic air travel is moving over time.</p>
+</div>
 
-    <div class="problem-grid">
-      <div class="problem-card">
-        <h4>Prices Swing 200–400% in a Day</h4>
-        <p>Airlines use dynamic pricing. A Delhi–Mumbai ticket can jump from ₹3,000 to ₹12,000 within hours based on demand, time, and seat availability. Manual collection can never capture this volatility.</p>
-      </div>
-      <div class="problem-card">
-        <h4>90%+ Fares Are Sold Online</h4>
-        <p>Yet the government still collects data from physical counters. The data is outdated, unrepresentative, and misses the online-only deals, OTA coupons, and surge pricing that real passengers pay.</p>
-      </div>
-      <div class="problem-card">
-        <h4>RBI Needs Real-Time Data</h4>
-        <p>The Reserve Bank of India uses airfare data to set monetary policy. Getting delayed or inaccurate price signals can lead to poor economic decisions that affect 1.4 billion people.</p>
-      </div>
-      <div class="problem-card">
-        <h4>No Route-Level Visibility</h4>
-        <p>Current CPI gives a single national average. It doesn't tell you if Delhi–Bengaluru got expensive while Mumbai–Chennai got cheaper. Policymakers need that granularity.</p>
-      </div>
-    </div>
-  </section>
+<div class="card">
+<h2>2. The Solution — APIx</h2>
+<p>APIx is an <strong>Airfare Price Index</strong> built like a Laspeyres consumer-price index: it scrapes live fares for a fixed basket of 12 directional routes, collapses them to the lowest fare per route per day, and tracks each route's price relative to a base day. The result is a weighted aggregate number — the same technique used for CPI and WPI, applied to airfares.</p>
+<div class="formula">APIx(t) = &Sigma; [ P<sub>i</sub>(t) &nbsp;/&nbsp; P<sub>i</sub>(0) &times; w<sub>i</sub> ] &times; 100</div>
+<p>Where <code>P<sub>i</sub>(t)</code> is the lowest fare on route <em>i</em> on day <em>t</em>, <code>P<sub>i</sub>(0)</code> is the lowest fare on the base day, and <code>w<sub>i</sub></code> are route weights derived from DGCA traffic share (sum &asymp; 1.0). Base day is always 100.</p>
+</div>
 
-  <!-- ═══════ THE SOLUTION ═══════ -->
-  <section>
-    <h2>2. The Solution — What We're Building</h2>
-    <p>
-      We're building <strong>APIx (Airfare Price Index)</strong> — an automated pipeline that scrapes
-      real-time flight prices from Google Flights every day, cleans the data, computes a weighted
-      price index, and presents it on a dashboard.
-    </p>
+<div class="card">
+<h2>3. The Pipeline</h2>
+<div class="pipeline">
+<div class="pipe">1 &middot; Scrape<small>Playwright + Google Flights<br>12 routes &times; 3 windows</small></div>
+<div class="arrow">&rarr;</div>
+<div class="pipe">2 &middot; Clean<small>dedup, null fares, IQR outliers<br>quality score</small></div>
+<div class="arrow">&rarr;</div>
+<div class="pipe">3 &middot; Index<small>Laspeyres weighted basket<br>daily / weekly / monthly</small></div>
+<div class="arrow">&rarr;</div>
+<div class="pipe">4 &middot; Serve<small>SQLite (data/apix.db)<br>frontend / dashboard</small></div>
+</div>
+<p>Every stage is a runnable entry point. The entire pipeline is exercised by 14 automated tests.</p>
+</div>
 
-    <details>
-      <summary>"Doesn't an airfare index already exist?" — The honest answer</summary>
-      <div>
-        <p><strong>Fair question. Here's what exists vs. what doesn't.</strong></p>
-        <ul>
-          <li><strong>Airline fare-trackers and commercial products DO exist</strong> (Google flight trends, Farecast-style tools, academic indices). So the <em>idea</em> of tracking fares isn't new.</li>
-          <li><strong>But India's official statistical office (MoSPI) has no automated index.</strong> Its airfare CPI is still collected <strong>manually</strong> from a handful of physical ticketing counters — days late, and unrepresentative, because 90%+ of fares are now sold online.</li>
-          <li><strong>This project isn't inventing a new statistic.</strong> It uses the same trusted Laspeyres/CPI method the government already uses, but applies it to <strong>live, automated, route-level data</strong> it currently can't get.</li>
-        </ul>
-        <p><strong>So the unique value isn't "an index." It's the reproducible, automated pipeline</strong> — scrape → clean → index → dashboard, run daily — that gives NSO and RBI accurate, high-frequency, DGCA-weighted airfare inflation data for the first time. That institutional tool doesn't exist today.</p>
-      </div>
-    </details>
+<div class="card">
+<h2>4. The Route Basket &amp; Weights</h2>
+<p>Four cities &mdash; Delhi (DEL), Mumbai (BOM), Bengaluru (BLR), Chennai (MAA) &mdash; form six city-pairs; each pair is flown in both directions, giving <strong>12 directional routes</strong>. Each route is scraped at three advance-purchase windows: <strong>T+1, T+7, T+30</strong>.</p>
+<table>
+<tr><th>Route</th><th>Index Weight</th><th>Route</th><th>Index Weight</th></tr>
+<tr><td class="mono">DEL-BOM</td><td>0.10</td><td class="mono">BOM-DEL</td><td>0.10</td></tr>
+<tr><td class="mono">DEL-BLR</td><td>0.09</td><td class="mono">BLR-DEL</td><td>0.09</td></tr>
+<tr><td class="mono">DEL-MAA</td><td>0.06</td><td class="mono">MAA-DEL</td><td>0.06</td></tr>
+<tr><td class="mono">BOM-BLR</td><td>0.10</td><td class="mono">BLR-BOM</td><td>0.10</td></tr>
+<tr><td class="mono">BOM-MAA</td><td>0.08</td><td class="mono">MAA-BOM</td><td>0.08</td></tr>
+<tr><td class="mono">BLR-MAA</td><td>0.07</td><td class="mono">MAA-BLR</td><td>0.07</td></tr>
+</table>
+<p>Weights live in <code>config/indexer.yaml</code> and are normalised to sum 1.0 at load time. Routes without data on a day are omitted &mdash; their weight stays <em>unclaimed</em> and is never re-distributed (no re-normalisation per day).</p>
+</div>
 
-    <div class="solution-grid">
-      <div class="solution-card">
-        <div class="icon">&#9992;</div>
-        <h4>Automated Scraper</h4>
-        <p>Uses Playwright to headlessly browse Google Flights and extract flight prices for all routes — no human needed.</p>
-      </div>
-      <div class="solution-card">
-        <div class="icon">&#128202;</div>
-        <h4>Data Cleaner</h4>
-        <p>Removes duplicates, catches outliers using IQR, scores data quality, and fills gaps automatically with Pandas.</p>
-      </div>
-      <div class="solution-card">
-        <div class="icon">&#128200;</div>
-        <h4>Index Builder</h4>
-        <p>Computes a Laspeyres-style basket index weighted by DGCA traffic data — daily, weekly, and monthly.</p>
-      </div>
-      <div class="solution-card">
-        <div class="icon">&#128202;</div>
-        <h4>Interactive Dashboard</h4>
-        <p>Streamlit-powered web app showing trends, heatmaps, carrier comparisons, and the raw data explorer.</p>
-      </div>
-      <div class="solution-card">
-        <div class="icon">&#9200;</div>
-        <h4>Daily Scheduler</h4>
-        <p>APScheduler runs the full pipeline every day automatically — scrape, clean, index, update dashboard.</p>
-      </div>
-    </div>
-  </section>
+<div class="card">
+<h2>5. What's Built</h2>
+<div class="grid">
+<div class="stat"><div class="num">22</div><div class="lbl">source &amp; config files</div></div>
+<div class="stat"><div class="num">5</div><div class="lbl">SQLite tables</div></div>
+<div class="stat"><div class="num">14</div><div class="lbl">passing tests</div></div>
+<div class="stat"><div class="num">3</div><div class="lbl">index horizons</div></div>
+</div>
+<table>
+<tr><th>Phase</th><th>Component</th><th>What it does</th><th>Lines</th></tr>
+<tr><td>P0</td><td class="mono">src/models/schemas.py</td><td>Pydantic models: FlightRecord, RouteConfig, CityConfig, IndexEntry</td><td>50</td></tr>
+<tr><td>P0</td><td class="mono">src/storage/database.py</td><td>SQLite layer: 5 tables, init_db, get_connection</td><td>120</td></tr>
+<tr><td>P1</td><td class="mono">src/scraper/google_flights.py</td><td>Core scraper: URL builder, aria-label parser, rate limit + retries</td><td>314</td></tr>
+<tr><td>P1</td><td class="mono">src/scraper/run_scrape.py</td><td>Batch runner: 12 routes &times; 3 windows &rarr; raw_flights</td><td>118</td></tr>
+<tr><td>P2</td><td class="mono">src/cleaner/clean.py</td><td>Production cleaner: dedup, nulls, IQR outliers, quality score</td><td>133</td></tr>
+<tr><td>P3</td><td class="mono">src/indexer/api_index.py</td><td>Laspeyres math: daily/rolling index, weights, SQLite writes</td><td>204</td></tr>
+<tr><td>P3</td><td class="mono">src/indexer/run_index.py</td><td>CLI entry point for the index run</td><td>80</td></tr>
+</table>
+</div>
 
-  <!-- ═══════ HOW THE PIPELINE WORKS ═══════ -->
-  <section>
-    <h2>3. How the Pipeline Works</h2>
-    <p>Think of it as a factory assembly line. Data flows through 5 stages:</p>
-
-    <div class="pipeline">
-      <div class="pipeline-step">
-        <div class="step-num">1</div>
-        <h4>Scrape</h4>
-        <p>Playwright visits Google Flights for each route and date, extracts fares, carriers, times, stops</p>
-      </div>
-      <div class="pipeline-arrow">&rarr;</div>
-      <div class="pipeline-step">
-        <div class="step-num">2</div>
-        <h4>Store Raw</h4>
-        <p>Validates every record with Pydantic, writes to <code>raw_flights</code> SQLite table</p>
-      </div>
-      <div class="pipeline-arrow">&rarr;</div>
-      <div class="pipeline-step">
-        <div class="step-num">3</div>
-        <h4>Clean</h4>
-        <p>Deduplicates, removes outliers (IQR), scores quality, writes to <code>cleaned_flights</code></p>
-      </div>
-      <div class="pipeline-arrow">&rarr;</div>
-      <div class="pipeline-step">
-        <div class="step-num">4</div>
-        <h4>Index</h4>
-        <p>Computes weighted APIx basket index (route-level + aggregate) at daily/weekly/monthly frequency</p>
-      </div>
-      <div class="pipeline-arrow">&rarr;</div>
-      <div class="pipeline-step">
-        <div class="step-num">5</div>
-        <h4>Display</h4>
-        <p>Streamlit dashboard shows trends, heatmaps, comparisons — consumable by NSO & RBI</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════ WHAT WE'RE TRACKING ═══════ -->
-  <section>
-    <h2>4. What We're Tracking</h2>
-    <h3>4 Metro Cities</h3>
-    <div class="weight-bars">
-      <div class="weight-row">
-        <span class="weight-label">New Delhi (DEL)</span>
-        <div class="weight-track">
-          <div class="weight-fill" style="width:60%; background: var(--accent);">30% traffic share</div>
-        </div>
-      </div>
-      <div class="weight-row">
-        <span class="weight-label">Mumbai (BOM)</span>
-        <div class="weight-track">
-          <div class="weight-fill" style="width:50%; background: var(--accent2);">25% traffic share</div>
-        </div>
-      </div>
-      <div class="weight-row">
-        <span class="weight-label">Bengaluru (BLR)</span>
-        <div class="weight-track">
-          <div class="weight-fill" style="width:50%; background: var(--accent3);">25% traffic share</div>
-        </div>
-      </div>
-      <div class="weight-row">
-        <span class="weight-label">Chennai (MAA)</span>
-        <div class="weight-track">
-          <div class="weight-fill" style="width:40%; background: var(--accent4);">20% traffic share</div>
-        </div>
-      </div>
-    </div>
-
-    <h3>12 Flight Routes (6 city-pairs, both directions)</h3>
-    <div class="route-list">
-      <span class="route-chip">DEL &harr; BOM</span>
-      <span class="route-chip">DEL &harr; BLR</span>
-      <span class="route-chip">DEL &harr; MAA</span>
-      <span class="route-chip">BOM &harr; BLR</span>
-      <span class="route-chip">BOM &harr; MAA</span>
-      <span class="route-chip">BLR &harr; MAA</span>
-    </div>
-
-    <h3>3 Booking Windows (How Far in Advance)</h3>
-    <div class="route-list">
-      <span class="route-chip">T+1 day (Last-minute)</span>
-      <span class="route-chip">T+7 days (1 week out)</span>
-      <span class="route-chip">T+30 days (1 month out)</span>
-    </div>
-
-    <p style="margin-top:16px;">
-      <strong>Total daily scrape tasks:</strong> 12 routes &times; 3 windows = <strong>36 searches per day</strong>.
-      Each search extracts the lowest available fare for that route on that departure date.
-    </p>
-  </section>
-
-  <!-- ═══════ THE INDEX FORMULA ═══════ -->
-  <section>
-    <h2>5. The Index Formula — How APIx Is Calculated</h2>
-    <p>
-      We use a <strong>Laspeyres-style weighted basket index</strong> — the exact same method
-      India already uses to build its Consumer Price Index (CPI). So instead of reinventing the wheel,
-      we apply the official, internationally standard technique to airfares. Here's what that means, step by step.
-    </p>
-
-    <h3>First, a simple analogy to "get it"</h3>
-    <p>
-      Imagine you want to track how much a grocery basket costs. You don't track every product in the shop —
-      you pick a <strong>fixed basket</strong> (e.g. 1kg rice + 1L milk + 5 eggs), record the total cost today,
-      record it again every week, and see how the total moves up or down over time.
-    </p>
-    <p>
-      <strong>APIx does exactly this, but for airplane tickets.</strong> Our "basket" is the set of 12 flight
-      routes (DEL–BOM, DEL–BLR, etc.). Each route is like an "item" in the basket. We record the average ticket
-      price for each route, then compare today's prices to a fixed starting point ("base period") and turn the
-      change into a single easy-to-read number called the index.
-    </p>
-
-    <h3>The 6 steps to computing APIx</h3>
-    <div class="step-list">
-
-      <div class="istep">
-        <div class="num"></div>
-        <div>
-          <h4>Every day, we scrape fares for each route</h4>
-          <p>
-            The scraper collects the <strong>lowest available fare</strong> for all 12 routes at 3 booking windows
-            (T+1, T+7, T+30). After cleaning, for each route we compute that day's <strong>average fare</strong>.
-            This is the day's "price" for each item in our basket.
-          </p>
-        </div>
-      </div>
-
-      <div class="istep">
-        <div class="num"></div>
-        <div>
-          <h4>We fix a "base period"</h4>
-          <p>
-            The very first day we have enough good data becomes the <strong>base period</strong>.
-            We set that day's index = <strong>100</strong> (a convention in statistics). All future days are
-            compared against this baseline. Our config requires a minimum of 30 data points before we trust
-            the base value.
-          </p>
-        </div>
-      </div>
-
-      <div class="istep">
-        <div class="num"></div>
-        <div>
-          <h4>Compute each route's index (the "item" change)</h4>
-          <p>
-            For every route, we ask: <em>"how much has this route's price changed vs the base day, in %?"</em>
-          </p>
-          <div class="formula-box" style="margin-top:8px">
-            <code>Route Index = (Today's Avg Fare &divide; Base Day Avg Fare) &times; 100</code>
-          </div>
-          <p style="margin-top:10px">
-            If DEL–BOM averaged ₹4,000 on the base day and costs ₹5,000 today, its route index = 125
-            (meaning prices went up 25%).
-          </p>
-        </div>
-      </div>
-
-      <div class="istep">
-        <div class="num"></div>
-        <div>
-          <h4>Weight each route by how popular it is</h4>
-          <p>
-            Not all routes matter equally — Delhi–Mumbai carries more passengers than Chennai–Bengaluru.
-            We weight each route by its <strong>DGCA passenger-traffic share</strong>. Cities are assigned
-            weights: DEL 30%, BOM 25%, BLR 25%, MAA 20%. So bigger routes pull the overall number more.
-            This is what makes it "weighted." A route with a 15% weight contributes 15% of the answer; a
-            route with 3% contributes only 3%.
-          </p>
-        </div>
-      </div>
-
-      <div class="istep">
-        <div class="num"></div>
-        <div>
-          <h4>Combine the routes into one aggregate APIx</h4>
-          <p>The final APIx is a <strong>weighted average</strong> of all the route indices:</p>
-          <div class="formula-box" style="margin-top:8px">
-            <code>APIx = (Route<sub>1</sub> Index &times; Wgt<sub>1</sub>) + (Route<sub>2</sub> Index &times; Wgt<sub>2</sub>) + ... + (Route<sub>12</sub> Index &times; Wgt<sub>12</sub>)</code>
-          </div>
-          <p style="margin-top:10px">
-            Every route "votes" with a weight, and the final number is the traffic-weighted total.
-            On the base day, this equals 100. Every day after, it tells you the overall change in
-            airfare inflation, regardless of which specific routes moved.
-          </p>
-        </div>
-      </div>
-
-      <div class="istep">
-        <div class="num"></div>
-        <div>
-          <h4>Store at 3 frequencies</h4>
-          <p>
-            We compute and store the index at <strong>daily</strong>, <strong>weekly</strong>, and
-            <strong>monthly</strong> frequency in three separate SQLite tables
-            (<code>daily_index</code>, <code>weekly_index</code>, <code>monthly_index</code>). The value is
-            rounded to 2 decimal places. RBI and NSO can then pull whichever frequency they need.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <h3>Concrete worked example (simplified to 3 routes for clarity)</h3>
-    <p>
-      Say our "basket" has just 3 routes. On Day 1 (the base day), we record their average fares. We assign
-      each route a weight based on passenger traffic:
-    </p>
-
-    <table class="example-table">
-      <thead>
-        <tr>
-          <th>Route</th>
-          <th>Weight</th>
-          <th>Day 1 Avg Fare (Base)</th>
-          <th>Day 30 Avg Fare</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>Delhi ↔ Mumbai</td><td>35%</td><td>₹4,000</td><td>₹5,000</td></tr>
-        <tr><td>Delhi ↔ Bengaluru</td><td>40%</td><td>₹4,500</td><td>₹4,500</td></tr>
-        <tr><td>Mumbai ↔ Chennai</td><td>25%</td><td>₹3,000</td><td>₹3,300</td></tr>
-      </tbody>
-    </table>
-
-    <p style="margin-top:18px"><strong>Step 3 — Route indices:</strong></p>
-    <table class="example-table">
-      <thead>
-        <tr>
-          <th>Route</th>
-          <th>Calculation</th>
-          <th>Route Index</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>Delhi ↔ Mumbai</td><td>(5000 ÷ 4000) × 100</td><td class="hl">125</td></tr>
-        <tr><td>Delhi ↔ Bengaluru</td><td>(4500 ÷ 4500) × 100</td><td class="hl">100</td></tr>
-        <tr><td>Mumbai ↔ Chennai</td><td>(3300 ÷ 3000) × 100</td><td class="hl">110</td></tr>
-      </tbody>
-    </table>
-
-    <p style="margin-top:18px"><strong>Step 5 — Weighted aggregate APIx on Day 30:</strong></p>
-    <table class="example-table">
-      <thead>
-        <tr>
-          <th>Route</th>
-          <th>Weight</th>
-          <th>Route Index</th>
-          <th>Weighted Contribution</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>Delhi ↔ Mumbai</td><td>0.35</td><td>125</td><td>0.35 × 125 = 43.75</td></tr>
-        <tr><td>Delhi ↔ Bengaluru</td><td>0.40</td><td>100</td><td>0.40 × 100 = 40.00</td></tr>
-        <tr><td>Mumbai ↔ Chennai</td><td>0.25</td><td>110</td><td>0.25 × 110 = 27.50</td></tr>
-      </tbody>
-    </table>
-
-    <div class="formula-box">
-      <div style="margin-bottom: 8px; font-weight: 600; color: var(--accent2);">APIx (Day 30)</div>
-      <code>43.75 + 40.00 + 27.50 = 111.25</code>
-      <p>
-        Since Day 1 = 100, an APIx of 111.25 means the overall basket of airfares rose 11.25% over 30 days.
-        The exact contribution of each route: Mumbai–Chennai rose 10%, but because it has a small weight
-        (25%) it pulled the total up less than Delhi–Mumbai (35% weight) rising 25%. This is why weighting matters.
-      </p>
-    </div>
-
-    <h3 style="margin-top:20px">Why this particular method?</h3>
-    <ul style="padding-left: 20px;">
-      <li><strong>It's the official standard.</strong> Same Laspeyres approach as CPI — policymakers already trust it.</li>
-      <li><strong>It isolates pure price change.</strong> Because the basket is fixed, a rise in APIx means prices rose, not that people bought more expensive routes.</li>
-      <li><strong>It's comparable.</strong> RBI can read "airfare index 111.25" the same way they read "CPI 118" — a consistent, comparable scale.</li>
-      <li><strong>Transparent.</strong> If a route has no data on a given day, we skip it rather than guess (no imputation).</li>
-    </ul>
-
-    <h3 style="margin-top:20px">Still not sure? Key one-liner</h3>
-    <p>
-      <strong>APIx answers one simple question:</strong>
-      <em>"Compared to our starting day, how much more (or less) does the same basket of 12 flight routes cost
-      now?"</em> Base day = 100, and every number above or below 100 is a percentage change from then.
-    </p>
-  </section>
-
-  <!-- ═══════ TECH STACK ═══════ -->
-  <section>
-    <h2>6. Technology Stack</h2>
-    <div class="tech-grid">
-      <div class="tech-item">
-        <div class="name">Python 3.13</div>
-        <div class="role">Core Language</div>
-      </div>
-      <div class="tech-item">
-        <div class="name">Playwright</div>
-        <div class="role">Browser Automation</div>
-      </div>
-      <div class="tech-item">
-        <div class="name">Pydantic v2</div>
-        <div class="role">Data Validation</div>
-      </div>
-      <div class="tech-item">
-        <div class="name">Pandas + NumPy</div>
-        <div class="role">Data Cleaning & Math</div>
-      </div>
-      <div class="tech-item">
-        <div class="name">SQLite</div>
-        <div class="role">Database (zero-config)</div>
-      </div>
-      <div class="tech-item">
-        <div class="name">YAML Config</div>
-        <div class="role">Routes & Settings</div>
-      </div>
-      <div class="tech-item">
-        <div class="name">Streamlit</div>
-        <div class="role">Web Dashboard</div>
-      </div>
-      <div class="tech-item">
-        <div class="name">APScheduler</div>
-        <div class="role">Daily Job Runner</div>
-      </div>
-      <div class="tech-item">
-        <div class="name">pytest</div>
-        <div class="role">Unit Testing</div>
-      </div>
-      <div class="tech-item">
-        <div class="name">FastAPI</div>
-        <div class="role">REST API (future)</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════ WHAT'S BUILT ═══════ -->
-  <section>
-    <h2>7. Build Progress</h2>
-
-    <div class="progress-wrap">
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" style="width: 40%;">40% Complete</div>
-      </div>
-      <div class="progress-label">
-        <span>Phase 0 (Planning) &mdash; Done</span>
-        <span>Phase 6 (Testing) &mdash; Not Started</span>
-      </div>
-    </div>
-
-    <table class="status-table">
-      <thead>
-        <tr>
-          <th>Phase</th>
-          <th>What It Does</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>P0</strong> — Planning</td>
-          <td>PRD, config files, project scaffold, database schema, data models</td>
-          <td><span class="dot dot-done"></span>Done</td>
-        </tr>
-        <tr>
-          <td><strong>P1</strong> — Scraper</td>
-          <td>Playwright-based Google Flights scraper with rate limiting, retry logic, and CLI runner</td>
-          <td><span class="dot dot-done"></span>Done</td>
-        </tr>
-        <tr>
-          <td><strong>P2</strong> — Cleaner</td>
-          <td>Pandas-based cleaning: dedup, outlier detection (IQR), quality scoring, null handling</td>
-          <td><span class="dot dot-done"></span>Done</td>
-        </tr>
-        <tr>
-          <td><strong>P3</strong> — Index Builder</td>
-          <td>Laspeyres weighted basket index computation — route-level + aggregate APIx</td>
-          <td><span class="dot dot-todo"></span>Not Started</td>
-        </tr>
-        <tr>
-          <td><strong>P4</strong> — Dashboard</td>
-          <td>Streamlit app with trend charts, heatmaps, carrier comparisons, data explorer</td>
-          <td><span class="dot dot-todo"></span>Not Started</td>
-        </tr>
-        <tr>
-          <td><strong>P5</strong> — Scheduler</td>
-          <td>APScheduler for daily automated runs, logging, error handling</td>
-          <td><span class="dot dot-todo"></span>Not Started</td>
-        </tr>
-        <tr>
-          <td><strong>P6</strong> — Testing</td>
-          <td>Unit tests, offline fixtures, 80%+ coverage, DGCA back-testing</td>
-          <td><span class="dot dot-todo"></span>Not Started</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <!-- ═══════ DETAILED COMPONENT BREAKDOWN ═══════ -->
-  <section>
-    <h2>8. Detailed Component Breakdown</h2>
-
-    <details>
-      <summary>Scraper Module — src/scraper/</summary>
-      <div>
-        <ul>
-          <li><strong>base.py</strong> — Abstract <code>BaseScraper</code> class that defines the contract all scrapers must follow</li>
-          <li><strong>driver.py</strong> — Async Playwright browser context manager. Handles Chromium launch, viewport size, user-agent rotation, and timeouts</li>
-          <li><strong>google_flights.py</strong> — The actual scraper (314 lines). Builds Google Flights search URLs, navigates to results, parses <code>aria-label</code> attributes on flight cards (more stable than CSS selectors), extracts price, carrier, times, duration, stops via regex</li>
-          <li><strong>run_scrape.py</strong> — CLI entry point. Iterates all 12 routes &times; 3 windows = 36 tasks, applies rate limiting (max 60 req/hr), exponential backoff retry (3 attempts), saves validated <code>FlightRecord</code> objects to SQLite</li>
-        </ul>
-      </div>
-    </details>
-
-    <details>
-      <summary>Cleaner Module — src/cleaner/</summary>
-      <div>
-        <ul>
-          <li><strong>clean.py</strong> — Pandas-based pipeline (133 lines)
-            <ul>
-              <li>Computes MD5 dedup hash per record (route + carrier + time + fare + window)</li>
-              <li>Removes duplicate entries</li>
-              <li>Handles null fares (configurable: drop or forward-fill)</li>
-              <li>IQR-based outlier detection grouped by route + lead window</li>
-              <li>Quality scoring (0.0–1.0) based on field completeness</li>
-              <li>Writes results to <code>cleaned_flights</code> table</li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-    </details>
-
-    <details>
-      <summary>Data Models — src/models/schemas.py</summary>
-      <div>
-        <ul>
-          <li><strong>FlightRecord</strong> — 16-field Pydantic model: origin, destination, carrier, flight_no, departure_time, arrival_time, duration_mins, stops, base_fare, taxes, total_fare, currency, lead_window_days, scrape_date, scrape_timestamp, quality_score</li>
-          <li><strong>RouteConfig</strong> — origin/dest pair with DGCA weight</li>
-          <li><strong>CityConfig</strong> — city code, name, traffic weight</li>
-          <li><strong>IndexEntry</strong> — index_date, route, weight, route_price, route_index, aggregate_index, base_period</li>
-        </ul>
-      </div>
-    </details>
-
-    <details>
-      <summary>Database — src/storage/database.py</summary>
-      <div>
-        <ul>
-          <li>SQLite single-file database at <code>data/apix.db</code></li>
-          <li>5 tables: <code>raw_flights</code>, <code>cleaned_flights</code>, <code>daily_index</code>, <code>weekly_index</code>, <code>monthly_index</code></li>
-          <li><code>init_db()</code> creates tables on demand, <code>get_connection()</code> returns live connections</li>
-          <li>Currently holds: 356 raw flights, 75 cleaned flights</li>
-        </ul>
-      </div>
-    </details>
-
-    <details>
-      <summary>Index Builder — src/indexer/ (PLANNED)</summary>
-      <div>
-        <ul>
-          <li>Reads from <code>cleaned_flights</code></li>
-          <li>Computes per-route average fare for each day</li>
-          <li>Calculates route-level index: <code>(today_avg / base_avg) &times; 100</code></li>
-          <li>Aggregates into overall APIx using DGCA traffic weights</li>
-          <li>Produces daily, weekly, and monthly index values</li>
-          <li>Requires minimum 30 data points before computing index</li>
-          <li>Skips missing routes (no imputation) for transparency</li>
-        </ul>
-      </div>
-    </details>
-
-    <details>
-      <summary>Dashboard — src/dashboard/ (PLANNED)</summary>
-      <div>
-        <ul>
-          <li>Streamlit web app reading from SQLite</li>
-          <li>Live daily APIx display</li>
-          <li>Price trend line charts by route</li>
-          <li>Sector-wise heatmap (city-pair matrix)</li>
-          <li>Lead-time elasticity curve (price vs booking window)</li>
-          <li>Carrier-wise comparison charts</li>
-          <li>Raw-data explorer with filters</li>
-          <li>Target: &lt;5s cold load, &lt;1s cached chart render</li>
-        </ul>
-      </div>
-    </details>
-
-    <details>
-      <summary>Scheduler — (PLANNED)</summary>
-      <div>
-        <ul>
-          <li>APScheduler-based daily job runner</li>
-          <li>Triggers full pipeline: scrape &rarr; clean &rarr; index &rarr; dashboard refresh</li>
-          <li>Logging and error handling for each stage</li>
-          <li>Designed to run as a local scheduled task (not a long-running daemon for MVP)</li>
-        </ul>
-      </div>
-    </details>
-  </section>
-
-  <!-- ═══════ CONSTRAINTS ═══════ -->
-  <section>
-    <h2>9. Key Constraints</h2>
-
-    <details open>
-      <summary>Technical Constraints</summary>
-      <div>
-        <ul>
-          <li>Python 3.10+ required (running 3.13)</li>
-          <li>Headless Chromium only — no GUI browser dependency</li>
-          <li>SQLite as sole database — zero infrastructure</li>
-          <li>Max 1 concurrent scraper — avoid anti-bot triggers</li>
-          <li>Max 60 requests/hour — respectful rate limiting</li>
-          <li>No secrets in code — use <code>.env</code> + python-dotenv</li>
-          <li>Windows-compatible development</li>
-        </ul>
-      </div>
-    </details>
-
-    <details>
-      <summary>Data Constraints</summary>
-      <div>
-        <ul>
-          <li>Google Flights only for MVP</li>
-          <li>Max 4 cities, 12 routes, 3 lead windows</li>
-          <li>Fares in INR only</li>
-          <li>Minimum 30 data points before computing index</li>
-          <li>Scraping frequency: once daily (batch, not real-time)</li>
-          <li>Historical data: max 90 days</li>
-        </ul>
-      </div>
-    </details>
-
-    <details>
-      <summary>Ethical / Legal Constraints</summary>
-      <div>
-        <ul>
-          <li>Honor robots.txt at all times</li>
-          <li>No scraping login-gated content</li>
-          <li>Respect Google Flights Terms of Service</li>
-          <li>Minimum volume, maximum value — fewest queries for valid index</li>
-          <li>Cache aggressively to reduce repeat requests</li>
-          <li>No personal data collected — no PII, no tracking</li>
-        </ul>
-      </div>
-    </details>
-  </section>
-
-  <!-- ═══════ RISKS ═══════ -->
-  <section>
-    <h2>10. Risks & How We Handle Them</h2>
-    <div class="risk-grid">
-      <div class="risk-card">
-        <h4>Anti-Bot / CAPTCHA</h4>
-        <p>We use rate limiting (60 req/hr), human-like random delays (3–8s), exponential backoff retry, and session management to stay under detection thresholds.</p>
-      </div>
-      <div class="risk-card">
-        <h4>Google Flights Layout Changes</h4>
-        <p>We parse <code>aria-label</code> attributes (structured text) instead of fragile CSS selectors. The scraper module is isolated — easy to swap to OTAs if needed.</p>
-      </div>
-      <div class="risk-card">
-        <h4>Terms of Service</h4>
-        <p>Ethical scraping policy: robots.txt compliance, modest volumes, cache-first approach, source attribution in documentation.</p>
-      </div>
-      <div class="risk-card">
-        <h4>Data Inconsistency</h4>
-        <p>Robust cleaning pipeline with IQR outlier detection, null handling (drop/forward-fill), deduplication, and quality scoring.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════ ACCEPTANCE CRITERIA ═══════ -->
-  <section>
-    <h2>11. What "Done" Looks Like</h2>
-    <ul style="padding-left: 20px; line-height: 2.2;">
-      <li>Pipeline runs end-to-end: scrape &rarr; clean &rarr; index &rarr; dashboard</li>
-      <li>At least 40 scraped flights captured per single run</li>
-      <li>Data cleaned of outliers and missing values programmatically</li>
-      <li>Daily APIx computed and stored in SQLite</li>
-      <li>Streamlit dashboard renders trends, heatmap, elasticity curve</li>
-      <li>&ge; 30 days back-tested against DGCA monthly data</li>
-      <li>Test suite with bundled fixtures (no live network in CI)</li>
-      <li>README with setup + run instructions</li>
-    </ul>
-  </section>
-
-  <!-- ═══════ USER STORIES ═══════ -->
-  <section>
-    <h2>12. Who Uses This and Why</h2>
-    <table class="status-table">
-      <thead>
-        <tr>
-          <th>User</th>
-          <th>What They Want</th>
-          <th>Why</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Data Analyst</td>
-          <td>Scrape flight prices daily</td>
-          <td>Up-to-date fare data for reports</td>
-        </tr>
-        <tr>
-          <td>Data Scientist</td>
-          <td>Automatically cleaned data</td>
-          <td>No hand-editing raw scraped quotes</td>
-        </tr>
-        <tr>
-          <td>Economist (NSO)</td>
-          <td>Compute APIx index</td>
-          <td>Study airfare inflation trends</td>
-        </tr>
-        <tr>
-          <td>Dashboard User</td>
-          <td>View price trends graphically</td>
-          <td>Spot spikes, surges, patterns</td>
-        </tr>
-        <tr>
-          <td>RBI Official</td>
-          <td>Consume index via API</td>
-          <td>Feed into monetary policy models</td>
-        </tr>
-        <tr>
-          <td>Administrator</td>
-          <td>Schedule runs &amp; view logs</td>
-          <td>Ensure pipeline is healthy</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <!-- ═══════ DIRECTORY STRUCTURE ═══════ -->
-  <section>
-    <h2>13. Project Structure</h2>
-    <details open>
-      <summary>Click to expand full file tree</summary>
-      <div>
-<pre style="font-size: 0.85rem; color: var(--muted); line-height: 1.8; overflow-x: auto;">
-SIH-2026/
-├── .env                          # Scraper config (env vars)
-├── requirements.txt              # Python dependencies
-├── config/
-│   ├── routes.yaml               # City definitions, 12 routes, lead windows, weights
-│   ├── scraper.yaml              # Rate limits, delays, browser settings
-│   └── indexer.yaml              # Index builder & outlier detection settings
-├── data/
-│   └── apix.db                   # SQLite database (356 raw, 75 cleaned flights)
-├── docs/
-│   ├── PRD.md                    # Full Product Requirements Document
-│   ├── CONSTRAINTS.md            # All project constraints
-│   ├── project-overview.html     # THIS FILE — project explainer
-│   └── walkthroughs/             # 13 line-by-line code walkthroughs (HTML)
+<div class="card">
+<h2>6. Directory Structure</h2>
+<pre>SIH-2026/
+&boxur;─ config/
+│  ├── routes.yaml          cities, 12 routes, 3 lead windows (59)
+│  ├── scraper.yaml         rate limits, retry, browser, timeouts (21)
+│  └── indexer.yaml         weights, base period, outlier rules (28)
+├── data/apix.db            single SQLite database
 ├── src/
-│   ├── models/schemas.py         # Pydantic data models (FlightRecord, etc.)
-│   ├── storage/database.py       # SQLite init, DDL, connections
-│   ├── scraper/
-│   │   ├── base.py               # Abstract scraper class
-│   │   ├── driver.py             # Playwright browser manager
-│   │   ├── google_flights.py     # Google Flights scraper (314 lines)
-│   │   └── run_scrape.py         # CLI entry point for daily scraping
-│   ├── cleaner/clean.py          # Pandas cleaning pipeline (133 lines)
-│   ├── indexer/                  # Index builder (NOT YET BUILT)
-│   └── dashboard/                # Streamlit app (NOT YET BUILT)
-└── tests/                        # Unit tests (NOT YET WRITTEN)
-</pre>
-      </div>
-    </details>
-  </section>
+│  ├── models/schemas.py    Pydantic models (50)
+│  ├── storage/database.py  SQLite layer (120)
+│  ├── scraper/             base, driver, google_flights, run_scrape, run_smoke
+│  ├── cleaner/             clean, pipeline, mock_data, check_db, test_run
+│  └── indexer/             api_index, run_index
+├── tests/                  test_scraper, test_indexer (217 lines)
+└── docs/                   this documentation + walkthroughs</pre>
+</div>
 
-  <footer>
-    APIx Platform — SIH-2026 | Ministry of Statistics &amp; Programme Implementation (MoSPI)
-    <br>Real-time Airfare Price Index for India
-  </footer>
+<div class="card">
+<h2>7. Tech Stack</h2>
+<p><span class="pill">Python 3.11+</span><span class="pill">Playwright</span><span class="pill">pandas</span><span class="pill">numpy</span><span class="pill">Pydantic v2</span><span class="pill">PyYAML</span><span class="pill">SQLite</span><span class="pill">APScheduler</span><span class="pill">Streamlit</span><span class="pill">Plotly</span><span class="pill g">pytest</span><span class="pill g">pytest-cov</span></p>
+<p>The core pipeline (scrape &rarr; clean &rarr; index) is pure Python + SQLite. Streamlit + Plotly are included for the dashboard layer on top of <code>data/apix.db</code>.</p>
+</div>
+
+<div class="card">
+<h2>8. How to Run</h2>
+<pre>pip install -r requirements.txt
+playwright install chromium            # once
+
+python -m src.scraper.run_scrape       # batch: raw_flights   (12 routes x 3 windows)
+python src/cleaner/clean.py            # clean: cleaned_flights
+python -m src.indexer.run_index        # index: daily/weekly/monthly_index
+
+pytest tests                           # 14 tests</pre>
+<div class="note"><strong>Note:</strong> the full scrape requires a live connection to Google Flights and rates itself to 60 requests/hour. For an offline demo, <code>src/cleaner/test_run.py</code> builds mock data and runs the whole Phase 2 pipeline.</div>
+</div>
+
+<div class="card">
+<h2>9. Constraints &amp; Acceptance Criteria</h2>
+<h3>Constraints</h3>
+<ul>
+<li><strong>Respect the source:</strong> hard cap of 60 requests/hour, random 3&ndash;8s delays, 3 retries with exponential backoff (&times;2).</li>
+<li><strong>Offline reproducibility:</strong> every DataFrame function is unit-testable without the network; fixtures replace scrapes in tests.</li>
+<li><strong>Single source of truth:</strong> all routes, weights, and settings live in <code>config/*.yaml</code>.</li>
+</ul>
+<h3>Acceptance criteria</h3>
+<ol>
+<li>System scrapes all 12 routes at 3 windows and stores every flight in <code>raw_flights</code>.</li>
+<li>Cleaning removes duplicates, null fares, and flags IQR outliers (1.5&times;) with a per-row quality score.</li>
+<li>The indexer writes <code>daily_index</code>, <code>weekly_index</code>, <code>monthly_index</code>; the base day is 100 for every route and window.</li>
+<li>Re-running the same day <em>replaces</em> rather than duplicates index rows.</li>
+<li>All weight sums check to 1.0 and route weights match <code>config/indexer.yaml</code>.</li>
+</ol>
+</div>
+
+<div class="card">
+<h2>10. Next Step</h2>
+<p>This backend is complete and runnable. The immediate next step is the <strong>frontend/dashboard</strong> on top of <code>data/apix.db</code> (Streamlit + Plotly), and optionally a FastAPI layer to expose the index as REST endpoints.</p>
+<p>Every file below is documented <strong>line by line</strong> in the walkthroughs &mdash; start with <a href="walkthroughs/index.html">the master index</a>.</p>
+</div>
 
 </div>
 </body>

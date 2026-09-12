@@ -59,7 +59,7 @@ def clean_raw_data(
     conn.close()
 
     if df.empty:
-        log.warning("raw_flights is empty — nothing to clean")
+        log.warning("raw_flights is empty - nothing to clean")
         return {"raw": 0, "cleaned": 0, "duplicates": 0, "outliers": 0, "nulls": 0}
 
     raw_count = len(df)
@@ -90,7 +90,7 @@ def clean_raw_data(
         .transform(lambda x: _flag_outliers_iqr(x, multiplier))
     )
     outlier_count = int(df["is_outlier"].sum())
-    log.info("Flagged %d outliers via IQR (×%.1f)", outlier_count, multiplier)
+    log.info("Flagged %d outliers via IQR (x%.1f)", outlier_count, multiplier)
 
     df["quality_score"] = _compute_quality_score(df)
     df["scrape_date"] = pd.to_datetime(df["scrape_timestamp"]).dt.date.astype(str)

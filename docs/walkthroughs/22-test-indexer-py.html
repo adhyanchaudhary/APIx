@@ -1,0 +1,1754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Walkthrough 22: tests/test_indexer.py</title>
+<style>
+:root{--bg:#F08080;--card:rgba(255,255,255,0.92);--blue:#0D47A1;--blue-mid:#1565C0;--blue-light:#BBDEFB;--green:#1B5E20;--green-light:#C8E6C9;--red:#B71C1C;--red-light:#FFCDD2;--black:#1A1A2E;--grey:#546E7A}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--black);line-height:1.7}
+.wrap{max-width:900px;margin:0 auto;padding:20px}
+header{background:var(--blue);color:#fff;padding:24px 32px;border-radius:14px;margin-bottom:24px}
+header h1{font-size:1.6rem}
+header .sub{opacity:.75;margin-top:4px;font-size:.9rem}
+.card{background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:20px;border-left:6px solid var(--blue-mid)}
+.card h2{color:var(--blue);font-size:1.2rem;margin-bottom:8px}
+.line-block{margin:14px 0;border-radius:8px;overflow:hidden;border:1px solid #ddd}
+.line-header{background:var(--blue);color:#fff;padding:6px 14px;font-size:.85rem;font-weight:600}
+.line-code{background:#263238;color:#80CBC4;padding:10px 16px;font-family:'Courier New',monospace;font-size:.85rem;white-space:pre;overflow-x:auto}
+.line-explain{background:#E8F5E9;padding:10px 16px;font-size:.9rem;border-top:1px solid #C8E6C9}
+.line-explain strong{color:var(--green)}
+.line-explain code{background:#C8E6C9;padding:1px 5px;border-radius:3px;font-family:'Courier New',monospace;font-size:.85rem}
+.nav{display:flex;justify-content:space-between;margin:20px 0}
+.nav a{background:var(--blue);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem}
+.nav a:hover{background:var(--blue-mid)}
+.note{background:var(--blue-light);border-left:4px solid var(--blue);padding:10px 14px;border-radius:6px;margin:10px 0;font-size:.9rem}
+.summary{background:var(--green-light);border-left:4px solid var(--green);padding:12px 16px;border-radius:6px;margin:14px 0;color:var(--green)}
+.summary::before{content:"Key takeaway: ";font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Walkthrough 22: tests/test_indexer.py</h1>
+<div class="sub">tests/test_indexer.py</div>
+</header>
+<div class="nav"><a href="21-test-scraper-py.html">&larr; Previous</a><a href="23-estimators-py.html">Next &rarr;</a></div>
+<div class="card">
+<h2>File Overview</h2>
+<p>Every line of this file is explained in plain English below. Code shown is read directly from the current file on disk.</p>
+</div>
+<div class="line-block">
+<div class="line-header">Line 1</div>
+<div class="line-code">"""Test suites for src.indexer.api_index — the APIx weighted basket index.</div>
+<div class="line-explain">Module docstring: the test suite for src.indexer.api_index — the APIx weighted basket index.</div>
+</div><div class="line-block">
+<div class="line-header">Line 2</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 3</div>
+<div class="line-code">All tests run offline using tests/fixtures/sample_cleaned.csv.</div>
+<div class="line-explain">Docstring: all tests run offline using tests/fixtures/sample_cleaned.csv.</div>
+</div><div class="line-block">
+<div class="line-header">Line 4</div>
+<div class="line-code">"""</div>
+<div class="line-explain">Closes the docstring.</div>
+</div><div class="line-block">
+<div class="line-header">Line 5</div>
+<div class="line-code">from pathlib import Path</div>
+<div class="line-explain">Imports Path for fixture file resolution.</div>
+</div><div class="line-block">
+<div class="line-header">Line 6</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 7</div>
+<div class="line-code">import pandas as pd</div>
+<div class="line-explain">Imports pandas for DataFrame assertions.</div>
+</div><div class="line-block">
+<div class="line-header">Line 8</div>
+<div class="line-code">import pytest</div>
+<div class="line-explain">Imports pytest for test utilities and pytest.approx.</div>
+</div><div class="line-block">
+<div class="line-header">Line 9</div>
+<div class="line-code">import yaml</div>
+<div class="line-explain">Imports yaml — used by the estimator-config end-to-end test.</div>
+</div><div class="line-block">
+<div class="line-header">Line 10</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 11</div>
+<div class="line-code">from src.indexer.api_index import (</div>
+<div class="line-explain">Opens the import block from src.indexer.api_index.</div>
+</div><div class="line-block">
+<div class="line-header">Line 12</div>
+<div class="line-code">    CONFIG_PATH,</div>
+<div class="line-explain">CONFIG_PATH — the real indexer.yaml (edited by the config-flag test).</div>
+</div><div class="line-block">
+<div class="line-header">Line 13</div>
+<div class="line-code">    INDEX_COLUMNS,</div>
+<div class="line-explain">INDEX_COLUMNS — for schema verification.</div>
+</div><div class="line-block">
+<div class="line-header">Line 14</div>
+<div class="line-code">    compute_daily_index,</div>
+<div class="line-explain">compute_daily_index — the 36-cell daily calculator.</div>
+</div><div class="line-block">
+<div class="line-header">Line 15</div>
+<div class="line-code">    compute_rolling_index,</div>
+<div class="line-explain">compute_rolling_index — weekly/monthly rollups.</div>
+</div><div class="line-block">
+<div class="line-header">Line 16</div>
+<div class="line-code">    load_estimator_config,</div>
+<div class="line-explain">load_estimator_config — the estimator settings under test.</div>
+</div><div class="line-block">
+<div class="line-header">Line 17</div>
+<div class="line-code">    load_route_weights,</div>
+<div class="line-explain">load_route_weights — config validation.</div>
+</div><div class="line-block">
+<div class="line-header">Line 18</div>
+<div class="line-code">    load_window_weights,</div>
+<div class="line-explain">load_window_weights — window shares config validation.</div>
+</div><div class="line-block">
+<div class="line-header">Line 19</div>
+<div class="line-code">    route_price_per_day,</div>
+<div class="line-explain">route_price_per_day — the price-collapse function.</div>
+</div><div class="line-block">
+<div class="line-header">Line 20</div>
+<div class="line-code">    write_index,</div>
+<div class="line-explain">write_index — the SQLite upsert function.</div>
+</div><div class="line-block">
+<div class="line-header">Line 21</div>
+<div class="line-code">)</div>
+<div class="line-explain">Closes the import block.</div>
+</div><div class="line-block">
+<div class="line-header">Line 22</div>
+<div class="line-code">from src.storage.database import get_connection, init_db</div>
+<div class="line-explain">Imports get_connection and init_db from the storage layer.</div>
+</div><div class="line-block">
+<div class="line-header">Line 23</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 24</div>
+<div class="line-code">FIXTURES = Path(__file__).resolve().parent / "fixtures"</div>
+<div class="line-explain">FIXTURES: path to the tests/fixtures directory.</div>
+</div><div class="line-block">
+<div class="line-header">Line 25</div>
+<div class="line-code">CSV = FIXTURES / "sample_cleaned.csv"</div>
+<div class="line-explain">CSV: path to the sample_cleaned.csv test fixture.</div>
+</div><div class="line-block">
+<div class="line-header">Line 26</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 27</div>
+<div class="line-code">WEIGHTS = {"DEL-BOM": 0.4, "DEL-BLR": 0.3, "BOM-BLR": 0.3}</div>
+<div class="line-explain">WEIGHTS: hardcoded test weights for the 3-route fixture.</div>
+</div><div class="line-block">
+<div class="line-header">Line 28</div>
+<div class="line-code"># Equal booking-lead-time shares for the 3-route × 2-window fixture: every</div>
+<div class="line-explain">Comment: equal booking-lead-time shares for the 3-route × 2-window fixture...</div>
+</div><div class="line-block">
+<div class="line-header">Line 29</div>
+<div class="line-code"># cell weight = route weight × 0.5, so the fixture blends both windows 50/50.</div>
+<div class="line-explain">...every cell weight = route weight × 0.5, so the fixture blends both windows 50/50.</div>
+</div><div class="line-block">
+<div class="line-header">Line 30</div>
+<div class="line-code">WINDOW_WEIGHTS = {1: 0.5, 7: 0.5}</div>
+<div class="line-explain">WINDOW_WEIGHTS: the window shares the tests pass in.</div>
+</div><div class="line-block">
+<div class="line-header">Line 31</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 32</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 33</div>
+<div class="line-code">@pytest.fixture</div>
+<div class="line-explain">pytest fixture marker.</div>
+</div><div class="line-block">
+<div class="line-header">Line 34</div>
+<div class="line-code">def cleaned_df() -&gt; pd.DataFrame:</div>
+<div class="line-explain">cleaned_df: returns the sample CSV as a DataFrame.</div>
+</div><div class="line-block">
+<div class="line-header">Line 35</div>
+<div class="line-code">    return pd.read_csv(CSV)</div>
+<div class="line-explain">Reads sample_cleaned.csv.</div>
+</div><div class="line-block">
+<div class="line-header">Line 36</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 37</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 38</div>
+<div class="line-code">@pytest.fixture</div>
+<div class="line-explain">pytest fixture marker.</div>
+</div><div class="line-block">
+<div class="line-header">Line 39</div>
+<div class="line-code">def prices(cleaned_df: pd.DataFrame) -&gt; pd.DataFrame:</div>
+<div class="line-explain">prices: takes cleaned_df as input.</div>
+</div><div class="line-block">
+<div class="line-header">Line 40</div>
+<div class="line-code">    return route_price_per_day(cleaned_df)</div>
+<div class="line-explain">Collapses to one fare per (route, window, date) with the default median.</div>
+</div><div class="line-block">
+<div class="line-header">Line 41</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 42</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 43</div>
+<div class="line-code">@pytest.fixture</div>
+<div class="line-explain">pytest fixture marker.</div>
+</div><div class="line-block">
+<div class="line-header">Line 44</div>
+<div class="line-code">def daily(prices: pd.DataFrame) -&gt; pd.DataFrame:</div>
+<div class="line-explain">daily: takes prices as input.</div>
+</div><div class="line-block">
+<div class="line-header">Line 45</div>
+<div class="line-code">    return compute_daily_index(prices, WEIGHTS, WINDOW_WEIGHTS)</div>
+<div class="line-explain">Computes the daily index with the test weights AND window weights.</div>
+</div><div class="line-block">
+<div class="line-header">Line 46</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 47</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 48</div>
+<div class="line-code">def _rows(daily: pd.DataFrame, window: int, date: str) -&gt; pd.DataFrame:</div>
+<div class="line-explain">Helper _rows: filters the daily frame by window and date.</div>
+</div><div class="line-block">
+<div class="line-header">Line 49</div>
+<div class="line-code">    return daily[(daily["lead_window_days"] == window) &amp; (daily["index_date"] == date)]</div>
+<div class="line-explain">Boolean mask over the two columns, returned as a fresh frame.</div>
+</div><div class="line-block">
+<div class="line-header">Line 50</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 51</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 52</div>
+<div class="line-code"># ── Config ──────────────────────────────────────────────────────────────────</div>
+<div class="line-explain">Section header: config tests.</div>
+</div><div class="line-block">
+<div class="line-header">Line 53</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 54</div>
+<div class="line-code">def test_route_weights_load_and_normalise():</div>
+<div class="line-explain">test_route_weights_load_and_normalise: verifies config loading.</div>
+</div><div class="line-block">
+<div class="line-header">Line 55</div>
+<div class="line-code">    weights = load_route_weights()</div>
+<div class="line-explain">Loads the real weights from config/indexer.yaml.</div>
+</div><div class="line-block">
+<div class="line-header">Line 56</div>
+<div class="line-code">    assert len(weights) == 12</div>
+<div class="line-explain">There must be 12 directional routes.</div>
+</div><div class="line-block">
+<div class="line-header">Line 57</div>
+<div class="line-code">    assert sum(weights.values()) == pytest.approx(1.0, abs=1e-6)</div>
+<div class="line-explain">The weights must sum to 1.0 (within tolerance).</div>
+</div><div class="line-block">
+<div class="line-header">Line 58</div>
+<div class="line-code">    assert weights["DEL-BOM"] &gt; 0</div>
+<div class="line-explain">DEL-BOM must carry positive weight.</div>
+</div><div class="line-block">
+<div class="line-header">Line 59</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 60</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 61</div>
+<div class="line-code">def test_estimator_config_loads_expected_keys():</div>
+<div class="line-explain">test_estimator_config_loads_expected_keys: verifies the estimator settings.</div>
+</div><div class="line-block">
+<div class="line-header">Line 62</div>
+<div class="line-code">    est = load_estimator_config()</div>
+<div class="line-explain">Loads the estimator config.</div>
+</div><div class="line-block">
+<div class="line-header">Line 63</div>
+<div class="line-code">    assert set(est) == {</div>
+<div class="line-explain">The key set must be exactly these five...</div>
+</div><div class="line-block">
+<div class="line-header">Line 64</div>
+<div class="line-code">        "aggregation_estimator",</div>
+<div class="line-explain">aggregation_estimator.</div>
+</div><div class="line-block">
+<div class="line-header">Line 65</div>
+<div class="line-code">        "aggregation_trim_frac",</div>
+<div class="line-explain">aggregation_trim_frac.</div>
+</div><div class="line-block">
+<div class="line-header">Line 66</div>
+<div class="line-code">        "rolling_estimator",</div>
+<div class="line-explain">rolling_estimator.</div>
+</div><div class="line-block">
+<div class="line-header">Line 67</div>
+<div class="line-code">        "rolling_trim_frac",</div>
+<div class="line-explain">rolling_trim_frac.</div>
+</div><div class="line-block">
+<div class="line-header">Line 68</div>
+<div class="line-code">        "route_price_method",</div>
+<div class="line-explain">route_price_method.</div>
+</div><div class="line-block">
+<div class="line-header">Line 69</div>
+<div class="line-code">    }</div>
+<div class="line-explain">Closes the set literal.</div>
+</div><div class="line-block">
+<div class="line-header">Line 70</div>
+<div class="line-code">    assert est["aggregation_estimator"] == "weighted_trimmed_mean"</div>
+<div class="line-explain">Default aggregation estimator is weighted_trimmed_mean (CPI-style).</div>
+</div><div class="line-block">
+<div class="line-header">Line 71</div>
+<div class="line-code">    assert est["aggregation_trim_frac"] == pytest.approx(0.10)</div>
+<div class="line-explain">Default aggregate trim is 10%.</div>
+</div><div class="line-block">
+<div class="line-header">Line 72</div>
+<div class="line-code">    assert est["rolling_estimator"] == "mean"</div>
+<div class="line-explain">Default rolling estimator is mean.</div>
+</div><div class="line-block">
+<div class="line-header">Line 73</div>
+<div class="line-code">    assert est["rolling_trim_frac"] == pytest.approx(0.10)</div>
+<div class="line-explain">Default rolling trim is 10%.</div>
+</div><div class="line-block">
+<div class="line-header">Line 74</div>
+<div class="line-code">    assert est["route_price_method"] == "median"</div>
+<div class="line-explain">Default route-price collapse is median.</div>
+</div><div class="line-block">
+<div class="line-header">Line 75</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 76</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 77</div>
+<div class="line-code">def test_window_weights_load_and_normalise():</div>
+<div class="line-explain">test_window_weights_load_and_normalise: verifies window shares config.</div>
+</div><div class="line-block">
+<div class="line-header">Line 78</div>
+<div class="line-code">    window_weights = load_window_weights()</div>
+<div class="line-explain">Loads the window weights from config.</div>
+</div><div class="line-block">
+<div class="line-header">Line 79</div>
+<div class="line-code">    assert set(window_weights) == {1, 7, 30}</div>
+<div class="line-explain">The three windows 1, 7 and 30 must be present.</div>
+</div><div class="line-block">
+<div class="line-header">Line 80</div>
+<div class="line-code">    assert sum(window_weights.values()) == pytest.approx(1.0, abs=1e-6)</div>
+<div class="line-explain">They must sum to 1.0.</div>
+</div><div class="line-block">
+<div class="line-header">Line 81</div>
+<div class="line-code">    assert window_weights[30] &gt; window_weights[1]</div>
+<div class="line-explain">The month-ahead share must beat the last-minute share (0.5 vs 0.2).</div>
+</div><div class="line-block">
+<div class="line-header">Line 82</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 83</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 84</div>
+<div class="line-code"># ── Price collapse ──────────────────────────────────────────────────────────</div>
+<div class="line-explain">Section header: price-collapse tests.</div>
+</div><div class="line-block">
+<div class="line-header">Line 85</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 86</div>
+<div class="line-code">def test_price_per_day_excludes_outliers(cleaned_df: pd.DataFrame, prices: pd.DataFrame):</div>
+<div class="line-explain">test_price_per_day_excludes_outliers: the flagged row must vanish.</div>
+</div><div class="line-block">
+<div class="line-header">Line 87</div>
+<div class="line-code">    assert len(cleaned_df) == 30</div>
+<div class="line-explain">The fixture has 30 cleaned rows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 88</div>
+<div class="line-code">    assert cleaned_df[cleaned_df["is_outlier"] == 1].shape[0] == 1</div>
+<div class="line-explain">Exactly 1 row is flagged as an outlier.</div>
+</div><div class="line-block">
+<div class="line-header">Line 89</div>
+<div class="line-code">    flagged = cleaned_df[cleaned_df["is_outlier"] == 1].iloc[0]</div>
+<div class="line-explain">Grabs that flagged row.</div>
+</div><div class="line-block">
+<div class="line-header">Line 90</div>
+<div class="line-code">    assert flagged["route"] == "DEL-BOM"</div>
+<div class="line-explain">It is on route DEL-BOM.</div>
+</div><div class="line-block">
+<div class="line-header">Line 91</div>
+<div class="line-code">    assert flagged["lead_window_days"] == 7</div>
+<div class="line-explain">It is in window 7.</div>
+</div><div class="line-block">
+<div class="line-header">Line 92</div>
+<div class="line-code">    assert flagged["scrape_date"] == "2026-09-04"</div>
+<div class="line-explain">It was scraped on 2026-09-04.</div>
+</div><div class="line-block">
+<div class="line-header">Line 93</div>
+<div class="line-code">    combo = prices[</div>
+<div class="line-explain">Builds the combo filter for that exact cell...</div>
+</div><div class="line-block">
+<div class="line-header">Line 94</div>
+<div class="line-code">        (prices["route"] == "DEL-BOM")</div>
+<div class="line-explain">...filter part 1: route match.</div>
+</div><div class="line-block">
+<div class="line-header">Line 95</div>
+<div class="line-code">        &amp; (prices["lead_window_days"] == 7)</div>
+<div class="line-explain">...filter part 2: window match.</div>
+</div><div class="line-block">
+<div class="line-header">Line 96</div>
+<div class="line-code">        &amp; (prices["scrape_date"] == "2026-09-04")</div>
+<div class="line-explain">...filter part 3: date match.</div>
+</div><div class="line-block">
+<div class="line-header">Line 97</div>
+<div class="line-code">    ]</div>
+<div class="line-explain">Closes the filter.</div>
+</div><div class="line-block">
+<div class="line-header">Line 98</div>
+<div class="line-code">    assert len(combo) == 1</div>
+<div class="line-explain">The cell survived with exactly one price row.</div>
+</div><div class="line-block">
+<div class="line-header">Line 99</div>
+<div class="line-code">    # Outlier fare 4200 excluded; 9/3's price carried forward instead.</div>
+<div class="line-explain">Comment: the outlier fare 4200 is excluded; 9/3's price carried forward instead.</div>
+</div><div class="line-block">
+<div class="line-header">Line 100</div>
+<div class="line-code">    assert combo.iloc[0]["route_price"] == 4050.0</div>
+<div class="line-explain">So the cell price is 4050 (the carried-forward fare), not 4200.</div>
+</div><div class="line-block">
+<div class="line-header">Line 101</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 102</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 103</div>
+<div class="line-code">def test_price_per_day_uses_median_fare_by_default():</div>
+<div class="line-explain">test_price_per_day_uses_median_fare_by_default: 3 fares collapse to the middle one.</div>
+</div><div class="line-block">
+<div class="line-header">Line 104</div>
+<div class="line-code">    df = pd.DataFrame(</div>
+<div class="line-explain">Opens a tiny DataFrame fixture...</div>
+</div><div class="line-block">
+<div class="line-header">Line 105</div>
+<div class="line-code">        {</div>
+<div class="line-explain">Three rows on route A-B.</div>
+</div><div class="line-block">
+<div class="line-header">Line 106</div>
+<div class="line-code">            "route": ["A-B"] * 3,</div>
+<div class="line-explain">All in window 1.</div>
+</div><div class="line-block">
+<div class="line-header">Line 107</div>
+<div class="line-code">            "lead_window_days": [1] * 3,</div>
+<div class="line-explain">All scraped on 2026-09-01.</div>
+</div><div class="line-block">
+<div class="line-header">Line 108</div>
+<div class="line-code">            "scrape_date": ["2026-09-01"] * 3,</div>
+<div class="line-explain">Fares 5000, 4800, 5200.</div>
+</div><div class="line-block">
+<div class="line-header">Line 109</div>
+<div class="line-code">            "total_fare": [5000.0, 4800.0, 5200.0],</div>
+<div class="line-explain">No outliers.</div>
+</div><div class="line-block">
+<div class="line-header">Line 110</div>
+<div class="line-code">            "is_outlier": [0, 0, 0],</div>
+<div class="line-explain">Closes the dict.</div>
+</div><div class="line-block">
+<div class="line-header">Line 111</div>
+<div class="line-code">        }</div>
+<div class="line-explain">Closes the DataFrame call.</div>
+</div><div class="line-block">
+<div class="line-header">Line 112</div>
+<div class="line-code">    )</div>
+<div class="line-explain">Collapses with the default method.</div>
+</div><div class="line-block">
+<div class="line-header">Line 113</div>
+<div class="line-code">    prices = route_price_per_day(df)</div>
+<div class="line-explain">The median is 5000, NOT the cheapest 4800.</div>
+</div><div class="line-block">
+<div class="line-header">Line 114</div>
+<div class="line-code">    assert prices.loc[0, "route_price"] == 5000.0  # median, not the cheapest 4800</div>
+<div class="line-explain">test_price_per_day_uses_min_fare_when_specified: same data, explicit min.</div>
+</div><div class="line-block">
+<div class="line-header">Line 115</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 116</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 117</div>
+<div class="line-code">def test_price_per_day_uses_min_fare_when_specified():</div>
+<div class="line-explain">Opens the same tiny fixture frame...</div>
+</div><div class="line-block">
+<div class="line-header">Line 118</div>
+<div class="line-code">    df = pd.DataFrame(</div>
+<div class="line-explain">Three rows on route A-B.</div>
+</div><div class="line-block">
+<div class="line-header">Line 119</div>
+<div class="line-code">        {</div>
+<div class="line-explain">Window 1.</div>
+</div><div class="line-block">
+<div class="line-header">Line 120</div>
+<div class="line-code">            "route": ["A-B"] * 3,</div>
+<div class="line-explain">Same date.</div>
+</div><div class="line-block">
+<div class="line-header">Line 121</div>
+<div class="line-code">            "lead_window_days": [1] * 3,</div>
+<div class="line-explain">Same fares.</div>
+</div><div class="line-block">
+<div class="line-header">Line 122</div>
+<div class="line-code">            "scrape_date": ["2026-09-01"] * 3,</div>
+<div class="line-explain">No outliers.</div>
+</div><div class="line-block">
+<div class="line-header">Line 123</div>
+<div class="line-code">            "total_fare": [5000.0, 4800.0, 5200.0],</div>
+<div class="line-explain">Closes the dict.</div>
+</div><div class="line-block">
+<div class="line-header">Line 124</div>
+<div class="line-code">            "is_outlier": [0, 0, 0],</div>
+<div class="line-explain">Closes the DataFrame call.</div>
+</div><div class="line-block">
+<div class="line-header">Line 125</div>
+<div class="line-code">        }</div>
+<div class="line-explain">Collapses with method=min.</div>
+</div><div class="line-block">
+<div class="line-header">Line 126</div>
+<div class="line-code">    )</div>
+<div class="line-explain">Now the cheapest fare 4800 wins.</div>
+</div><div class="line-block">
+<div class="line-header">Line 127</div>
+<div class="line-code">    prices = route_price_per_day(df, method="min")</div>
+<div class="line-explain">test_price_per_day_rejects_unknown_method: bad method must raise.</div>
+</div><div class="line-block">
+<div class="line-header">Line 128</div>
+<div class="line-code">    assert prices.loc[0, "route_price"] == 4800.0</div>
+<div class="line-explain">Opens a two-row fixture...</div>
+</div><div class="line-block">
+<div class="line-header">Line 129</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 130</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 131</div>
+<div class="line-code">def test_price_per_day_rejects_unknown_method():</div>
+<div class="line-explain">Two rows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 132</div>
+<div class="line-code">    df = pd.DataFrame(</div>
+<div class="line-explain">Window 1.</div>
+</div><div class="line-block">
+<div class="line-header">Line 133</div>
+<div class="line-code">        {</div>
+<div class="line-explain">Same date.</div>
+</div><div class="line-block">
+<div class="line-header">Line 134</div>
+<div class="line-code">            "route": ["A-B"] * 2,</div>
+<div class="line-explain">Fares 5000 and 4800.</div>
+</div><div class="line-block">
+<div class="line-header">Line 135</div>
+<div class="line-code">            "lead_window_days": [1] * 2,</div>
+<div class="line-explain">No outliers.</div>
+</div><div class="line-block">
+<div class="line-header">Line 136</div>
+<div class="line-code">            "scrape_date": ["2026-09-01"] * 2,</div>
+<div class="line-explain">Closes the dict.</div>
+</div><div class="line-block">
+<div class="line-header">Line 137</div>
+<div class="line-code">            "total_fare": [5000.0, 4800.0],</div>
+<div class="line-explain">Closes the DataFrame call.</div>
+</div><div class="line-block">
+<div class="line-header">Line 138</div>
+<div class="line-code">            "is_outlier": [0, 0],</div>
+<div class="line-explain">Expects a ValueError.</div>
+</div><div class="line-block">
+<div class="line-header">Line 139</div>
+<div class="line-code">        }</div>
+<div class="line-explain">Calls with the nonsense method 'avg'.</div>
+</div><div class="line-block">
+<div class="line-header">Line 140</div>
+<div class="line-code">    )</div>
+<div class="line-explain">Closes the with block.</div>
+</div><div class="line-block">
+<div class="line-header">Line 141</div>
+<div class="line-code">    with pytest.raises(ValueError):</div>
+<div class="line-explain">test_price_per_day_carries_forward_across_gap: missing days are filled.</div>
+</div><div class="line-block">
+<div class="line-header">Line 142</div>
+<div class="line-code">        route_price_per_day(df, method="avg")</div>
+<div class="line-explain">Fixture with a coverage gap on 2026-09-02...</div>
+</div><div class="line-block">
+<div class="line-header">Line 143</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 144</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 145</div>
+<div class="line-code">def test_price_per_day_carries_forward_across_gap():</div>
+<div class="line-explain">Three rows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 146</div>
+<div class="line-code">    df = pd.DataFrame(</div>
+<div class="line-explain">Window 1.</div>
+</div><div class="line-block">
+<div class="line-header">Line 147</div>
+<div class="line-code">        {</div>
+<div class="line-explain">Dates 09-01, 09-03, 09-04 (09-02 missing).</div>
+</div><div class="line-block">
+<div class="line-header">Line 148</div>
+<div class="line-code">            "route": ["A-B"] * 3,</div>
+<div class="line-explain">Fares 5000, 5200, 5400.</div>
+</div><div class="line-block">
+<div class="line-header">Line 149</div>
+<div class="line-code">            "lead_window_days": [1] * 3,</div>
+<div class="line-explain">No outliers.</div>
+</div><div class="line-block">
+<div class="line-header">Line 150</div>
+<div class="line-code">            "scrape_date": ["2026-09-01", "2026-09-03", "2026-09-04"],</div>
+<div class="line-explain">Closes the dict.</div>
+</div><div class="line-block">
+<div class="line-header">Line 151</div>
+<div class="line-code">            "total_fare": [5000.0, 5200.0, 5400.0],</div>
+<div class="line-explain">Closes the DataFrame call.</div>
+</div><div class="line-block">
+<div class="line-header">Line 152</div>
+<div class="line-code">            "is_outlier": [0, 0, 0],</div>
+<div class="line-explain">Collapses the fares.</div>
+</div><div class="line-block">
+<div class="line-header">Line 153</div>
+<div class="line-code">        }</div>
+<div class="line-explain">The gap date must now exist...</div>
+</div><div class="line-block">
+<div class="line-header">Line 154</div>
+<div class="line-code">    )</div>
+<div class="line-explain">Exactly one row for 09-02.</div>
+</div><div class="line-block">
+<div class="line-header">Line 155</div>
+<div class="line-code">    prices = route_price_per_day(df)</div>
+<div class="line-explain">Its price is the last known fare, 5000.</div>
+</div><div class="line-block">
+<div class="line-header">Line 156</div>
+<div class="line-code">    gap = prices[prices["scrape_date"] == "2026-09-02"]</div>
+<div class="line-explain">test_price_per_day_no_phantom_dates_before_first_observation: no fill before the start.</div>
+</div><div class="line-block">
+<div class="line-header">Line 157</div>
+<div class="line-code">    assert len(gap) == 1</div>
+<div class="line-explain">Fixture that only starts on 09-03...</div>
+</div><div class="line-block">
+<div class="line-header">Line 158</div>
+<div class="line-code">    assert gap.iloc[0]["route_price"] == 5000.0</div>
+<div class="line-explain">Two rows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 159</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 160</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 161</div>
+<div class="line-code">def test_price_per_day_no_phantom_dates_before_first_observation():</div>
+<div class="line-explain">Window 1.</div>
+</div><div class="line-block">
+<div class="line-header">Line 162</div>
+<div class="line-code">    df = pd.DataFrame(</div>
+<div class="line-explain">Dates 09-03 and 09-04 only.</div>
+</div><div class="line-block">
+<div class="line-header">Line 163</div>
+<div class="line-code">        {</div>
+<div class="line-explain">Fares.</div>
+</div><div class="line-block">
+<div class="line-header">Line 164</div>
+<div class="line-code">            "route": ["A-B"] * 2,</div>
+<div class="line-explain">No outliers.</div>
+</div><div class="line-block">
+<div class="line-header">Line 165</div>
+<div class="line-code">            "lead_window_days": [1] * 2,</div>
+<div class="line-explain">Closes the dict.</div>
+</div><div class="line-block">
+<div class="line-header">Line 166</div>
+<div class="line-code">            "scrape_date": ["2026-09-03", "2026-09-04"],</div>
+<div class="line-explain">Closes the DataFrame call.</div>
+</div><div class="line-block">
+<div class="line-header">Line 167</div>
+<div class="line-code">            "total_fare": [5200.0, 5400.0],</div>
+<div class="line-explain">Collapses.</div>
+</div><div class="line-block">
+<div class="line-header">Line 168</div>
+<div class="line-code">            "is_outlier": [0, 0],</div>
+<div class="line-explain">Only the two real dates exist — 09-01/09-02 are NOT invented.</div>
+</div><div class="line-block">
+<div class="line-header">Line 169</div>
+<div class="line-code">        }</div>
+<div class="line-explain">Section header: daily-index tests.</div>
+</div><div class="line-block">
+<div class="line-header">Line 170</div>
+<div class="line-code">    )</div>
+<div class="line-explain">test_base_day_is_100_for_each_window: the base date anchors at 100.</div>
+</div><div class="line-block">
+<div class="line-header">Line 171</div>
+<div class="line-code">    prices = route_price_per_day(df)</div>
+<div class="line-explain">Checks windows 1 and 7.</div>
+</div><div class="line-block">
+<div class="line-header">Line 172</div>
+<div class="line-code">    assert set(prices["scrape_date"]) == {"2026-09-03", "2026-09-04"}</div>
+<div class="line-explain">Grabs the base-date rows for this window.</div>
+</div><div class="line-block">
+<div class="line-header">Line 173</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 174</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 175</div>
+<div class="line-code"># ── Daily index ─────────────────────────────────────────────────────────────</div>
+<div class="line-explain">The base date must have data.</div>
+</div><div class="line-block">
+<div class="line-header">Line 176</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 177</div>
+<div class="line-code">def test_base_day_is_100_for_each_window(daily: pd.DataFrame):</div>
+<div class="line-explain">Every route_index equals 100.0.</div>
+</div><div class="line-block">
+<div class="line-header">Line 178</div>
+<div class="line-code">    for window in (1, 7):</div>
+<div class="line-explain">The aggregate headline equals 100.0 too.</div>
+</div><div class="line-block">
+<div class="line-header">Line 179</div>
+<div class="line-code">        d1 = _rows(daily, window, "2026-09-01")</div>
+<div class="line-explain">test_weighted_index_math: verifies the 36-cell composite formula.</div>
+</div><div class="line-block">
+<div class="line-header">Line 180</div>
+<div class="line-code">        assert not d1.empty</div>
+<div class="line-explain">Comment: day 3, the 36-cell basket (route weight × 0.5 window share each).</div>
+</div><div class="line-block">
+<div class="line-header">Line 181</div>
+<div class="line-code">        assert (d1["route_index"] == 100.0).all()</div>
+<div class="line-explain">Comment: t+1 cell indices — DEL-BOM 98.0, DEL-BLR 101.67...</div>
+</div><div class="line-block">
+<div class="line-header">Line 182</div>
+<div class="line-code">        assert (d1["aggregate_index"] == 100.0).all()</div>
+<div class="line-explain">...BOM-BLR 105.71.</div>
+</div><div class="line-block">
+<div class="line-header">Line 183</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 184</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 185</div>
+<div class="line-code">def test_weighted_index_math(daily: pd.DataFrame):</div>
+<div class="line-explain">Comment: t+7 cell indices — DEL-BOM 101.25, DEL-BLR 101.0...</div>
+</div><div class="line-block">
+<div class="line-header">Line 186</div>
+<div class="line-code">    # Day 3, 36-cell basket (route weight × 0.5 window share each):</div>
+<div class="line-explain">...BOM-BLR 106.67.</div>
+</div><div class="line-block">
+<div class="line-header">Line 187</div>
+<div class="line-code">    #   t+1: DEL-BOM 4900/5000=98.0, DEL-BLR 6100/6000=101.67,</div>
+<div class="line-explain">Comment: composite = sum of cell_index × route_w × 0.5 = 102.11, ONE headline per date.</div>
+</div><div class="line-block">
+<div class="line-header">Line 188</div>
+<div class="line-code">    #        BOM-BLR 3700/3500=105.71</div>
+<div class="line-explain">Grabs day 3, window 1, indexed by route.</div>
+</div><div class="line-block">
+<div class="line-header">Line 189</div>
+<div class="line-code">    #   t+7: DEL-BOM 4050/4000=101.25, DEL-BLR 5050/5000=101.0,</div>
+<div class="line-explain">DEL-BOM route_index ≈ 98.0.</div>
+</div><div class="line-block">
+<div class="line-header">Line 190</div>
+<div class="line-code">    #        BOM-BLR 3200/3000=106.67</div>
+<div class="line-explain">DEL-BLR route_index ≈ 101.67.</div>
+</div><div class="line-block">
+<div class="line-header">Line 191</div>
+<div class="line-code">    # Composite = Σ cell_index × route_w × 0.5 = 102.11, one headline per date.</div>
+<div class="line-explain">BOM-BLR route_index ≈ 105.71.</div>
+</div><div class="line-block">
+<div class="line-header">Line 192</div>
+<div class="line-code">    d3 = _rows(daily, 1, "2026-09-03").set_index("route")</div>
+<div class="line-explain">The composite headline ≈ 102.11.</div>
+</div><div class="line-block">
+<div class="line-header">Line 193</div>
+<div class="line-code">    assert d3.loc["DEL-BOM", "route_index"] == pytest.approx(98.0, abs=0.1)</div>
+<div class="line-explain">Comment: the composite is identical for every row of the same date.</div>
+</div><div class="line-block">
+<div class="line-header">Line 194</div>
+<div class="line-code">    assert d3.loc["DEL-BLR", "route_index"] == pytest.approx(101.67, abs=0.01)</div>
+<div class="line-explain">So there is only one distinct headline on day 3 window 1...</div>
+</div><div class="line-block">
+<div class="line-header">Line 195</div>
+<div class="line-code">    assert d3.loc["BOM-BLR", "route_index"] == pytest.approx(105.71, abs=0.01)</div>
+<div class="line-explain">...and the same for window 7.</div>
+</div><div class="line-block">
+<div class="line-header">Line 196</div>
+<div class="line-code">    assert d3.loc["DEL-BOM", "aggregate_index"] == pytest.approx(102.11, abs=0.01)</div>
+<div class="line-explain">test_daily_index_aggregate_median_estimator: weighted median over the 6 cells.</div>
+</div><div class="line-block">
+<div class="line-header">Line 197</div>
+<div class="line-code">    # The composite headline is identical for every row of the same date.</div>
+<div class="line-explain">Comment: day 3, the 6 cell indices sorted with their weights...</div>
+</div><div class="line-block">
+<div class="line-header">Line 198</div>
+<div class="line-code">    assert d3["aggregate_index"].nunique() == 1</div>
+<div class="line-explain">...cumulative weight crosses 0.5 at 101.25.</div>
+</div><div class="line-block">
+<div class="line-header">Line 199</div>
+<div class="line-code">    assert _rows(daily, 7, "2026-09-03")["aggregate_index"].nunique() == 1</div>
+<div class="line-explain">Rebuilds daily with estimator=weighted_median.</div>
+</div><div class="line-block">
+<div class="line-header">Line 200</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 201</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 202</div>
+<div class="line-code">def test_daily_index_aggregate_median_estimator(prices: pd.DataFrame):</div>
+<div class="line-explain">Grabs day 3, window 1.</div>
+</div><div class="line-block">
+<div class="line-header">Line 203</div>
+<div class="line-code">    # Day 3, 6 cell indices sorted 98(.2), 101(.15), 101.25(.2), 101.67(.15),</div>
+<div class="line-explain">The composite headline ≈ 101.25.</div>
+</div><div class="line-block">
+<div class="line-header">Line 204</div>
+<div class="line-code">    # 105.71(.15), 106.67(.15): cumulative weight crosses 0.5 at 101.25.</div>
+<div class="line-explain">test_daily_index_aggregate_trimmed_estimator: 10% weight-trim over the 6 cells.</div>
+</div><div class="line-block">
+<div class="line-header">Line 205</div>
+<div class="line-code">    daily = compute_daily_index(prices, WEIGHTS, WINDOW_WEIGHTS, estimator="weighted_median")</div>
+<div class="line-explain">Comment: cumulative weights 0.2/0.35/0.55/0.7/0.85/1.0...</div>
+</div><div class="line-block">
+<div class="line-header">Line 206</div>
+<div class="line-code">    d3 = _rows(daily, 1, "2026-09-03").set_index("route")</div>
+<div class="line-explain">...kept weights give ≈ 102.05.</div>
+</div><div class="line-block">
+<div class="line-header">Line 207</div>
+<div class="line-code">    assert d3.loc["DEL-BOM", "aggregate_index"] == pytest.approx(101.25, abs=0.01)</div>
+<div class="line-explain">Rebuilds daily with estimator=weighted_trimmed_mean.</div>
+</div><div class="line-block">
+<div class="line-header">Line 208</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 209</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 210</div>
+<div class="line-code">def test_daily_index_aggregate_trimmed_estimator(prices: pd.DataFrame):</div>
+<div class="line-explain">Grabs day 3, window 1.</div>
+</div><div class="line-block">
+<div class="line-header">Line 211</div>
+<div class="line-code">    # 10% weight-trim over the 6 sorted cells (cum 0.2/0.35/0.55/0.7/0.85/1.0):</div>
+<div class="line-explain">The composite headline ≈ 102.05.</div>
+</div><div class="line-block">
+<div class="line-header">Line 212</div>
+<div class="line-code">    # kept weights 0.10/0.15/0.20/0.15/0.15/0.05 → or 102.05.</div>
+<div class="line-explain">test_missing_route_carries_forward_last_fare: the outlier day still has data.</div>
+</div><div class="line-block">
+<div class="line-header">Line 213</div>
+<div class="line-code">    daily = compute_daily_index(prices, WEIGHTS, WINDOW_WEIGHTS, estimator="weighted_trimmed_mean")</div>
+<div class="line-explain">Comment: window 7, day 4 — DEL-BOM's 9/4 fare is an outlier...</div>
+</div><div class="line-block">
+<div class="line-header">Line 214</div>
+<div class="line-code">    d3 = _rows(daily, 1, "2026-09-03").set_index("route")</div>
+<div class="line-explain">...so 9/3's fare (4050) is carried forward; the route is NOT missing...</div>
+</div><div class="line-block">
+<div class="line-header">Line 215</div>
+<div class="line-code">    assert d3.loc["DEL-BOM", "aggregate_index"] == pytest.approx(102.05, abs=0.01)</div>
+<div class="line-explain">...and the composite ≈ 104.36.</div>
+</div><div class="line-block">
+<div class="line-header">Line 216</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 217</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 218</div>
+<div class="line-code">def test_missing_route_carries_forward_last_fare(daily: pd.DataFrame):</div>
+<div class="line-explain">Grabs window 7, day 4.</div>
+</div><div class="line-block">
+<div class="line-header">Line 219</div>
+<div class="line-code">    # Window 7, day 4: DEL-BOM's 9/4 fare is an outlier → the last good fare</div>
+<div class="line-explain">Indexes by route.</div>
+</div><div class="line-block">
+<div class="line-header">Line 220</div>
+<div class="line-code">    # (9/3 = 4050) is carried forward, so the route is NOT missing and the</div>
+<div class="line-explain">All three routes are present (the row was carried forward, not dropped).</div>
+</div><div class="line-block">
+<div class="line-header">Line 221</div>
+<div class="line-code">    # composite = .2·(106+101.25) + .15·(100.83+100+108.57+110)... = 104.36.</div>
+<div class="line-explain">DEL-BOM's price is the carried-forward 4050.</div>
+</div><div class="line-block">
+<div class="line-header">Line 222</div>
+<div class="line-code">    d4 = _rows(daily, 7, "2026-09-04")</div>
+<div class="line-explain">Its route_index ≈ 101.25.</div>
+</div><div class="line-block">
+<div class="line-header">Line 223</div>
+<div class="line-code">    by_route = d4.set_index("route")</div>
+<div class="line-explain">Its composite headline ≈ 104.36.</div>
+</div><div class="line-block">
+<div class="line-header">Line 224</div>
+<div class="line-code">    assert set(by_route.index) == {"DEL-BOM", "DEL-BLR", "BOM-BLR"}</div>
+<div class="line-explain">test_cells_without_a_shared_base_join_later_at_100: late-starting cells join cleanly.</div>
+</div><div class="line-block">
+<div class="line-header">Line 225</div>
+<div class="line-code">    assert by_route.loc["DEL-BOM", "route_price"] == 4050.0</div>
+<div class="line-explain">Comment: a window that starts after the shared base day has no base fare...</div>
+</div><div class="line-block">
+<div class="line-header">Line 226</div>
+<div class="line-code">    assert by_route.loc["DEL-BOM", "route_index"] == pytest.approx(101.25, abs=0.01)</div>
+<div class="line-explain">...it prices itself against its own first observation and joins at 100.</div>
+</div><div class="line-block">
+<div class="line-header">Line 227</div>
+<div class="line-code">    assert by_route.loc["DEL-BOM", "aggregate_index"] == pytest.approx(104.36, abs=0.01)</div>
+<div class="line-explain">Stitches the fixture prices together...</div>
+</div><div class="line-block">
+<div class="line-header">Line 228</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 229</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 230</div>
+<div class="line-code">def test_cells_without_a_shared_base_join_later_at_100(prices: pd.DataFrame):</div>
+<div class="line-explain">...the existing prices...</div>
+</div><div class="line-block">
+<div class="line-header">Line 231</div>
+<div class="line-code">    # A window that starts after the shared base day joins the basket at 100</div>
+<div class="line-explain">...plus a brand-new window-30 cell...</div>
+</div><div class="line-block">
+<div class="line-header">Line 232</div>
+<div class="line-code">    # on its own first day (it has no base fare on the global base date).</div>
+<div class="line-explain">...on route DEL-BOM...</div>
+</div><div class="line-block">
+<div class="line-header">Line 233</div>
+<div class="line-code">    df = pd.concat(</div>
+<div class="line-explain">...window 30...</div>
+</div><div class="line-block">
+<div class="line-header">Line 234</div>
+<div class="line-code">        [</div>
+<div class="line-explain">...starting 2026-09-03...</div>
+</div><div class="line-block">
+<div class="line-header">Line 235</div>
+<div class="line-code">            prices,</div>
+<div class="line-explain">...at price 6000.</div>
+</div><div class="line-block">
+<div class="line-header">Line 236</div>
+<div class="line-code">            pd.DataFrame(</div>
+<div class="line-explain">Closes the inner frame.</div>
+</div><div class="line-block">
+<div class="line-header">Line 237</div>
+<div class="line-code">                {</div>
+<div class="line-explain">Closes the dict.</div>
+</div><div class="line-block">
+<div class="line-header">Line 238</div>
+<div class="line-code">                    "route": ["DEL-BOM"],</div>
+<div class="line-explain">Closes the list.</div>
+</div><div class="line-block">
+<div class="line-header">Line 239</div>
+<div class="line-code">                    "lead_window_days": [30],</div>
+<div class="line-explain">...with ignore_index.</div>
+</div><div class="line-block">
+<div class="line-header">Line 240</div>
+<div class="line-code">                    "scrape_date": ["2026-09-03"],</div>
+<div class="line-explain">Closes concat.</div>
+</div><div class="line-block">
+<div class="line-header">Line 241</div>
+<div class="line-code">                    "route_price": [6000.0],</div>
+<div class="line-explain">Builds daily with window weights that include a (still tiny) 30 share.</div>
+</div><div class="line-block">
+<div class="line-header">Line 242</div>
+<div class="line-code">                }</div>
+<div class="line-explain">Grabs window 30 on 2026-09-03, indexed by route.</div>
+</div><div class="line-block">
+<div class="line-header">Line 243</div>
+<div class="line-code">            ),</div>
+<div class="line-explain">It joins at route_index exactly 100.</div>
+</div><div class="line-block">
+<div class="line-header">Line 244</div>
+<div class="line-code">        ],</div>
+<div class="line-explain">Comment: the cell prices itself against its OWN first observation...</div>
+</div><div class="line-block">
+<div class="line-header">Line 245</div>
+<div class="line-code">        ignore_index=True,</div>
+<div class="line-explain">...while cells on the shared base keep the global anchor.</div>
+</div><div class="line-block">
+<div class="line-header">Line 246</div>
+<div class="line-code">    )</div>
+<div class="line-explain">base_period is the cell's own first date, 2026-09-03.</div>
+</div><div class="line-block">
+<div class="line-header">Line 247</div>
+<div class="line-code">    daily = compute_daily_index(df, WEIGHTS, {1: 0.5, 7: 0.1, 30: 0.4})</div>
+<div class="line-explain">Window-1 cells on the same day still anchor to 2026-09-01.</div>
+</div><div class="line-block">
+<div class="line-header">Line 248</div>
+<div class="line-code">    late = _rows(daily, 30, "2026-09-03").set_index("route")</div>
+<div class="line-explain">Window 30's first index_date is 2026-09-03.</div>
+</div><div class="line-block">
+<div class="line-header">Line 249</div>
+<div class="line-code">    assert late.loc["DEL-BOM", "route_index"] == 100.0</div>
+<div class="line-explain">Comment: joining at 100 means the composite does not jerk upward on day one.</div>
+</div><div class="line-block">
+<div class="line-header">Line 250</div>
+<div class="line-code">    # The cell prices itself against its OWN first observation and joins the</div>
+<div class="line-explain">So the headline on the join day equals the first window-30 headline.</div>
+</div><div class="line-block">
+<div class="line-header">Line 251</div>
+<div class="line-code">    # composite on that day, while cells on the shared base keep the anchor.</div>
+<div class="line-explain">test_never_observed_route_stays_omitted: zero-weight routes never appear.</div>
+</div><div class="line-block">
+<div class="line-header">Line 252</div>
+<div class="line-code">    assert late.loc["DEL-BOM", "base_period"] == "2026-09-03"</div>
+<div class="line-explain">Weights include a phantom GHOST-RTE at weight 0.</div>
+</div><div class="line-block">
+<div class="line-header">Line 253</div>
+<div class="line-code">    assert _rows(daily, 1, "2026-09-03").set_index("route").loc["DEL-BOM", "base_period"] == "2026-09-01"</div>
+<div class="line-explain">Computes the daily index.</div>
+</div><div class="line-block">
+<div class="line-header">Line 254</div>
+<div class="line-code">    assert daily[daily["lead_window_days"] == 30]["index_date"].min() == "2026-09-03"</div>
+<div class="line-explain">GHOST-RTE is not in the output routes.</div>
+</div><div class="line-block">
+<div class="line-header">Line 255</div>
+<div class="line-code">    # It joins at 100, so the composite on its first day does not jerk upward.</div>
+<div class="line-explain">test_route_price_in_daily: prices propagate into the daily table.</div>
+</div><div class="line-block">
+<div class="line-header">Line 256</div>
+<div class="line-code">    assert late.loc["DEL-BOM", "aggregate_index"] == pytest.approx(daily[daily["lead_window_days"] == 30]["aggregate_index"].iloc[0], abs=0.01)</div>
+<div class="line-explain">Grabs day 2, window 1, indexed by route.</div>
+</div><div class="line-block">
+<div class="line-header">Line 257</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 258</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 259</div>
+<div class="line-code">def test_never_observed_route_stays_omitted(prices: pd.DataFrame):</div>
+<div class="line-explain">DEL-BLR's price is 6000.</div>
+</div><div class="line-block">
+<div class="line-header">Line 260</div>
+<div class="line-code">    weights = {"DEL-BOM": 0.4, "DEL-BLR": 0.3, "BOM-BLR": 0.3, "GHOST-RTE": 0.0}</div>
+<div class="line-explain">BOM-BLR's price is 3600.</div>
+</div><div class="line-block">
+<div class="line-header">Line 261</div>
+<div class="line-code">    daily = compute_daily_index(prices, weights)</div>
+<div class="line-explain">test_empty_prices_gives_empty: empty input yields empty output.</div>
+</div><div class="line-block">
+<div class="line-header">Line 262</div>
+<div class="line-code">    assert "GHOST-RTE" not in set(daily["route"])</div>
+<div class="line-explain">Builds an empty prices frame.</div>
+</div><div class="line-block">
+<div class="line-header">Line 263</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 264</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 265</div>
+<div class="line-code">def test_route_price_in_daily(daily: pd.DataFrame):</div>
+<div class="line-explain">compute_daily_index returns empty.</div>
+</div><div class="line-block">
+<div class="line-header">Line 266</div>
+<div class="line-code">    d2 = _rows(daily, 1, "2026-09-02").set_index("route")</div>
+<div class="line-explain">compute_rolling_index on an empty daily also returns empty.</div>
+</div><div class="line-block">
+<div class="line-header">Line 267</div>
+<div class="line-code">    assert d2.loc["DEL-BLR", "route_price"] == 6000.0</div>
+<div class="line-explain">Section header: rolling (weekly/monthly) tests.</div>
+</div><div class="line-block">
+<div class="line-header">Line 268</div>
+<div class="line-code">    assert d2.loc["BOM-BLR", "route_price"] == 3600.0</div>
+<div class="line-explain">test_rolling_route_index: rolling mean of route indices.</div>
+</div><div class="line-block">
+<div class="line-header">Line 269</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 270</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 271</div>
+<div class="line-code">def test_empty_prices_gives_empty(daily):</div>
+<div class="line-explain">Rebuilds prices from the CSV fixture.</div>
+</div><div class="line-block">
+<div class="line-header">Line 272</div>
+<div class="line-code">    prices = pd.DataFrame(columns=["route", "lead_window_days", "scrape_date", "route_price"])</div>
+<div class="line-explain">Rebuilds the daily index.</div>
+</div><div class="line-block">
+<div class="line-header">Line 273</div>
+<div class="line-code">    assert compute_daily_index(prices, WEIGHTS).empty</div>
+<div class="line-explain">Rolls a 3-day window (short enough for the 5-day fixture).</div>
+</div><div class="line-block">
+<div class="line-header">Line 274</div>
+<div class="line-code">    assert compute_rolling_index(daily if False else pd.DataFrame(columns=INDEX_COLUMNS), 7).empty</div>
+<div class="line-explain">Filters window 1 and indexes by (date, route).</div>
+</div><div class="line-block">
+<div class="line-header">Line 275</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 276</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 277</div>
+<div class="line-code"># ── Rolling (weekly/monthly) ───────────────────────────────────────────────</div>
+<div class="line-explain">Comment: DEL-BOM route_index 100, 104, 98, 106, 102 → 3-day mean at d3 = 100.67.</div>
+</div><div class="line-block">
+<div class="line-header">Line 278</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 279</div>
+<div class="line-code">def test_rolling_route_index():</div>
+<div class="line-explain">Day 3 has ≈ 100.67.</div>
+</div><div class="line-block">
+<div class="line-header">Line 280</div>
+<div class="line-code">    prices = route_price_per_day(pd.read_csv(CSV))</div>
+<div class="line-explain">Comment: day 1 with min_periods=1 equals the daily value.</div>
+</div><div class="line-block">
+<div class="line-header">Line 281</div>
+<div class="line-code">    daily = compute_daily_index(prices, WEIGHTS)</div>
+<div class="line-explain">Day 1 is ≈ 100.0.</div>
+</div><div class="line-block">
+<div class="line-header">Line 282</div>
+<div class="line-code">    weekly = compute_rolling_index(daily, 3)</div>
+<div class="line-explain">test_rolling_route_index_median_estimator: rolling median.</div>
+</div><div class="line-block">
+<div class="line-header">Line 283</div>
+<div class="line-code">    w1 = weekly[weekly["lead_window_days"] == 1].set_index(["index_date", "route"])</div>
+<div class="line-explain">Rebuilds prices.</div>
+</div><div class="line-block">
+<div class="line-header">Line 284</div>
+<div class="line-code">    # DEL-BOM route_index: 100, 104, 98, 106, 102 → 3-day mean at d3 = 100.67</div>
+<div class="line-explain">Rebuilds daily.</div>
+</div><div class="line-block">
+<div class="line-header">Line 285</div>
+<div class="line-code">    assert w1.loc[("2026-09-03", "DEL-BOM"), "route_index"] == pytest.approx(100.67, abs=0.01)</div>
+<div class="line-explain">Rolls with estimator=median.</div>
+</div><div class="line-block">
+<div class="line-header">Line 286</div>
+<div class="line-code">    # d1 has min_periods=1 → equals the daily value</div>
+<div class="line-explain">Filters window 1, indexes by route.</div>
+</div><div class="line-block">
+<div class="line-header">Line 287</div>
+<div class="line-code">    assert w1.loc[("2026-09-01", "DEL-BOM"), "route_index"] == pytest.approx(100.0, abs=0.01)</div>
+<div class="line-explain">Comment: median(100, 104) = 102 at d2.</div>
+</div><div class="line-block">
+<div class="line-header">Line 288</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 289</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 290</div>
+<div class="line-code">def test_rolling_route_index_median_estimator():</div>
+<div class="line-explain">Day 2 ≈ 102.0.</div>
+</div><div class="line-block">
+<div class="line-header">Line 291</div>
+<div class="line-code">    prices = route_price_per_day(pd.read_csv(CSV))</div>
+<div class="line-explain">Comment: median(100, 104, 98) = 100 at d3.</div>
+</div><div class="line-block">
+<div class="line-header">Line 292</div>
+<div class="line-code">    daily = compute_daily_index(prices, WEIGHTS)</div>
+<div class="line-explain">Day 3 ≈ 100.0.</div>
+</div><div class="line-block">
+<div class="line-header">Line 293</div>
+<div class="line-code">    weekly = compute_rolling_index(daily, 3, estimator="median")</div>
+<div class="line-explain">test_rolling_route_index_trimmed_estimator: rolling weight-trimmed mean.</div>
+</div><div class="line-block">
+<div class="line-header">Line 294</div>
+<div class="line-code">    w1 = weekly[weekly["lead_window_days"] == 1].set_index(["index_date", "route"])</div>
+<div class="line-explain">Rebuilds prices.</div>
+</div><div class="line-block">
+<div class="line-header">Line 295</div>
+<div class="line-code">    # DEL-BOM route_index 100, 104, 98 → median(100, 104) = 102 at d2.</div>
+<div class="line-explain">Rebuilds daily.</div>
+</div><div class="line-block">
+<div class="line-header">Line 296</div>
+<div class="line-code">    assert w1.loc[("2026-09-02", "DEL-BOM"), "route_index"] == pytest.approx(102.0, abs=0.01)</div>
+<div class="line-explain">Rolls with estimator=trimmed_mean, trim_frac=0.10.</div>
+</div><div class="line-block">
+<div class="line-header">Line 297</div>
+<div class="line-code">    # median(100, 104, 98) = 100 at d3.</div>
+<div class="line-explain">Filters window 1, indexes by route.</div>
+</div><div class="line-block">
+<div class="line-header">Line 298</div>
+<div class="line-code">    assert w1.loc[("2026-09-03", "DEL-BOM"), "route_index"] == pytest.approx(100.0, abs=0.01)</div>
+<div class="line-explain">Comment: 10% trim over [98, 100, 104] → ≈ 100.58.</div>
+</div><div class="line-block">
+<div class="line-header">Line 299</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 300</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 301</div>
+<div class="line-code">def test_rolling_route_index_trimmed_estimator():</div>
+<div class="line-explain">Day 3 ≈ 100.58.</div>
+</div><div class="line-block">
+<div class="line-header">Line 302</div>
+<div class="line-code">    prices = route_price_per_day(pd.read_csv(CSV))</div>
+<div class="line-explain">test_weekly_aggregate_is_rolling_mean_of_daily_aggregate: weekly = mean of daily headlines.</div>
+</div><div class="line-block">
+<div class="line-header">Line 303</div>
+<div class="line-code">    daily = compute_daily_index(prices, WEIGHTS)</div>
+<div class="line-explain">Rebuilds prices.</div>
+</div><div class="line-block">
+<div class="line-header">Line 304</div>
+<div class="line-code">    weekly = compute_rolling_index(daily, 3, estimator="trimmed_mean", trim_frac=0.10)</div>
+<div class="line-explain">Rebuilds daily.</div>
+</div><div class="line-block">
+<div class="line-header">Line 305</div>
+<div class="line-code">    w1 = weekly[weekly["lead_window_days"] == 1].set_index(["index_date", "route"])</div>
+<div class="line-explain">Rolls a 7-day window (covers the whole fixture here).</div>
+</div><div class="line-block">
+<div class="line-header">Line 306</div>
+<div class="line-code">    # 10% weight-trim over [98, 100, 104] → kept 0.7/1.0/0.7 → (98·.7+100+104·.7)/2.4 = 100.58</div>
+<div class="line-explain">Unique daily headlines for window 1.</div>
+</div><div class="line-block">
+<div class="line-header">Line 307</div>
+<div class="line-code">    assert w1.loc[("2026-09-03", "DEL-BOM"), "route_index"] == pytest.approx(100.58, abs=0.01)</div>
+<div class="line-explain">Their mean is the expected weekly value.</div>
+</div><div class="line-block">
+<div class="line-header">Line 308</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 309</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 310</div>
+<div class="line-code">def test_weekly_aggregate_is_rolling_mean_of_daily_aggregate():</div>
+<div class="line-explain">Weekly window-1 rows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 311</div>
+<div class="line-code">    prices = route_price_per_day(pd.read_csv(CSV))</div>
+<div class="line-explain">The last weekly headline.</div>
+</div><div class="line-block">
+<div class="line-header">Line 312</div>
+<div class="line-code">    daily = compute_daily_index(prices, WEIGHTS)</div>
+<div class="line-explain">It must equal the mean of the daily headlines.</div>
+</div><div class="line-block">
+<div class="line-header">Line 313</div>
+<div class="line-code">    weekly = compute_rolling_index(daily, 7)</div>
+<div class="line-explain">test_rolling_writes_all_index_columns: the output schema is canonical.</div>
+</div><div class="line-block">
+<div class="line-header">Line 314</div>
+<div class="line-code">    w1_daily = daily[daily["lead_window_days"] == 1].drop_duplicates("index_date")["aggregate_index"]</div>
+<div class="line-explain">Rebuilds prices.</div>
+</div><div class="line-block">
+<div class="line-header">Line 315</div>
+<div class="line-code">    expected = w1_daily.mean()</div>
+<div class="line-explain">Rebuilds daily.</div>
+</div><div class="line-block">
+<div class="line-header">Line 316</div>
+<div class="line-code">    w1 = weekly[weekly["lead_window_days"] == 1]</div>
+<div class="line-explain">Rolls weekly.</div>
+</div><div class="line-block">
+<div class="line-header">Line 317</div>
+<div class="line-code">    last = w1.drop_duplicates("index_date").iloc[-1]["aggregate_index"]</div>
+<div class="line-explain">The column list exactly matches INDEX_COLUMNS.</div>
+</div><div class="line-block">
+<div class="line-header">Line 318</div>
+<div class="line-code">    assert last == pytest.approx(expected, abs=0.01)</div>
+<div class="line-explain">And the output is non-empty.</div>
+</div><div class="line-block">
+<div class="line-header">Line 319</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 320</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 321</div>
+<div class="line-code">def test_rolling_writes_all_index_columns():</div>
+<div class="line-explain">Section header: write / idempotency tests.</div>
+</div><div class="line-block">
+<div class="line-header">Line 322</div>
+<div class="line-code">    prices = route_price_per_day(pd.read_csv(CSV))</div>
+<div class="line-explain">test_write_index_overwrites_same_date: re-running must not duplicate.</div>
+</div><div class="line-block">
+<div class="line-header">Line 323</div>
+<div class="line-code">    daily = compute_daily_index(prices, WEIGHTS)</div>
+<div class="line-explain">A temp database file.</div>
+</div><div class="line-block">
+<div class="line-header">Line 324</div>
+<div class="line-code">    weekly = compute_rolling_index(daily, 7)</div>
+<div class="line-explain">Creates the schema.</div>
+</div><div class="line-block">
+<div class="line-header">Line 325</div>
+<div class="line-code">    assert list(weekly.columns) == INDEX_COLUMNS</div>
+<div class="line-explain">Rebuilds prices from the CSV.</div>
+</div><div class="line-block">
+<div class="line-header">Line 326</div>
+<div class="line-code">    assert not weekly.empty</div>
+<div class="line-explain">Rebuilds daily.</div>
+</div><div class="line-block">
+<div class="line-header">Line 327</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 328</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 329</div>
+<div class="line-code"># ── Write / idempotency ────────────────────────────────────────────────────</div>
+<div class="line-explain">First write.</div>
+</div><div class="line-block">
+<div class="line-header">Line 330</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 331</div>
+<div class="line-code">def test_write_index_overwrites_same_date(tmp_path):</div>
+<div class="line-explain">Second write of the same values.</div>
+</div><div class="line-block">
+<div class="line-header">Line 332</div>
+<div class="line-code">    db = tmp_path / "apix.db"</div>
+<div class="line-explain">Opens the database to verify.</div>
+</div><div class="line-block">
+<div class="line-header">Line 333</div>
+<div class="line-code">    init_db(db)</div>
+<div class="line-explain">try block.</div>
+</div><div class="line-block">
+<div class="line-header">Line 334</div>
+<div class="line-code">    prices = route_price_per_day(pd.read_csv(CSV))</div>
+<div class="line-explain">Total row count in daily_index.</div>
+</div><div class="line-block">
+<div class="line-header">Line 335</div>
+<div class="line-code">    daily = compute_daily_index(prices, WEIGHTS)</div>
+<div class="line-explain">Opens the specific date-window query...</div>
+</div><div class="line-block">
+<div class="line-header">Line 336</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 337</div>
+<div class="line-code">    n1 = write_index(daily, "daily_index", db)</div>
+<div class="line-explain">...SELECT with 2026-09-01 / window 1 filter...</div>
+</div><div class="line-block">
+<div class="line-header">Line 338</div>
+<div class="line-code">    n2 = write_index(daily, "daily_index", db)</div>
+<div class="line-explain">Fetches the count.</div>
+</div><div class="line-block">
+<div class="line-header">Line 339</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 340</div>
+<div class="line-code">    conn = get_connection(db)</div>
+<div class="line-explain">finally: close the connection.</div>
+</div><div class="line-block">
+<div class="line-header">Line 341</div>
+<div class="line-code">    try:</div>
+<div class="line-explain">Closes the block.</div>
+</div><div class="line-block">
+<div class="line-header">Line 342</div>
+<div class="line-code">        count = conn.execute("SELECT COUNT(*) FROM daily_index").fetchone()[0]</div>
+<div class="line-explain">Both writes returned the same count as the final total (no duplication).</div>
+</div><div class="line-block">
+<div class="line-header">Line 343</div>
+<div class="line-code">        dup = conn.execute(</div>
+<div class="line-explain">Exactly 3 rows for that date-window → 3 routes, no duplicates.</div>
+</div><div class="line-block">
+<div class="line-header">Line 344</div>
+<div class="line-code">            "SELECT COUNT(*) FROM daily_index WHERE index_date = '2026-09-01' AND lead_window_days = 1"</div>
+<div class="line-explain">test_write_index_rejects_unknown_table: unknown table names are refused.</div>
+</div><div class="line-block">
+<div class="line-header">Line 345</div>
+<div class="line-code">        ).fetchone()[0]</div>
+<div class="line-explain">An empty frame with the canonical schema.</div>
+</div><div class="line-block">
+<div class="line-header">Line 346</div>
+<div class="line-code">    finally:</div>
+<div class="line-explain">Expects a ValueError.</div>
+</div><div class="line-block">
+<div class="line-header">Line 347</div>
+<div class="line-code">        conn.close()</div>
+<div class="line-explain">Tries writing to 'hack_index'.</div>
+</div><div class="line-block">
+<div class="line-header">Line 348</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 349</div>
+<div class="line-code">    assert n1 == n2 == count</div>
+<div class="line-explain">Section header: end-to-end integration tests.</div>
+</div><div class="line-block">
+<div class="line-header">Line 350</div>
+<div class="line-code">    assert dup == 3  # 3 routes, same date/window, no duplicates</div>
+<div class="line-explain">test_run_index_end_to_end: the full pipeline on a temp database.</div>
+</div><div class="line-block">
+<div class="line-header">Line 351</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 352</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 353</div>
+<div class="line-code">def test_write_index_rejects_unknown_table(tmp_path):</div>
+<div class="line-explain">Imports run_index locally to keep the test suite import-light.</div>
+</div><div class="line-block">
+<div class="line-header">Line 354</div>
+<div class="line-code">    daily = pd.DataFrame(columns=INDEX_COLUMNS)</div>
+<div class="line-explain">Temp database path.</div>
+</div><div class="line-block">
+<div class="line-header">Line 355</div>
+<div class="line-code">    with pytest.raises(ValueError):</div>
+<div class="line-explain">Creates the schema.</div>
+</div><div class="line-block">
+<div class="line-header">Line 356</div>
+<div class="line-code">        write_index(daily, "hack_index", tmp_path / "apix.db")</div>
+<div class="line-explain">Loads the CSV fixture.</div>
+</div><div class="line-block">
+<div class="line-header">Line 357</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 358</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 359</div>
+<div class="line-code"># ── End-to-end ─────────────────────────────────────────────────────────────</div>
+<div class="line-explain">Opens a connection.</div>
+</div><div class="line-block">
+<div class="line-header">Line 360</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 361</div>
+<div class="line-code">def test_run_index_end_to_end(tmp_path):</div>
+<div class="line-explain">try block.</div>
+</div><div class="line-block">
+<div class="line-header">Line 362</div>
+<div class="line-code">    from src.indexer.run_index import run_index</div>
+<div class="line-explain">Writes cleaned_flights into it.</div>
+</div><div class="line-block">
+<div class="line-header">Line 363</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 364</div>
+<div class="line-code">    db = tmp_path / "apix.db"</div>
+<div class="line-explain">finally: close.</div>
+</div><div class="line-block">
+<div class="line-header">Line 365</div>
+<div class="line-code">    init_db(db)</div>
+<div class="line-explain">Closes the block.</div>
+</div><div class="line-block">
+<div class="line-header">Line 366</div>
+<div class="line-code">    cleaned = pd.read_csv(CSV)</div>
+<div class="line-explain">Runs the whole pipeline against the temp db.</div>
+</div><div class="line-block">
+<div class="line-header">Line 367</div>
+<div class="line-code">    conn = get_connection(db)</div>
+<div class="line-explain">Comment: 5 dates × 2 windows × 3 routes; carry-forward fills the one gap.</div>
+</div><div class="line-block">
+<div class="line-header">Line 368</div>
+<div class="line-code">    try:</div>
+<div class="line-explain">Expected daily rows = 30.</div>
+</div><div class="line-block">
+<div class="line-header">Line 369</div>
+<div class="line-code">        cleaned.to_sql("cleaned_flights", conn, if_exists="append", index=False)</div>
+<div class="line-explain">Daily count matches.</div>
+</div><div class="line-block">
+<div class="line-header">Line 370</div>
+<div class="line-code">    finally:</div>
+<div class="line-explain">Weekly count matches.</div>
+</div><div class="line-block">
+<div class="line-header">Line 371</div>
+<div class="line-code">        conn.close()</div>
+<div class="line-explain">Monthly count matches.</div>
+</div><div class="line-block">
+<div class="line-header">Line 372</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 373</div>
+<div class="line-code">    result = run_index(db_path=db)</div>
+<div class="line-explain">Opens the database to verify results.</div>
+</div><div class="line-block">
+<div class="line-header">Line 374</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 375</div>
+<div class="line-code">    # 5 dates × 2 windows × 3 routes; carry-forward fills the one gap.</div>
+<div class="line-explain">try block.</div>
+</div><div class="line-block">
+<div class="line-header">Line 376</div>
+<div class="line-code">    daily_expected = 5 * 2 * 3  # 30</div>
+<div class="line-explain">Pulls the distinct (aggregate, window, date) triples.</div>
+</div><div class="line-block">
+<div class="line-header">Line 377</div>
+<div class="line-code">    assert result["daily"] == daily_expected</div>
+<div class="line-explain">finally: close.</div>
+</div><div class="line-block">
+<div class="line-header">Line 378</div>
+<div class="line-code">    assert result["weekly"] == daily_expected</div>
+<div class="line-explain">Closes the block.</div>
+</div><div class="line-block">
+<div class="line-header">Line 379</div>
+<div class="line-code">    assert result["monthly"] == daily_expected</div>
+<div class="line-explain">daily_index must be populated.</div>
+</div><div class="line-block">
+<div class="line-header">Line 380</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 381</div>
+<div class="line-code">    conn = get_connection(db)</div>
+<div class="line-explain">test_run_index_respects_estimator_config: a custom config file is honoured.</div>
+</div><div class="line-block">
+<div class="line-header">Line 382</div>
+<div class="line-code">    try:</div>
+<div class="line-explain">Imports run_index locally.</div>
+</div><div class="line-block">
+<div class="line-header">Line 383</div>
+<div class="line-code">        agg = conn.execute("SELECT DISTINCT aggregate_index, lead_window_days, index_date FROM daily_index ORDER BY index_date, lead_window_days").fetchall()</div>
+<div class="line-explain">Temp database.</div>
+</div><div class="line-block">
+<div class="line-header">Line 384</div>
+<div class="line-code">    finally:</div>
+<div class="line-explain">Creates the schema.</div>
+</div><div class="line-block">
+<div class="line-header">Line 385</div>
+<div class="line-code">        conn.close()</div>
+<div class="line-explain">Loads the fixture.</div>
+</div><div class="line-block">
+<div class="line-header">Line 386</div>
+<div class="line-code">    assert agg, "daily_index must be populated"</div>
+<div class="line-explain">Opens a connection.</div>
+</div><div class="line-block">
+<div class="line-header">Line 387</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 388</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 389</div>
+<div class="line-code">def test_run_index_respects_estimator_config(tmp_path):</div>
+<div class="line-explain">try block.</div>
+</div><div class="line-block">
+<div class="line-header">Line 390</div>
+<div class="line-code">    from src.indexer.run_index import run_index</div>
+<div class="line-explain">Writes cleaned_flights.</div>
+</div><div class="line-block">
+<div class="line-header">Line 391</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 392</div>
+<div class="line-code">    db = tmp_path / "apix.db"</div>
+<div class="line-explain">finally: close.</div>
+</div><div class="line-block">
+<div class="line-header">Line 393</div>
+<div class="line-code">    init_db(db)</div>
+<div class="line-explain">Closes the block.</div>
+</div><div class="line-block">
+<div class="line-header">Line 394</div>
+<div class="line-code">    cleaned = pd.read_csv(CSV)</div>
+<div class="line-explain">A temp config file path.</div>
+</div><div class="line-block">
+<div class="line-header">Line 395</div>
+<div class="line-code">    conn = get_connection(db)</div>
+<div class="line-explain">Loads the REAL indexer.yaml as a dict.</div>
+</div><div class="line-block">
+<div class="line-header">Line 396</div>
+<div class="line-code">    try:</div>
+<div class="line-explain">Switches the aggregation estimator to weighted_median.</div>
+</div><div class="line-block">
+<div class="line-header">Line 397</div>
+<div class="line-code">        cleaned.to_sql("cleaned_flights", conn, if_exists="append", index=False)</div>
+<div class="line-explain">Switches the rolling estimator to median.</div>
+</div><div class="line-block">
+<div class="line-header">Line 398</div>
+<div class="line-code">    finally:</div>
+<div class="line-explain">Writes the modified config out.</div>
+</div><div class="line-block">
+<div class="line-header">Line 399</div>
+<div class="line-code">        conn.close()</div>
+<div class="line-explain">Runs the pipeline with the custom config.</div>
+</div><div class="line-block">
+<div class="line-header">Line 400</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 401</div>
+<div class="line-code">    cfg = tmp_path / "indexer.yaml"</div>
+<div class="line-explain">Still builds 30 daily rows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 402</div>
+<div class="line-code">    base_cfg = yaml.safe_load(open(CONFIG_PATH))</div>
+<div class="line-explain">Opens the db to verify.</div>
+</div><div class="line-block">
+<div class="line-header">Line 403</div>
+<div class="line-code">    base_cfg["index"]["aggregation_estimator"] = "weighted_median"</div>
+<div class="line-explain">try block.</div>
+</div><div class="line-block">
+<div class="line-header">Line 404</div>
+<div class="line-code">    base_cfg["index"]["rolling_estimator"] = "median"</div>
+<div class="line-explain">Reads one aggregate value...</div>
+</div><div class="line-block">
+<div class="line-header">Line 405</div>
+<div class="line-code">    cfg.write_text(yaml.safe_dump(base_cfg))</div>
+<div class="line-explain">...for 2026-09-03, window 1...</div>
+</div><div class="line-block">
+<div class="line-header">Line 406</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 407</div>
+<div class="line-code">    result = run_index(db_path=db, cfg_path=cfg)</div>
+<div class="line-explain">Closes the SELECT.</div>
+</div><div class="line-block">
+<div class="line-header">Line 408</div>
+<div class="line-code">    assert result["daily"] == 30</div>
+<div class="line-explain">Fetches the row.</div>
+</div><div class="line-block">
+<div class="line-header">Line 409</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 410</div>
+<div class="line-code">    conn = get_connection(db)</div>
+<div class="line-explain">Counts weekly rows for window 1...</div>
+</div><div class="line-block">
+<div class="line-header">Line 411</div>
+<div class="line-code">    try:</div>
+<div class="line-explain">...fetches the count.</div>
+</div><div class="line-block">
+<div class="line-header">Line 412</div>
+<div class="line-code">        row = conn.execute(</div>
+<div class="line-explain">finally: close.</div>
+</div><div class="line-block">
+<div class="line-header">Line 413</div>
+<div class="line-code">            "SELECT aggregate_index FROM daily_index "</div>
+<div class="line-explain">Closes the block.</div>
+</div><div class="line-block">
+<div class="line-header">Line 414</div>
+<div class="line-code">            "WHERE index_date = '2026-09-03' AND lead_window_days = 1 LIMIT 1"</div>
+<div class="line-explain">Comment: day 3, weighted median over the 6 fixture cells with config window weights...</div>
+</div><div class="line-block">
+<div class="line-header">Line 415</div>
+<div class="line-code">        ).fetchone()</div>
+<div class="line-explain">...cum 0.08/0.17/0.29/0.35/0.41/0.50 crosses the weight half at 101.25.</div>
+</div><div class="line-block">
+<div class="line-header">Line 416</div>
+<div class="line-code">        weekly = conn.execute(</div>
+<div class="line-explain">The stored headline ≈ 101.25.</div>
+</div><div class="line-block">
+<div class="line-header">Line 417</div>
+<div class="line-code">            "SELECT COUNT(*) FROM weekly_index WHERE lead_window_days = 1"</div>
+<div class="line-explain">Weekly has 15 rows (3 routes × 5 dates) — rolling median ran fine.</div>
+</div><div class="line-block">
+<div class="line-header">Line 418</div>
+<div class="line-code">        ).fetchone()[0]</div>
+<div class="line-explain">Fetches the daily index value computed for that date.</div>
+</div><div class="line-block">
+<div class="line-header">Line 419</div>
+<div class="line-code">    finally:</div>
+<div class="line-explain">Runs the cleanup clause regardless of whether the assertions passed.</div>
+</div><div class="line-block">
+<div class="line-header">Line 420</div>
+<div class="line-code">        conn.close()</div>
+<div class="line-explain">Closes the database connection.</div>
+</div><div class="line-block">
+<div class="line-header">Line 421</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 422</div>
+<div class="line-code">    # Day 3, weighted median over the 6 fixture cells configured with</div>
+<div class="line-explain">Comment: explains the expected weighted-median value for Day 3.</div>
+</div><div class="line-block">
+<div class="line-header">Line 423</div>
+<div class="line-code">    # window_weights {1:0.2, 7:0.3, 30:0.5} (window 30 absent from data):</div>
+<div class="line-explain">Comment: notes the window weights in play; window 30 is absent from the fixture data.</div>
+</div><div class="line-block">
+<div class="line-header">Line 424</div>
+<div class="line-code">    # cum 0.08/0.17/0.29/0.35/0.41/0.50 crosses 0.25 at 101.25.</div>
+<div class="line-explain">Comment: walks the cumulative share to the 0.25 crossing at 101.25.</div>
+</div><div class="line-block">
+<div class="line-header">Line 425</div>
+<div class="line-code">    assert row[0] == pytest.approx(101.25, abs=0.01)</div>
+<div class="line-explain">Asserts the day-3 aggregate equals the hand-computed 101.25 (within 0.01).</div>
+</div><div class="line-block">
+<div class="line-header">Line 426</div>
+<div class="line-code">    assert weekly == 15  # 3 routes × 5 dates, rolling median ran fine</div>
+<div class="line-explain">Asserts 15 rows surfaced for the 3-route x 5-date weekly index.</div>
+</div>
+<div class="card">
+<h2>Summary</h2>
+<p>This file has <strong>426 lines</strong>, each explained above.</p>
+</div>
+<div class="nav"><a href="21-test-scraper-py.html">&larr; Previous</a><a href="23-estimators-py.html">Next &rarr;</a></div>
+</div>
+</body>
+</html>

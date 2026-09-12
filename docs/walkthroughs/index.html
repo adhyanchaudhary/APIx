@@ -26,52 +26,66 @@ ol li .desc{color:var(--grey);font-size:.9rem}
 <div class="wrap">
 <header>
 <h1>Code Walkthrough - Master Index</h1>
-<p>15 files, explained line by line. Read them in order.</p>
+<p>29 files, explained line by line against the current code. Read them in order.</p>
 </header>
 
 <div class="card">
-<h2>Phase 0 - Environment & Setup (Files 1-8)</h2>
+<h2>Phase 0 - Environment &amp; Setup (Files 1-8)</h2>
 <ol>
-<li><a href="01-env.html">.env</a> <span class="phase-label p0">P0</span><br><span class="desc">Secret settings file: browser path, speed limits, retry count.</span></li>
-<li><a href="02-gitignore.html">.gitignore</a> <span class="phase-label p0">P0</span><br><span class="desc">What NOT to upload to GitHub: secrets, database, cache files.</span></li>
-<li><a href="03-requirements.html">requirements.txt</a> <span class="phase-label p0">P0</span><br><span class="desc">Shopping list of Python libraries the project needs.</span></li>
-<li><a href="04-routes-yaml.html">config/routes.yaml</a> <span class="phase-label p0">P0</span><br><span class="desc">4 cities, 12 routes, 3 lead windows, index weights.</span></li>
+<li><a href="01-env.html">.env</a> <span class="phase-label p0">P0</span><br><span class="desc">Runtime settings: browser storage, log level, rate limits, retries.</span></li>
+<li><a href="02-gitignore.html">.gitignore</a> <span class="phase-label p0">P0</span><br><span class="desc">What NOT to commit: secrets, database, cache files.</span></li>
+<li><a href="03-requirements.html">requirements.txt</a> <span class="phase-label p0">P0</span><br><span class="desc">The 11 Python libraries the project depends on.</span></li>
+<li><a href="04-routes-yaml.html">config/routes.yaml</a> <span class="phase-label p0">P0</span><br><span class="desc">4 cities, 12 directional routes, 3 lead windows, index settings.</span></li>
 <li><a href="05-scraper-yaml.html">config/scraper.yaml</a> <span class="phase-label p0">P0</span><br><span class="desc">Rate limits, retry policy, browser settings, timeouts.</span></li>
-<li><a href="06-indexer-yaml.html">config/indexer.yaml</a> <span class="phase-label p0">P0</span><br><span class="desc">Index formula settings, outlier detection rules.</span></li>
-<li><a href="07-schemas-py.html">src/models/schemas.py</a> <span class="phase-label p0">P0</span><br><span class="desc">Pydantic data models: FlightRecord, RouteConfig, IndexEntry.</span></li>
-<li><a href="08-database-py.html">src/storage/database.py</a> <span class="phase-label p0">P0</span><br><span class="desc">SQLite setup: 5 table definitions, init and connection functions.</span></li>
+<li><a href="06-indexer-yaml.html">config/indexer.yaml</a> <span class="phase-label p0">P0</span><br><span class="desc">Index formula settings, route weights, outlier detection rules.</span></li>
+<li><a href="07-schemas-py.html">src/models/schemas.py</a> <span class="phase-label p0">P0</span><br><span class="desc">Pydantic models: FlightRecord, RouteConfig, CityConfig, IndexEntry.</span></li>
+<li><a href="08-database-py.html">src/storage/database.py</a> <span class="phase-label p0">P0</span><br><span class="desc">SQLite layer: 5 table definitions, init and connection helpers.</span></li>
 </ol>
 </div>
 
 <div class="card">
-<h2>Phase 1 - The Scraper (Files 9-12)</h2>
+<h2>Phase 1 - The Scraper (Files 9-12, 16, 21)</h2>
 <ol start="9">
-<li><a href="09-base-py.html">src/scraper/base.py</a> <span class="phase-label p1">P1</span><br><span class="desc">Abstract interface: the contract every scraper must follow.</span></li>
-<li><a href="10-driver-py.html">src/scraper/driver.py</a> <span class="phase-label p1">P1</span><br><span class="desc">Playwright browser launcher with auto-cleanup.</span></li>
-<li><a href="11-google-flights-py.html">src/scraper/google_flights.py</a> <span class="phase-label p1">P1</span><br><span class="desc">Core scraper: URL builder, aria-label parser, retry logic. (302 lines)</span></li>
-<li><a href="12-run-scrape-py.html">src/scraper/run_scrape.py</a> <span class="phase-label p1">P1</span><br><span class="desc">Orchestrator: loops all routes, saves to database.</span></li>
+<li><a href="09-base-py.html">src/scraper/base.py</a> <span class="phase-label p1">P1</span><br><span class="desc">Abstract contract every scraper must implement.</span></li>
+<li><a href="10-driver-py.html">src/scraper/driver.py</a> <span class="phase-label p1">P1</span><br><span class="desc">Playwright browser launcher with guaranteed cleanup.</span></li>
+<li><a href="11-google-flights-py.html">src/scraper/google_flights.py</a> <span class="phase-label p1">P1</span><br><span class="desc">Core scraper: URL builder, aria-label parsing, rate limit + retries. (314 lines)</span></li>
+<li><a href="12-run-scrape-py.html">src/scraper/run_scrape.py</a> <span class="phase-label p1">P1</span><br><span class="desc">Batch runner: 12 routes x 3 windows, saves to raw_flights.</span></li>
+<li><a href="16-run-smoke-py.html">src/scraper/run_smoke.py</a> <span class="phase-label p1">P1</span><br><span class="desc">One-route smoke test of the live scraper, prints + persists results.</span></li>
+<li><a href="21-test-scraper-py.html">src/test_scraper.py</a> <span class="phase-label p1">P1</span><br><span class="desc">Duplicate single-route scraper test used during development.</span></li>
 </ol>
 </div>
 
 <div class="card">
-<h2>Phase 2 - Data Cleaning (File 13)</h2>
+<h2>Phase 2 - Data Cleaning (Files 13, 17-20)</h2>
 <ol start="13">
-<li><a href="13-clean-py.html">src/cleaner/clean.py</a> <span class="phase-label p1">P2</span><br><span class="desc">Pandas pipeline: dedup, outlier detection (IQR), quality scoring.</span></li>
+<li><a href="13-clean-py.html">src/cleaner/clean.py</a> <span class="phase-label p1">P2</span><br><span class="desc">Production cleaner: dedup, nulls, IQR outliers, quality score - raw_flights to cleaned_flights.</span></li>
+<li><a href="17-pipeline-py.html">src/cleaner/pipeline.py</a> <span class="phase-label p1">P2</span><br><span class="desc">Modular cleaner functions (cast, dedup, filter, nulls, outliers) with SQLAlchemy writer.</span></li>
+<li><a href="18-mock-data-py.html">src/cleaner/mock_data.py</a> <span class="phase-label p1">P2</span><br><span class="desc">Fake DataFrames/databases engineered with real-world defects for testing.</span></li>
+<li><a href="19-check-db-py.html">src/cleaner/check_db.py</a> <span class="phase-label p1">P2</span><br><span class="desc">Diagnostics: raw vs cleaned counts, outliers, nulls, fare summary.</span></li>
+<li><a href="20-test-run-py.html">src/cleaner/test_run.py</a> <span class="phase-label p1">P2</span><br><span class="desc">Runs the pipeline on mock data and prints a validation summary.</span></li>
 </ol>
 </div>
 
 <div class="card">
-<h2>Phase 3 - The Index Builder (Files 14-15)</h2>
+<h2>Phase 3 - The Index Builder (Files 14-15, 22-29)</h2>
 <ol start="14">
-<li><a href="14-run-index-py.html">src/indexer/run_index.py</a> <span class="phase-label p1">P3</span><br><span class="desc">Phase 3 entry point: reads cleaned data, builds daily + weekly + monthly indices, writes to SQLite.</span></li>
-<li><a href="15-api-index-py.html">src/indexer/api_index.py</a> <span class="phase-label p1">P3</span><br><span class="desc">Laspeyres-style weighted basket math, per lead window. The core of APIx.</span></li>
+<li><a href="14-run-index-py.html">src/indexer/run_index.py</a> <span class="phase-label p1">P3</span><br><span class="desc">Entry point: reads cleaned flights, builds daily/weekly/monthly indices, writes to SQLite.</span></li>
+<li><a href="15-api-index-py.html">src/indexer/api_index.py</a> <span class="phase-label p1">P3</span><br><span class="desc">Laspeyres-style weighted basket math for route + aggregate indices.</span></li>
+<li><a href="22-test-indexer-py.html">tests/test_indexer.py</a> <span class="phase-label p1">P3</span><br><span class="desc">Offline pytest suite for the index math using a CSV fixture.</span></li>
+<li><a href="23-estimators-py.html">src/indexer/estimators.py</a> <span class="phase-label p1">P3</span><br><span class="desc">Pluggable aggregation estimators: weighted mean, trimmed mean, weighted median.</span></li>
+<li><a href="24-synthetic-py.html">src/indexer/synthetic.py</a> <span class="phase-label p1">P3</span><br><span class="desc">Deterministic synthetic cleaned-flights generator for estimator research.</span></li>
+<li><a href="25-metrics-py.html">src/indexer/metrics.py</a> <span class="phase-label p1">P3</span><br><span class="desc">Stability metrics: day-to-day volatility, route sensitivity, weight elasticity.</span></li>
+<li><a href="26-report-py.html">src/indexer/report.py</a> <span class="phase-label p1">P3</span><br><span class="desc">Empirical estimator comparison report: aggregation, rolling, route sensitivity.</span></li>
+<li><a href="27-test-estimators-py.html">tests/test_estimators.py</a> <span class="phase-label p1">P3</span><br><span class="desc">Unit tests for the weighted-mean, trimmed-mean, and weighted-median estimators.</span></li>
+<li><a href="28-test-metrics-py.html">tests/test_metrics.py</a> <span class="phase-label p1">P3</span><br><span class="desc">Unit tests for stability stats, synthetic data, and estimator comparison.</span></li>
+<li><a href="29-price-predictor-py.html">src/models/price_predictor.py</a> <span class="phase-label p1">P3</span><br><span class="desc">Standalone TensorFlow fare-direction classifier (Phase 2 model, not in MVP).</span></li>
 </ol>
 </div>
 
 <div class="card" style="border-left-color:var(--green);">
 <h2 style="color:var(--green);">How to Use These Walkthroughs</h2>
-<p>Open any file above. Each walkthrough shows every line of code with a plain-English explanation beneath it. Read them in order (1-15) for the best learning experience.</p>
-<p style="margin-top:10px;">Files 1-8 are Phase 0 (setup). Files 9-12 are Phase 1 (the scraper). File 13 is Phase 2 (cleaning). Files 14-15 are Phase 3 (the APIx index).</p>
+<p>Open any file above. Each walkthrough shows every line of code with a plain-English explanation beneath it. Read them in order (1-29) for the best learning experience.</p>
+<p style="margin-top:10px;">Files 1-8 are Phase 0 (setup). Files 9-12, 16, 21 are Phase 1 (scraper). Files 13, 17-20 are Phase 2 (cleaning). Files 14-15, 22-29 are Phase 3 (the APIx index).</p>
 </div>
 </div>
 </body>
