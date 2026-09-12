@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Walkthrough 28: tests/test_metrics.py</title>
+<style>
+:root{--bg:#F08080;--card:rgba(255,255,255,0.92);--blue:#0D47A1;--blue-mid:#1565C0;--blue-light:#BBDEFB;--green:#1B5E20;--green-light:#C8E6C9;--red:#B71C1C;--red-light:#FFCDD2;--black:#1A1A2E;--grey:#546E7A}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--black);line-height:1.7}
+.wrap{max-width:900px;margin:0 auto;padding:20px}
+header{background:var(--blue);color:#fff;padding:24px 32px;border-radius:14px;margin-bottom:24px}
+header h1{font-size:1.6rem}
+header .sub{opacity:.75;margin-top:4px;font-size:.9rem}
+.card{background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:20px;border-left:6px solid var(--blue-mid)}
+.card h2{color:var(--blue);font-size:1.2rem;margin-bottom:8px}
+.line-block{margin:14px 0;border-radius:8px;overflow:hidden;border:1px solid #ddd}
+.line-header{background:var(--blue);color:#fff;padding:6px 14px;font-size:.85rem;font-weight:600}
+.line-code{background:#263238;color:#80CBC4;padding:10px 16px;font-family:'Courier New',monospace;font-size:.85rem;white-space:pre;overflow-x:auto}
+.line-explain{background:#E8F5E9;padding:10px 16px;font-size:.9rem;border-top:1px solid #C8E6C9}
+.line-explain strong{color:var(--green)}
+.line-explain code{background:#C8E6C9;padding:1px 5px;border-radius:3px;font-family:'Courier New',monospace;font-size:.85rem}
+.nav{display:flex;justify-content:space-between;margin:20px 0}
+.nav a{background:var(--blue);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem}
+.nav a:hover{background:var(--blue-mid)}
+.note{background:var(--blue-light);border-left:4px solid var(--blue);padding:10px 14px;border-radius:6px;margin:10px 0;font-size:.9rem}
+.summary{background:var(--green-light);border-left:4px solid var(--green);padding:12px 16px;border-radius:6px;margin:14px 0;color:var(--green)}
+.summary::before{content:"Key takeaway: ";font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Walkthrough 28: tests/test_metrics.py</h1>
+<div class="sub">tests/test_metrics.py</div>
+</header>
+<div class="nav"><a href="27-test-estimators-py.html">&larr; Previous</a><a href="29-price-predictor-py.html">Next &rarr;</a></div>
+<div class="card">
+<h2>File Overview</h2>
+<p>Every line of this file is explained in plain English below. Code shown is read directly from the current file on disk.</p>
+</div>
+<div class="line-block">
+<div class="line-header">Line 1</div>
+<div class="line-code">"""Tests for Phase E: metrics, synthetic data, and the report smoke."""</div>
+<div class="line-explain">Module docstring: tests for Phase E — metrics, synthetic data, and the report smoke.</div>
+</div><div class="line-block">
+<div class="line-header">Line 2</div>
+<div class="line-code">import numpy as np</div>
+<div class="line-explain">Imports numpy for NaN checks.</div>
+</div><div class="line-block">
+<div class="line-header">Line 3</div>
+<div class="line-code">import pandas as pd</div>
+<div class="line-explain">Imports pandas for DataFrame handling.</div>
+</div><div class="line-block">
+<div class="line-header">Line 4</div>
+<div class="line-code">import pytest</div>
+<div class="line-explain">Imports pytest for assertions.</div>
+</div><div class="line-block">
+<div class="line-header">Line 5</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 6</div>
+<div class="line-code">from src.indexer.metrics import (</div>
+<div class="line-explain">Opens the metrics import block...</div>
+</div><div class="line-block">
+<div class="line-header">Line 7</div>
+<div class="line-code">    AGGREGATION_ESTIMATORS,</div>
+<div class="line-explain">AGGREGATION_ESTIMATORS, STABILITY_COLUMNS, aggregate_by_day.</div>
+</div><div class="line-block">
+<div class="line-header">Line 8</div>
+<div class="line-code">    STABILITY_COLUMNS,</div>
+<div class="line-explain">best_estimator_per_window, compare_aggregation_estimators.</div>
+</div><div class="line-block">
+<div class="line-header">Line 9</div>
+<div class="line-code">    aggregate_by_day,</div>
+<div class="line-explain">route_sensitivity, stability_stats, weight_elasticity.</div>
+</div><div class="line-block">
+<div class="line-header">Line 10</div>
+<div class="line-code">    best_estimator_per_window,</div>
+<div class="line-explain">Closes the metrics import block.</div>
+</div><div class="line-block">
+<div class="line-header">Line 11</div>
+<div class="line-code">    compare_aggregation_estimators,</div>
+<div class="line-explain">Imports the synthetic generator and its constants.</div>
+</div><div class="line-block">
+<div class="line-header">Line 12</div>
+<div class="line-code">    route_sensitivity,</div>
+<div class="line-explain">Section header: stability stats tests.</div>
+</div><div class="line-block">
+<div class="line-header">Line 13</div>
+<div class="line-code">    stability_stats,</div>
+<div class="line-explain">test_stability_stats_basic: checks the four metrics by hand.</div>
+</div><div class="line-block">
+<div class="line-header">Line 14</div>
+<div class="line-code">    weight_elasticity,</div>
+<div class="line-explain">Comment: series [100, 105, 95, 100] → diffs [5, -10, 5].</div>
+</div><div class="line-block">
+<div class="line-header">Line 15</div>
+<div class="line-code">)</div>
+<div class="line-explain">Scores that series with a threshold of 5.0.</div>
+</div><div class="line-block">
+<div class="line-header">Line 16</div>
+<div class="line-code">from src.indexer.synthetic import make_synthetic_cleaned, ROUTES, WINDOWS</div>
+<div class="line-explain">mean_abs_change = 20/3.</div>
+</div><div class="line-block">
+<div class="line-header">Line 17</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 18</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 19</div>
+<div class="line-code"># ── Stability stats ──────────────────────────────────────────────────────────</div>
+<div class="line-explain">std_change ≈ 8.660.</div>
+</div><div class="line-block">
+<div class="line-header">Line 20</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 21</div>
+<div class="line-code">def test_stability_stats_basic():</div>
+<div class="line-explain">max_abs_change = 10.0.</div>
+</div><div class="line-block">
+<div class="line-header">Line 22</div>
+<div class="line-code">    # series [100, 105, 95, 100] → diffs [5, -10, 5]</div>
+<div class="line-explain">extreme_move_days = 1.</div>
+</div><div class="line-block">
+<div class="line-header">Line 23</div>
+<div class="line-code">    stats = stability_stats([100, 105, 95, 100], threshold=5.0)</div>
+<div class="line-explain">test_stability_stats_single_value: a single value has no moves.</div>
+</div><div class="line-block">
+<div class="line-header">Line 24</div>
+<div class="line-code">    assert stats["mean_abs_change"] == pytest.approx(20 / 3, abs=0.01)</div>
+<div class="line-explain">Scores a single-value series.</div>
+</div><div class="line-block">
+<div class="line-header">Line 25</div>
+<div class="line-code">    assert stats["std_change"] == pytest.approx(8.660, abs=0.01)</div>
+<div class="line-explain">mean is NaN (no diffs).</div>
+</div><div class="line-block">
+<div class="line-header">Line 26</div>
+<div class="line-code">    assert stats["max_abs_change"] == pytest.approx(10.0)</div>
+<div class="line-explain">No extreme days.</div>
+</div><div class="line-block">
+<div class="line-header">Line 27</div>
+<div class="line-code">    assert stats["extreme_move_days"] == 1</div>
+<div class="line-explain">test_stability_stats_with_nan_fills: NaNs are dropped first.</div>
+</div><div class="line-block">
+<div class="line-header">Line 28</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 29</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 30</div>
+<div class="line-code">def test_stability_stats_single_value():</div>
+<div class="line-explain">Scores a series with a NaN in the middle.</div>
+</div><div class="line-block">
+<div class="line-header">Line 31</div>
+<div class="line-code">    stats = stability_stats([100])</div>
+<div class="line-explain">After dropping the NaN, the series is flat → move of 0.0.</div>
+</div><div class="line-block">
+<div class="line-header">Line 32</div>
+<div class="line-code">    assert np.isnan(stats["mean_abs_change"])</div>
+<div class="line-explain">Section header: synthetic data tests.</div>
+</div><div class="line-block">
+<div class="line-header">Line 33</div>
+<div class="line-code">    assert stats["extreme_move_days"] == 0</div>
+<div class="line-explain">test_make_synthetic_shape_and_uniques: the generator's shape and content.</div>
+</div><div class="line-block">
+<div class="line-header">Line 34</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 35</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 36</div>
+<div class="line-code">def test_stability_stats_with_nan_fills():</div>
+<div class="line-explain">Builds the default synthetic frame.</div>
+</div><div class="line-block">
+<div class="line-header">Line 37</div>
+<div class="line-code">    stats = stability_stats([100, np.nan, 100])</div>
+<div class="line-explain">All 12 routes are present.</div>
+</div><div class="line-block">
+<div class="line-header">Line 38</div>
+<div class="line-code">    assert stats["mean_abs_change"] == pytest.approx(0.0)</div>
+<div class="line-explain">All three windows are present.</div>
+</div><div class="line-block">
+<div class="line-header">Line 39</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 40</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 41</div>
+<div class="line-code"># ── Synthetic data ───────────────────────────────────────────────────────────</div>
+<div class="line-explain">15 unique dates overall (comment: all dates present across routes).</div>
+</div><div class="line-block">
+<div class="line-header">Line 42</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 43</div>
+<div class="line-code">def test_make_synthetic_shape_and_uniques():</div>
+<div class="line-explain">504 rows total (comment: 12 routes × 14 dates × 3 windows).</div>
+</div><div class="line-block">
+<div class="line-header">Line 44</div>
+<div class="line-code">    df = make_synthetic_cleaned()</div>
+<div class="line-explain">All fares are positive.</div>
+</div><div class="line-block">
+<div class="line-header">Line 45</div>
+<div class="line-code">    assert set(df["route"]) == set(ROUTES)</div>
+<div class="line-explain">Section header: aggregate-by-day tests.</div>
+</div><div class="line-block">
+<div class="line-header">Line 46</div>
+<div class="line-code">    assert set(df["lead_window_days"]) == set(WINDOWS)</div>
+<div class="line-explain">test_aggregate_by_day_series: extracts a usable daily series.</div>
+</div><div class="line-block">
+<div class="line-header">Line 47</div>
+<div class="line-code">    assert df["scrape_date"].nunique() == 15  # all dates present across routes</div>
+<div class="line-explain">Imports the index builders locally.</div>
+</div><div class="line-block">
+<div class="line-header">Line 48</div>
+<div class="line-code">    assert len(df) == 504  # 12 routes × 14 dates × 3 windows</div>
+<div class="line-explain">Imports load_route_weights locally.</div>
+</div><div class="line-block">
+<div class="line-header">Line 49</div>
+<div class="line-code">    assert df["total_fare"].min() &gt; 0</div>
+<div class="line-explain">Builds synthetic cleaned data.</div>
+</div><div class="line-block">
+<div class="line-header">Line 50</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 51</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 52</div>
+<div class="line-code"># ── Aggregate by day ─────────────────────────────────────────────────────────</div>
+<div class="line-explain">Collapses it to cell prices.</div>
+</div><div class="line-block">
+<div class="line-header">Line 53</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 54</div>
+<div class="line-code">def test_aggregate_by_day_series():</div>
+<div class="line-explain">Loads the real route weights.</div>
+</div><div class="line-block">
+<div class="line-header">Line 55</div>
+<div class="line-code">    from src.indexer.api_index import compute_daily_index, route_price_per_day</div>
+<div class="line-explain">Computes the daily index.</div>
+</div><div class="line-block">
+<div class="line-header">Line 56</div>
+<div class="line-code">    from src.indexer.api_index import load_route_weights</div>
+<div class="line-explain">Extracts the window-1 aggregate series.</div>
+</div><div class="line-block">
+<div class="line-header">Line 57</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 58</div>
+<div class="line-code">    cleaned = make_synthetic_cleaned()</div>
+<div class="line-explain">The series is non-empty.</div>
+</div><div class="line-block">
+<div class="line-header">Line 59</div>
+<div class="line-code">    prices = route_price_per_day(cleaned)</div>
+<div class="line-explain">Dates are monotonically increasing.</div>
+</div><div class="line-block">
+<div class="line-header">Line 60</div>
+<div class="line-code">    weights = load_route_weights()</div>
+<div class="line-explain">Section header: aggregation-estimator comparison tests.</div>
+</div><div class="line-block">
+<div class="line-header">Line 61</div>
+<div class="line-code">    daily = compute_daily_index(prices, weights, round_to=4)</div>
+<div class="line-explain">test_compare_aggregation_estimators_keys_and_columns: the comparison map.</div>
+</div><div class="line-block">
+<div class="line-header">Line 62</div>
+<div class="line-code">    series = aggregate_by_day(daily, window=1)</div>
+<div class="line-explain">Builds synthetic data.</div>
+</div><div class="line-block">
+<div class="line-header">Line 63</div>
+<div class="line-code">    assert len(series) &gt; 0</div>
+<div class="line-explain">Imports the helpers locally.</div>
+</div><div class="line-block">
+<div class="line-header">Line 64</div>
+<div class="line-code">    assert series.index.is_monotonic_increasing</div>
+<div class="line-explain">Collapses prices.</div>
+</div><div class="line-block">
+<div class="line-header">Line 65</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 66</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 67</div>
+<div class="line-code"># ── Compare aggregation estimators ───────────────────────────────────────────</div>
+<div class="line-explain">Loads the route weights.</div>
+</div><div class="line-block">
+<div class="line-header">Line 68</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 69</div>
+<div class="line-code">def test_compare_aggregation_estimators_keys_and_columns():</div>
+<div class="line-explain">Runs the comparison.</div>
+</div><div class="line-block">
+<div class="line-header">Line 70</div>
+<div class="line-code">    cleaned = make_synthetic_cleaned()</div>
+<div class="line-explain">All three estimators are present as keys.</div>
+</div><div class="line-block">
+<div class="line-header">Line 71</div>
+<div class="line-code">    from src.indexer.api_index import load_route_weights, route_price_per_day</div>
+<div class="line-explain">Loops over the tables...</div>
+</div><div class="line-block">
+<div class="line-header">Line 72</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 73</div>
+<div class="line-code">    prices = route_price_per_day(cleaned)</div>
+<div class="line-explain">...each has all four stability columns.</div>
+</div><div class="line-block">
+<div class="line-header">Line 74</div>
+<div class="line-code">    weights = load_route_weights()</div>
+<div class="line-explain">test_best_estimator_per_window_returns_all_windows: every window gets a pick.</div>
+</div><div class="line-block">
+<div class="line-header">Line 75</div>
+<div class="line-code">    comp = compare_aggregation_estimators(prices, weights)</div>
+<div class="line-explain">Builds synthetic data.</div>
+</div><div class="line-block">
+<div class="line-header">Line 76</div>
+<div class="line-code">    assert set(comp.keys()) == set(AGGREGATION_ESTIMATORS)</div>
+<div class="line-explain">Imports the helpers locally.</div>
+</div><div class="line-block">
+<div class="line-header">Line 77</div>
+<div class="line-code">    for name, table in comp.items():</div>
+<div class="line-explain">Collapses prices.</div>
+</div><div class="line-block">
+<div class="line-header">Line 78</div>
+<div class="line-code">        assert all(col in table.columns for col in STABILITY_COLUMNS)</div>
+<div class="line-explain">Loads the route weights.</div>
+</div><div class="line-block">
+<div class="line-header">Line 79</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 80</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 81</div>
+<div class="line-code">def test_best_estimator_per_window_returns_all_windows():</div>
+<div class="line-explain">Runs the comparison.</div>
+</div><div class="line-block">
+<div class="line-header">Line 82</div>
+<div class="line-code">    cleaned = make_synthetic_cleaned()</div>
+<div class="line-explain">Picks the best estimator per window.</div>
+</div><div class="line-block">
+<div class="line-header">Line 83</div>
+<div class="line-code">    from src.indexer.api_index import load_route_weights, route_price_per_day</div>
+<div class="line-explain">All three windows are present.</div>
+</div><div class="line-block">
+<div class="line-header">Line 84</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 85</div>
+<div class="line-code">    prices = route_price_per_day(cleaned)</div>
+<div class="line-explain">Loops over the picks...</div>
+</div><div class="line-block">
+<div class="line-header">Line 86</div>
+<div class="line-code">    weights = load_route_weights()</div>
+<div class="line-explain">...each name is one of the aggregation estimators.</div>
+</div><div class="line-block">
+<div class="line-header">Line 87</div>
+<div class="line-code">    comp = compare_aggregation_estimators(prices, weights)</div>
+<div class="line-explain">Section header: route sensitivity tests.</div>
+</div><div class="line-block">
+<div class="line-header">Line 88</div>
+<div class="line-code">    best = best_estimator_per_window(comp)</div>
+<div class="line-explain">test_route_sensitivity_all_routes_and_robust: every route is scored, robustly.</div>
+</div><div class="line-block">
+<div class="line-header">Line 89</div>
+<div class="line-code">    assert set(best.keys()) == set(WINDOWS)</div>
+<div class="line-explain">Builds synthetic data.</div>
+</div><div class="line-block">
+<div class="line-header">Line 90</div>
+<div class="line-code">    for window, name in best.items():</div>
+<div class="line-explain">Imports the helpers locally.</div>
+</div><div class="line-block">
+<div class="line-header">Line 91</div>
+<div class="line-code">        assert name in AGGREGATION_ESTIMATORS</div>
+<div class="line-explain">Collapses prices.</div>
+</div><div class="line-block">
+<div class="line-header">Line 92</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 93</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 94</div>
+<div class="line-code"># ── Route sensitivity ────────────────────────────────────────────────────────</div>
+<div class="line-explain">Loads the route weights.</div>
+</div><div class="line-block">
+<div class="line-header">Line 95</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 96</div>
+<div class="line-code">def test_route_sensitivity_all_routes_and_robust():</div>
+<div class="line-explain">Computes sensitivity for window 1.</div>
+</div><div class="line-block">
+<div class="line-header">Line 97</div>
+<div class="line-code">    cleaned = make_synthetic_cleaned()</div>
+<div class="line-explain">Every weighted route appears in the output.</div>
+</div><div class="line-block">
+<div class="line-header">Line 98</div>
+<div class="line-code">    from src.indexer.api_index import load_route_weights, route_price_per_day</div>
+<div class="line-explain">Comment: losing one route's data moves the headline by well under 2 points.</div>
+</div><div class="line-block">
+<div class="line-header">Line 99</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 100</div>
+<div class="line-code">    prices = route_price_per_day(cleaned)</div>
+<div class="line-explain">The maximum move is below 2.0.</div>
+</div><div class="line-block">
+<div class="line-header">Line 101</div>
+<div class="line-code">    weights = load_route_weights()</div>
+<div class="line-explain">Comment: sorted descending.</div>
+</div><div class="line-block">
+<div class="line-header">Line 102</div>
+<div class="line-code">    sens = route_sensitivity(prices, weights, window=1)</div>
+<div class="line-explain">The scores are sorted descending.</div>
+</div><div class="line-block">
+<div class="line-header">Line 103</div>
+<div class="line-code">    assert set(sens.index) == set(weights)</div>
+<div class="line-explain">test_weight_elasticity_positive_and_ranked: leverage is positive, ranked.</div>
+</div><div class="line-block">
+<div class="line-header">Line 104</div>
+<div class="line-code">    # Losing one route's data moves the headline by well under 2 index points.</div>
+<div class="line-explain">Builds synthetic data.</div>
+</div><div class="line-block">
+<div class="line-header">Line 105</div>
+<div class="line-code">    assert sens.max() &lt; 2.0</div>
+<div class="line-explain">Imports the helpers locally.</div>
+</div><div class="line-block">
+<div class="line-header">Line 106</div>
+<div class="line-code">    # Sorted descending.</div>
+<div class="line-explain">Collapses prices.</div>
+</div><div class="line-block">
+<div class="line-header">Line 107</div>
+<div class="line-code">    assert list(sens.values) == sorted(sens.values, reverse=True)</div>
+<div class="line-explain">Loads the route weights.</div>
+</div><div class="line-block">
+<div class="line-header">Line 108</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 109</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 110</div>
+<div class="line-code">def test_weight_elasticity_positive_and_ranked():</div>
+<div class="line-explain">Computes elasticity for window 1.</div>
+</div><div class="line-block">
+<div class="line-header">Line 111</div>
+<div class="line-code">    cleaned = make_synthetic_cleaned()</div>
+<div class="line-explain">Every weighted route appears.</div>
+</div><div class="line-block">
+<div class="line-header">Line 112</div>
+<div class="line-code">    from src.indexer.api_index import load_route_weights, route_price_per_day</div>
+<div class="line-explain">All scores are positive.</div>
+</div><div class="line-block">
+<div class="line-header">Line 113</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 114</div>
+<div class="line-code">    prices = route_price_per_day(cleaned)</div>
+<div class="line-explain">Comment: sorted descending, so the first route has the most leverage.</div>
+</div><div class="line-block">
+<div class="line-header">Line 115</div>
+<div class="line-code">    weights = load_route_weights()</div>
+<div class="line-explain">The scores are sorted descending.</div>
+</div><div class="line-block">
+<div class="line-header">Line 116</div>
+<div class="line-code">    elas = weight_elasticity(prices, weights, window=1)</div>
+<div class="line-explain">Computes weight elasticity for lead window 1.</div>
+</div><div class="line-block">
+<div class="line-header">Line 117</div>
+<div class="line-code">    assert set(elas.index) == set(weights)</div>
+<div class="line-explain">Asserts the result index matches the weight keys.</div>
+</div><div class="line-block">
+<div class="line-header">Line 118</div>
+<div class="line-code">    assert (elas &gt; 0).all()</div>
+<div class="line-explain">Asserts every elasticity is positive.</div>
+</div><div class="line-block">
+<div class="line-header">Line 119</div>
+<div class="line-code">    # Sorted descending, so the first route has the most leverage.</div>
+<div class="line-explain">Comment: sorted descending, so the first route has the most leverage.</div>
+</div><div class="line-block">
+<div class="line-header">Line 120</div>
+<div class="line-code">    assert list(elas.values) == sorted(elas.values, reverse=True)</div>
+<div class="line-explain">Asserts the elasticities come back sorted descending.</div>
+</div>
+<div class="card">
+<h2>Summary</h2>
+<p>This file has <strong>120 lines</strong>, each explained above.</p>
+</div>
+<div class="nav"><a href="27-test-estimators-py.html">&larr; Previous</a><a href="29-price-predictor-py.html">Next &rarr;</a></div>
+</div>
+</body>
+</html>

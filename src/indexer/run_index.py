@@ -15,8 +15,11 @@ from pathlib import Path
 from src.indexer.api_index import (
     compute_daily_index,
     compute_rolling_index,
+    load_active_windows,
+    load_estimator_config,
     load_index_config,
     load_route_weights,
+    load_window_weights,
     read_cleaned_flights,
     route_price_per_day,
     write_index,
@@ -40,30 +43,59 @@ def run_index(db_path: Path | str | None = None, cfg_path: Path | str | None = N
 
     cleaned = read_cleaned_flights(db_path)
     if cleaned.empty:
-        log.warning("cleaned_flights is empty — nothing to index")
+        log.warning("cleaned_flights is empty - nothing to index")
         return {"daily": 0, "weekly": 0, "monthly": 0}
 
     weights = load_route_weights(cfg_path)
+    window_weights = load_window_weights(cfg_path)
     round_to = load_index_config(cfg_path).get("round_to", 2)
+    active_windows = load_active_windows(cfg_path)
+    est = load_estimator_config(cfg_path)
 
-    log.info("═══ Index run ═══")
+    log.info("=== Index run ===")
     log.info("Weights: %d routes (normalised to %s)", len(weights), round(sum(weights.values()), 4))
+    log.info("Window weights (booking lead-time shares): %s", window_weights)
+    log.info("Active lead windows: %s", active_windows)
+    log.info("Route price method: %s", est["route_price_method"])
+    log.info(
+        "Estimators: aggregate=%s (trim %s) | rolling=%s (trim %s)",
+        est["aggregation_estimator"],
+        est["aggregation_trim_frac"],
+        est["rolling_estimator"],
+        est["rolling_trim_frac"],
+    )
 
-    prices = route_price_per_day(cleaned)
+    prices = route_price_per_day(cleaned, method=est["route_price_method"])
     if prices.empty:
-        log.warning("No price rows after cleaning filter — nothing to index")
+        log.warning("No price rows after cleaning filter - nothing to index")
         return {"daily": 0, "weekly": 0, "monthly": 0}
-    log.info("Price rows: %d (route × window × date)", len(prices))
+    prices = prices[prices["lead_window_days"].isin(active_windows)]
+    if prices.empty:
+        log.warning("No price rows for active windows %s - nothing to index", active_windows)
+        return {"daily": 0, "weekly": 0, "monthly": 0}
+    log.info("Price rows: %d (route x window x date, active windows only)", len(prices))
 
-    daily = compute_daily_index(prices, weights, round_to)
-    weekly = compute_rolling_index(daily, 7, round_to)
-    monthly = compute_rolling_index(daily, 30, round_to)
+    daily = compute_daily_index(
+        prices, weights, window_weights, round_to,
+        estimator=est["aggregation_estimator"],
+        trim_frac=est["aggregation_trim_frac"],
+    )
+    weekly = compute_rolling_index(
+        daily, 7, round_to,
+        estimator=est["rolling_estimator"],
+        trim_frac=est["rolling_trim_frac"],
+    )
+    monthly = compute_rolling_index(
+        daily, 30, round_to,
+        estimator=est["rolling_estimator"],
+        trim_frac=est["rolling_trim_frac"],
+    )
 
     n_daily = write_index(daily, "daily_index", db_path)
     n_weekly = write_index(weekly, "weekly_index", db_path)
     n_monthly = write_index(monthly, "monthly_index", db_path)
 
-    log.info("═══ Complete: daily=%d | weekly=%d | monthly=%d ═══", n_daily, n_weekly, n_monthly)
+    log.info("=== Complete: daily=%d | weekly=%d | monthly=%d ===", n_daily, n_weekly, n_monthly)
     return {"daily": n_daily, "weekly": n_weekly, "monthly": n_monthly}
 
 

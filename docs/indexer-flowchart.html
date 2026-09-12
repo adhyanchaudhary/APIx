@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>APIx Indexer — Deep Dive</title>
+<style>
+:root{
+  --bg:#F5F6FA; --ink:#1A1A2E; --muted:#546E7A;
+  --p3:#6A1B9A; --p3-lt:#F3E5F5; --p3-mid:#CE93D8;
+  --accent:#1565C0; --accent-lt:#E3F2FD;
+  --ok:#2E7D32; --ok-lt:#E8F5E9;
+  --warn:#EF6C00; --warn-lt:#FFF3E0;
+  --db:#37474F; --db-lt:#ECEFF1;
+  --card:#FFFFFF; --line:#E0E0E0;
+  --mono:'Courier New',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;padding:24px}
+.wrap{max-width:1080px;margin:0 auto}
+header{background:linear-gradient(135deg,#6A1B9A,#8E24AA);color:#fff;border-radius:14px;padding:26px 32px;margin-bottom:22px}
+header h1{font-size:1.7rem}
+header p{opacity:.88;margin-top:6px;font-size:.95rem}
+.card{background:var(--card);border-radius:14px;padding:22px 26px;margin-bottom:20px;border:1px solid var(--line);box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.card h2{font-size:1.15rem;margin-bottom:12px;color:#6A1B9A}
+.card h3{font-size:.95rem;margin-bottom:8px;color:var(--accent)}
+
+.flow{display:flex;flex-direction:column;align-items:stretch;gap:0}
+.arrow{text-align:center;color:var(--muted);font-size:1.3rem;line-height:1;padding:6px 0;user-select:none}
+.pill{display:inline-flex;align-items:center;gap:8px;font-size:.72rem;font-weight:700;letter-spacing:.5px;padding:3px 10px;border-radius:12px;align-self:flex-start;text-transform:uppercase;color:#fff}
+.boxes{display:flex;flex-wrap:wrap;gap:12px}
+.node{background:#fafafa;border:1px solid var(--line);border-left:5px solid var(--p3);border-radius:10px;padding:12px 14px;flex:1 1 300px}
+.node.accent{border-left-color:var(--accent)}
+.node.ok{border-left-color:var(--ok)}
+.node.warn{border-left-color:var(--warn)}
+.node.db{border-left-color:var(--db);background:var(--db-lt)}
+.node .titre{font-weight:700;font-size:.95rem;color:var(--p3)}
+.node.accent .titre{color:var(--accent)}
+.node.ok .titre{color:var(--ok)}
+.node.warn .titre{color:var(--warn)}
+.node.db .titre{color:var(--db)}
+.node .fichier{font-family:var(--mono);font-size:.8rem;color:var(--muted);margin:4px 0}
+.node p{font-size:.85rem;margin-top:4px}
+.node ul{margin:6px 0 0 18px;font-size:.83rem}
+.node li{margin-bottom:4px}
+code,.ml{font-family:var(--mono);font-size:.8rem;background:#f0f0f0;padding:0 4px;border-radius:3px}
+b{color:var(--ink)}
+
+.formula{background:var(--p3-lt);border:1px solid var(--p3-mid);border-radius:8px;padding:10px 14px;margin-top:10px;font-family:var(--mono);font-size:.82rem;color:#4A148C;white-space:pre-line}
+.fact{background:var(--accent-lt);border-left:5px solid var(--accent);border-radius:8px;padding:12px 16px;margin-top:14px;font-size:.85rem;color:#0D47A1}
+.fact b{color:#1565C0}
+
+.dbrow{display:flex;flex-wrap:wrap;gap:14px}
+.db{background:var(--db-lt);border:1px solid var(--db);border-radius:8px;padding:12px 14px;flex:1 1 220px}
+.db .dbname{font-family:var(--mono);font-weight:700;color:var(--db);font-size:.85rem;border-bottom:2px dashed var(--db);padding-bottom:4px;margin-bottom:6px}
+.db ul{margin:0 0 0 16px;font-size:.78rem;color:#455A64}
+.db .writer{font-size:.74rem;color:var(--muted);margin-top:6px}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{font-size:.8rem;font-family:var(--mono);background:var(--p3-lt);color:#4A148C;border:1px solid var(--p3-mid);border-radius:14px;padding:3px 12px}
+.chip.blue{background:var(--accent-lt);color:#0D47A1;border-color:#90CAF9}
+
+.step-label{display:flex;align-items:center;gap:10px;margin:6px 0 10px}
+.step-num{flex:0 0 34px;height:34px;border-radius:50%;background:var(--p3);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.95rem}
+.step-label h3{margin:0}
+.note2{font-size:.8rem;color:var(--muted);text-align:center;margin-top:14px}
+table.data{margin:12px 0;border-collapse:collapse;font-size:.76rem;width:100%}
+table.data caption{font-size:.8rem;font-weight:600;color:var(--p3);text-align:left;margin-bottom:6px}
+table.data th{text-align:left;color:#fff;background:var(--p3);padding:4px 8px;font-weight:600}
+table.data td{border:1px solid var(--line);padding:4px 8px;vertical-align:top;text-align:right}
+table.data td.l{text-align:left}
+table.data tr.hl{background:var(--warn-lt)}
+.sumline{font-family:var(--mono);font-size:.8rem;background:var(--ok-lt);border:1px solid #A5D6A7;border-radius:8px;padding:10px 14px;margin-top:12px;color:#1B5E20;white-space:pre-line}
+table.params{margin:10px 0 0;border-collapse:collapse;font-size:.8rem;width:100%}
+table.params th{text-align:left;color:#fff;background:var(--p3);padding:5px 10px;font-weight:600}
+table.params td{border:1px solid var(--line);padding:5px 10px;vertical-align:top}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>APIx Indexer — Deep Dive</h1>
+  <p>Zoomed into Phase 3: from <code>apix.db</code> cleaned flights to the daily / weekly / monthly APIx indices — every function, its inputs, and the math behind the 36-cell basket.</p>
+</header>
+
+<!-- orchestrator -->
+<div class="card">
+  <h2>Orchestrator — what <code>run_index</code> does, in order</h2>
+  <div class="flow">
+
+    <div class="boxes">
+      <div class="node db accent">
+        <div class="titre">Inputs it loads</div>
+        <ul>
+          <li><code>cleaned_flights</code> table (all rows)</li>
+          <li><code>indexer.yaml</code> &#8594; <b>12 route weights</b> (normalised to 1.0)</li>
+          <li><code>window_weights</code> &#8594; <b>1:0.20, 7:0.30, 30:0.50</b></li>
+          <li><code>active_windows</code> &#8594; <b>[1, 7, 30]</b></li>
+          <li>estimator config (names + trim fractions, price method)</li>
+          <li><code>round_to</code> &#8594; <b>2</b> decimal places</li>
+        </ul>
+      </div>
+      <div class="node ok">
+        <div class="titre">Pipeline ordering (in <code>run_index</code>)</div>
+        <ul>
+          <li><b>1.</b> read cleaned flights — early-return zero counts if empty</li>
+          <li><b>2.</b> load weights, windows, estimator config</li>
+          <li><b>3.</b> collapse fares &#8594; <code>route_price_per_day</code></li>
+          <li><b>4.</b> keep only active windows</li>
+          <li><b>5.</b> daily composite &#8594; <code>compute_daily_index</code></li>
+          <li><b>6.</b> 7-day &#8594; <code>compute_rolling_index</code></li>
+          <li><b>7.</b> 30-day &#8594; <code>compute_rolling_index</code></li>
+          <li><b>8.</b> write the three index tables</li>
+        </ul>
+      </div>
+      <div class="node warn">
+        <div class="titre">Entry points</div>
+        <div class="fichier">python -m src.indexer.run_index [--db path]</div>
+        <p>3 <code>log.info</code> banners: weights + windows, route-price method, estimators. Returns <code>{daily, weekly, monthly}</code> row counts.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP A -->
+<div class="card">
+  <div class="step-label"><div class="step-num">1</div><h3>Collapse fares into cells — <code>api_index.route_price_per_day()</code></h3></div>
+  <div class="boxes">
+    <div class="node accent">
+      <div class="titre">Cell = (route &times; lead window &times; date)</div>
+      <ul>
+        <li>Group raw cleaned rows by <code>(route, lead_window_days, scrape_date)</code></li>
+        <li>Collapse the fares in a cell to <b>one price</b> using <code>method</code> (default <code>median</code>, or <code>min</code>)</li>
+        <li>Rows with <code>is_outlier = 1</code> are <b>excluded</b> from the price (they stay in the DB)</li>
+        <li>Null <code>total_fare</code> rows are dropped first</li>
+      </ul>
+    </div>
+    <div class="node">
+      <div class="titre">Carry-forward (<code>_carry_forward_missing_dates</code>)</div>
+      <ul>
+        <li>Fills every calendar day between a group's first and last observed date</li>
+        <li>Gap days inherit the <b>last known fare</b> (forward-fill)</li>
+        <li>Dates before the first observation stay missing (nothing to carry from)</li>
+      </ul>
+      <div class="fact" style="margin-top:10px">
+        <b>Why?</b> a coverage gap no longer drags the aggregate down for no economic reason — the route is simply "still at yesterday's price".
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP B -->
+<div class="card">
+  <div class="step-label"><div class="step-num">2</div><h3>The daily composite — <code>api_index.compute_daily_index()</code></h3></div>
+  <div class="boxes">
+    <div class="node">
+      <div class="titre">Build the 36-cell basket</div>
+      <ul>
+        <li><b>cell_weight</b> = route weight &times; window share, for all 12 routes &times; 3 windows</li>
+        <li>If no <code>window_weights</code> given, active windows share equal weight</li>
+      </ul>
+      <div class="formula">base_date = first date with ANY data
+base    = each cell's fare on base_date   (index = 100 on day one)
+first_price / first_date = a cell's OWN first observation
+            (fallback for cells absent on the shared base date)</div>
+    </div>
+    <div class="node ok">
+      <div class="titre">Score every present cell</div>
+      <ul>
+        <li>Base price = fare on the shared base date if the cell existed then</li>
+        <li>Otherwise use the cell's own first fare and join the basket at <b>100</b> on its start date</li>
+        <li>Non-positive base fares are skipped (division guard)</li>
+      </ul>
+      <div class="formula">route_index(cell) = today_price / base_price &times; 100
+weight(cell)      = route_weight(cell) &times; window_share(cell)</div>
+    </div>
+    <div class="node accent">
+      <div class="titre">One headline per date</div>
+      <ul>
+        <li>The composite = <code>aggregate(route_indices, cell_weights, estimator, trim_frac)</code> over the cells present <b>that day</b></li>
+        <li>Aggregate is stamped identically onto every row of that date</li>
+      </ul>
+      <div class="fact">
+        <b>Key fact:</b> there is ONE composite number per date (not one per window).
+        Weights re-balance over the cells present each day, so a late-starting
+        window expands the basket without jerking the headline.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- estimators -->
+<div class="card">
+  <h2>Inside the headline — <code>estimators.aggregate()</code> &amp; the estimator registry</h2>
+  <p style="font-size:.85rem;color:var(--muted);margin-bottom:10px">
+    <code>aggregate(values, weights, estimator="weighted_mean", trim_frac=0.10)</code> dispatches by name to one of three estimators. Trimmed mean needs the trim fraction; everything else just calls the registry.
+  </p>
+  <div class="boxes">
+    <div class="node">
+      <div class="titre">weighted_mean — classic Laspeyres</div>
+      <div class="formula">&Sigma;(v &times; w) / &Sigma;w</div>
+      <p>Each route index weighted by its basket share. Plain weighted average — kept as a selectable option, not the active default.</p>
+    </div>
+    <div class="node">
+      <div class="titre">weighted_trimmed_mean — configured default (CPI-style)</div>
+      <div class="formula">sort by value &#8594; clip each element's weight so cumulative weight stays in
+[trim&middot;&Sigma;w, (1-trim)&middot;&Sigma;w] &#8594; re-balance &amp; average the survivors</div>
+      <ul>
+        <li>Trimming is measured in <b>weight mass</b>, not route count — a small route is fully eaten, a big route only shaved</li>
+        <li>If nothing survives (trim &#8805; 0.5) it falls back to the weighted median</li>
+      </ul>
+    </div>
+    <div class="node">
+      <div class="titre">weighted_median</div>
+      <div class="formula">sort by value &#8594; the value where cumulative weight crosses 0.5&middot;&Sigma;w</div>
+      <p>Splits an exact half boundary by averaging the two neighbours.</p>
+    </div>
+  </div>
+  <div class="chips">
+    <span class="chip">DEFAULT_TRIM_FRAC = 0.10</span>
+    <span class="chip">ESTIMATORS = {"weighted_mean", "weighted_trimmed_mean", "weighted_median"}</span>
+    <span class="chip blue">chosen in config/indexer.yaml &rarr; aggregation_estimator</span>
+  </div>
+</div>
+
+<!-- WORKED EXAMPLE -->
+<div class="card">
+  <h2>Worked example — what the code actually produces (3 routes &times; 2 windows)</h2>
+  <p style="font-size:.85rem;color:var(--muted);margin-bottom:4px">
+    Every number below is a <b>real output of the indexer</b> on the fixture <code>tests/fixtures/sample_cleaned.csv</code>
+    (5 days: 2026-09-01 … 2026-09-05) with route weights <code>DEL-BOM 0.4 / DEL-BLR 0.3 / BOM-BLR 0.3</code>
+    and window shares <code>0.5 / 0.5</code>. The full daily run uses 12 routes &times; 3 windows = <b>36 cells</b>;
+    this fixture uses 6 cells so the arithmetic stays eyeball-able.
+    <br><span style="color:var(--warn)">Note:</span> this run uses the classic <code>weighted_mean</code> as the test expects;
+    the production config now defaults to <code>weighted_trimmed_mean</code> (CPI-style) — that only changes the final 102.11 headline, not the cell prices or route indices.
+  </p>
+
+  <table class="data">
+    <caption>STEP 1 — collapsed cell prices (INR, median per route &times; window &times; day, missing days carried forward)</caption>
+    <tr><th style="text-align:left">cell (route, window)</th><th>09-01</th><th>09-02</th><th>09-03</th><th>09-04</th><th>09-05</th></tr>
+    <tr><td class="l">DEL-BOM (1 day)</td><td>5,000</td><td>5,200</td><td>4,900</td><td>5,300</td><td>5,100</td></tr>
+    <tr class="hl"><td class="l">DEL-BOM (7 day)</td><td>4,000</td><td>4,100</td><td>4,050</td><td><b>4,050 &#8592; carried</b></td><td>4,150</td></tr>
+    <tr><td class="l">DEL-BLR (1 day)</td><td>6,000</td><td>6,000</td><td>6,100</td><td>6,050</td><td>6,100</td></tr>
+    <tr><td class="l">DEL-BLR (7 day)</td><td>5,000</td><td>5,000</td><td>5,050</td><td>5,000</td><td>5,050</td></tr>
+    <tr><td class="l">BOM-BLR (1 day)</td><td>3,500</td><td>3,600</td><td>3,700</td><td>3,800</td><td>3,900</td></tr>
+    <tr><td class="l">BOM-BLR (7 day)</td><td>3,000</td><td>3,100</td><td>3,200</td><td>3,300</td><td>3,400</td></tr>
+  </table>
+  <p style="font-size:.8rem;color:var(--muted)">Highlighted: 09-04 real fare was <code>4,200</code> but flagged <code>is_outlier=1</code>, so the cell
+  falls back to yesterday's <code>4,050</code>. The 09-01 column becomes the shared base = <b>100</b> for every cell.</p>
+
+  <table class="data">
+    <caption>STEP 2 — daily index rows for 2026-09-03 (this is exactly what lands in <code>daily_index</code>)</caption>
+    <tr><th style="text-align:left">lead window</th><th style="text-align:left">route</th><th style="text-align:left">weight</th><th style="text-align:left">route_price</th><th style="text-align:left">route_index</th><th style="text-align:left">base_period</th><th style="text-align:left">aggregate_index</th></tr>
+    <tr><td>1</td><td class="l">DEL-BOM</td><td>0.20</td><td>4,900</td><td><b>98.00</b></td><td class="l">09-01</td><td rowspan="6" style="vertical-align:middle;background:var(--ok-lt);font-weight:700">102.11</td></tr>
+    <tr><td>7</td><td class="l">DEL-BOM</td><td>0.20</td><td>4,050</td><td><b>101.25</b></td><td class="l">09-01</td></tr>
+    <tr><td>1</td><td class="l">DEL-BLR</td><td>0.15</td><td>6,100</td><td><b>101.67</b></td><td class="l">09-01</td></tr>
+    <tr><td>7</td><td class="l">DEL-BLR</td><td>0.15</td><td>5,050</td><td><b>101.00</b></td><td class="l">09-01</td></tr>
+    <tr><td>1</td><td class="l">BOM-BLR</td><td>0.15</td><td>3,700</td><td><b>105.71</b></td><td class="l">09-01</td></tr>
+    <tr><td>7</td><td class="l">BOM-BLR</td><td>0.15</td><td>3,200</td><td><b>106.67</b></td><td class="l">09-01</td></tr>
+  </table>
+
+  <div class="sumline">composite = &#931; weight &times; route_index
+    = 0.20&times;98.00 + 0.20&times;101.25 + 0.15&times;101.67 + 0.15&times;101.00 + 0.15&times;105.71 + 0.15&times;106.67
+    = 102.1075 &#8776; <b>102.11</b>  (one identical headline stamped on all 6 rows of 09-03)</div>
+
+  <table class="data" style="margin-top:18px">
+    <caption>STEP 3 — <code>compute_rolling_index</code> output (values = rolling mean of the daily series; weekly = 7-day window, monthly = 30-day window, both <code>min_periods=1</code>)</caption>
+    <tr><th style="text-align:left">date</th><th style="text-align:left">daily headline</th><th style="text-align:left">weekly (7-day mean)</th><th style="text-align:left">monthly (30-day mean)</th></tr>
+    <tr><td class="l">09-01</td><td>100.00</td><td>100.00</td><td>100.00</td></tr>
+    <tr><td class="l">09-02</td><td>102.23</td><td>101.12</td><td>101.12</td></tr>
+    <tr><td class="l">09-03</td><td>102.11</td><td>101.45</td><td>101.45</td></tr>
+    <tr><td class="l">09-04</td><td>104.36</td><td>102.18</td><td>102.18</td></tr>
+    <tr><td class="l">09-05</td><td>105.26</td><td>102.79</td><td>102.79</td></tr>
+  </table>
+  <p style="font-size:.8rem;color:var(--muted)">Weekly and monthly are identical for the first 7 days — <code>min_periods=1</code> means each rolling value
+  is just the expanding mean of everything seen so far. They diverge in week 2: the weekly window drops 09-01 while the 30-day window still includes it — which is exactly the smoothing the report measures.</p>
+</div>
+
+<!-- STEP C -->
+<div class="card">
+  <div class="step-label"><div class="step-num">3</div><h3>Weekly &amp; monthly rollups — <code>api_index.compute_rolling_index()</code></h3></div>
+  <div class="boxes">
+    <div class="node">
+      <div class="titre">Rolling smoother (<code>_rolling_agg</code>)</div>
+      <ul>
+        <li>Applied per (window, route) for <code>route_price</code> and <code>route_index</code></li>
+        <li>Applied per window only for the composite (one number per date)</li>
+        <li><code>min_periods=1</code> &#8594; early days still yield a value</li>
+      </ul>
+      <div class="chips">
+        <span class="chip">mean</span>
+        <span class="chip">median</span>
+        <span class="chip">trimmed_mean (rolling_trim_frac = 0.10)</span>
+      </div>
+    </div>
+    <div class="node accent">
+      <div class="titre">Two calls</div>
+      <ul>
+        <li><code>window_days = 7</code> &#8594; <b>weekly</b></li>
+        <li><code>window_days = 30</code> &#8594; <b>monthly</b></li>
+        <li>Output keeps the canonical <code>INDEX_COLUMNS</code> schema, rolled values rounded</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- STEP D -->
+<div class="card">
+  <div class="step-label"><div class="step-num">4</div><h3>Persist — <code>api_index.write_index()</code></h3></div>
+  <div class="boxes">
+    <div class="node ok">
+      <div class="titre">Idempotent upsert</div>
+      <ul>
+        <li>Rejects any table name outside <code>INDEX_TABLES</code></li>
+        <li>For each <code>(index_date, lead_window_days)</code> group: <b>DELETE existing rows</b>, then bulk-insert</li>
+        <li>Re-running for the same date re-computes instead of duplicating</li>
+        <li>Returns the number of rows written</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="arrow">&#9660;</div>
+
+<!-- outputs -->
+<div class="card">
+  <h2>What lands in <code>data/apix.db</code></h2>
+  <div class="dbrow">
+    <div class="db">
+      <div class="dbname">daily_index</div>
+      <ul><li>index_date, lead_window_days, route, weight, route_price, route_index, aggregate_index, base_period</li><li>&#8776; 36 rows &times; dates</li></ul>
+      <div class="writer">written by: run_index.py &#8594; write_index()</div>
+    </div>
+    <div class="db">
+      <div class="dbname">weekly_index</div>
+      <ul><li>same schema, 7-day rolling over the daily values</li></ul>
+      <div class="writer">compute_rolling_index(7)</div>
+    </div>
+    <div class="db">
+      <div class="dbname">monthly_index</div>
+      <ul><li>same schema, 30-day rolling over the daily values</li></ul>
+      <div class="writer">compute_rolling_index(30)</div>
+    </div>
+  </div>
+  <table class="params" style="margin-top:16px">
+    <tr><th>Column</th><th>Meaning</th></tr>
+    <tr><td><code>index_date</code></td><td>date the observation applies to (scrape date of the basket)</td></tr>
+    <tr><td><code>lead_window_days</code></td><td>booking window of the cell — 1, 7 or 30</td></tr>
+    <tr><td><code>route</code></td><td>directional city-pair, e.g. DEL-BOM</td></tr>
+    <tr><td><code>weight</code></td><td>cell weight = route weight &times; window share</td></tr>
+    <tr><td><code>route_price</code></td><td>collapsed median fare for that cell on that date</td></tr>
+    <tr><td><code>route_index</code></td><td>cell index vs its own base fare (base = 100)</td></tr>
+    <tr><td><code>aggregate_index</code></td><td>the single composite headline, identical for every row of a date</td></tr>
+    <tr><td><code>base_period</code></td><td>the date used as this cell's base (where its index = 100)</td></tr>
+  </table>
+</div>
+
+<!-- research -->
+<div class="card">
+  <h2>Research tools that consume the same inputs</h2>
+  <div class="boxes">
+    <div class="node warn">
+      <div class="titre">Synthetic data</div>
+      <div class="fichier">synthetic.py &#8594; make_synthetic_cleaned()</div>
+      <p>Seeded, cleaned-flights-shaped generator (price drift, weekend bumps, spikes, deliberate gaps) so the research below is reproducible before real 30-day data lands.</p>
+    </div>
+    <div class="node">
+      <div class="titre">Stability metrics</div>
+      <div class="fichier">metrics.py</div>
+      <ul>
+        <li><code>stability_stats()</code> — mean/stdev/max day-to-day headline move + extreme-day count</li>
+        <li><code>aggregate_by_day()</code> — the unique daily composite series for a window</li>
+        <li><code>compare_aggregation_estimators()</code> — estimator &times; window stability table</li>
+        <li><code>route_sensitivity()</code> — headline move if a route loses all data (SMALLER = better)</li>
+        <li><code>weight_elasticity()</code> — headline move per +0.01 route weight (which DGCA weights matter)</li>
+        <li><code>best_estimator_per_window()</code> — calmest estimator per window</li>
+      </ul>
+    </div>
+    <div class="node">
+      <div class="titre">Report</div>
+      <div class="fichier">report.py &#8594; run_report()</div>
+      <ul>
+        <li>Uses real db by default; falls back to synthetic when &lt;3 routes or &lt;5 dates</li>
+        <li>Prints: aggregation comparison, 7-day rolling comparison, route sensitivity + weight leverage</li>
+      </ul>
+      <p style="margin-top:6px"><code>python -m src.indexer.report --synthetic</code></p>
+    </div>
+  </div>
+</div>
+
+<p class="note2">This is the zoomed view of <code>docs/project-flowchart.html</code> "Phase 3". Every function here also has a line-by-line walkthrough (&rarr; <code>docs/walkthroughs/index.html</code>, files 14, 15, 23, 24, 25, 26).</p>
+
+</div>
+</body>
+</html>

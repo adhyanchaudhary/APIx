@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Walkthrough 18: src/cleaner/mock_data.py</title>
+<style>
+:root{--bg:#F08080;--card:rgba(255,255,255,0.92);--blue:#0D47A1;--blue-mid:#1565C0;--blue-light:#BBDEFB;--green:#1B5E20;--green-light:#C8E6C9;--red:#B71C1C;--red-light:#FFCDD2;--black:#1A1A2E;--grey:#546E7A}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--black);line-height:1.7}
+.wrap{max-width:900px;margin:0 auto;padding:20px}
+header{background:var(--blue);color:#fff;padding:24px 32px;border-radius:14px;margin-bottom:24px}
+header h1{font-size:1.6rem}
+header .sub{opacity:.75;margin-top:4px;font-size:.9rem}
+.card{background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:20px;border-left:6px solid var(--blue-mid)}
+.card h2{color:var(--blue);font-size:1.2rem;margin-bottom:8px}
+.line-block{margin:14px 0;border-radius:8px;overflow:hidden;border:1px solid #ddd}
+.line-header{background:var(--blue);color:#fff;padding:6px 14px;font-size:.85rem;font-weight:600}
+.line-code{background:#263238;color:#80CBC4;padding:10px 16px;font-family:'Courier New',monospace;font-size:.85rem;white-space:pre;overflow-x:auto}
+.line-explain{background:#E8F5E9;padding:10px 16px;font-size:.9rem;border-top:1px solid #C8E6C9}
+.line-explain strong{color:var(--green)}
+.line-explain code{background:#C8E6C9;padding:1px 5px;border-radius:3px;font-family:'Courier New',monospace;font-size:.85rem}
+.nav{display:flex;justify-content:space-between;margin:20px 0}
+.nav a{background:var(--blue);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem}
+.nav a:hover{background:var(--blue-mid)}
+.note{background:var(--blue-light);border-left:4px solid var(--blue);padding:10px 14px;border-radius:6px;margin:10px 0;font-size:.9rem}
+.summary{background:var(--green-light);border-left:4px solid var(--green);padding:12px 16px;border-radius:6px;margin:14px 0;color:var(--green)}
+.summary::before{content:"Key takeaway: ";font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Walkthrough 18: src/cleaner/mock_data.py</h1>
+<div class="sub">src/cleaner/mock_data.py</div>
+</header>
+<div class="nav"><a href="17-pipeline-py.html">&larr; Previous</a><a href="19-check-db-py.html">Next &rarr;</a></div>
+<div class="card">
+<h2>File Overview</h2>
+<p>Every line of this file is explained in plain English below. Code shown is read directly from the current file on disk.</p>
+</div>
+<div class="line-block">
+<div class="line-header">Line 1</div>
+<div class="line-code">import os</div>
+<div class="line-explain">Imports os for file existence checks.</div>
+</div><div class="line-block">
+<div class="line-header">Line 2</div>
+<div class="line-code">import random</div>
+<div class="line-explain">Imports random for reproducible fake data generation.</div>
+</div><div class="line-block">
+<div class="line-header">Line 3</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 4</div>
+<div class="line-code">import pandas as pd</div>
+<div class="line-explain">Imports pandas for DataFrame construction.</div>
+</div><div class="line-block">
+<div class="line-header">Line 5</div>
+<div class="line-code">from sqlalchemy import create_engine</div>
+<div class="line-explain">Imports sqlalchemy create_engine for writing mock databases.</div>
+</div><div class="line-block">
+<div class="line-header">Line 6</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 7</div>
+<div class="line-code">ROUTES = [</div>
+<div class="line-explain">ROUTES: 12 directional city-pair routes from Delhi.</div>
+</div><div class="line-block">
+<div class="line-header">Line 8</div>
+<div class="line-code">    "DEL-BOM", "DEL-BLR", "DEL-MAA", "DEL-HYD",</div>
+<div class="line-explain">Second row of routes.</div>
+</div><div class="line-block">
+<div class="line-header">Line 9</div>
+<div class="line-code">    "DEL-CCU", "DEL-PNQ", "DEL-JAI", "DEL-GOA",</div>
+<div class="line-explain">Third row of routes.</div>
+</div><div class="line-block">
+<div class="line-header">Line 10</div>
+<div class="line-code">    "DEL-AMD", "DEL-KOJ", "DEL-GAU", "DEL-SXR",</div>
+<div class="line-explain">Fourth row of routes.</div>
+</div><div class="line-block">
+<div class="line-header">Line 11</div>
+<div class="line-code">]</div>
+<div class="line-explain">Closes the ROUTES list.</div>
+</div><div class="line-block">
+<div class="line-header">Line 12</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 13</div>
+<div class="line-code">CARRIER_CODES = ["6E", "AI", "UK", "SG", "QP"]</div>
+<div class="line-explain">CARRIER_CODES: five Indian airline IATA codes.</div>
+</div><div class="line-block">
+<div class="line-header">Line 14</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 15</div>
+<div class="line-code">BASE_DATE = pd.Timestamp("2026-09-10")</div>
+<div class="line-explain">BASE_DATE: the reference date for generating 30-day fare windows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 16</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 17</div>
+<div class="line-code">EXTREME_FARES = [820, 940, 26500, 31000, 780, 880, 29000, 33500]</div>
+<div class="line-explain">EXTREME_FARES: deliberately extreme values to test outlier detection.</div>
+</div><div class="line-block">
+<div class="line-header">Line 18</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 19</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 20</div>
+<div class="line-code">def build_mock_df(seed=42):</div>
+<div class="line-explain">Defines build_mock_df: creates a realistic DataFrame with deliberate defects.</div>
+</div><div class="line-block">
+<div class="line-header">Line 21</div>
+<div class="line-code">    random.seed(seed)</div>
+<div class="line-explain">Seeds the random generator for reproducibility.</div>
+</div><div class="line-block">
+<div class="line-header">Line 22</div>
+<div class="line-code">    rows = []</div>
+<div class="line-explain">Initialises the row accumulator.</div>
+</div><div class="line-block">
+<div class="line-header">Line 23</div>
+<div class="line-code">    for route in ROUTES:</div>
+<div class="line-explain">Loops over each of the 12 routes.</div>
+</div><div class="line-block">
+<div class="line-header">Line 24</div>
+<div class="line-code">        base = random.randint(3200, 5200)</div>
+<div class="line-explain">Random base fare between 3200 and 5200.</div>
+</div><div class="line-block">
+<div class="line-header">Line 25</div>
+<div class="line-code">        for day in range(1, 31):</div>
+<div class="line-explain">Loops over 30 days of lead window.</div>
+</div><div class="line-block">
+<div class="line-header">Line 26</div>
+<div class="line-code">            fare = base + random.randint(0, 900)</div>
+<div class="line-explain">Adds random variation of up to 900 to the base fare.</div>
+</div><div class="line-block">
+<div class="line-header">Line 27</div>
+<div class="line-code">            if day &lt;= 3:</div>
+<div class="line-explain">First 3 days get a 2-4x surge multiplier (simulate last-minute pricing).</div>
+</div><div class="line-block">
+<div class="line-header">Line 28</div>
+<div class="line-code">                fare *= random.uniform(2.0, 4.0)</div>
+<div class="line-explain">Applies the surge multiplier.</div>
+</div><div class="line-block">
+<div class="line-header">Line 29</div>
+<div class="line-code">            elif day &lt;= 10:</div>
+<div class="line-explain">Days 4-10 get a 1.3-1.8x multiplier (near-term premium).</div>
+</div><div class="line-block">
+<div class="line-header">Line 30</div>
+<div class="line-code">                fare *= random.uniform(1.3, 1.8)</div>
+<div class="line-explain">Applies the near-term multiplier.</div>
+</div><div class="line-block">
+<div class="line-header">Line 31</div>
+<div class="line-code">            code = random.choice(CARRIER_CODES)</div>
+<div class="line-explain">Picks a random carrier for this row.</div>
+</div><div class="line-block">
+<div class="line-header">Line 32</div>
+<div class="line-code">            rows.append({</div>
+<div class="line-explain">Appends a flight record dict.</div>
+</div><div class="line-block">
+<div class="line-header">Line 33</div>
+<div class="line-code">                "route": route,</div>
+<div class="line-explain">Route field.</div>
+</div><div class="line-block">
+<div class="line-header">Line 34</div>
+<div class="line-code">                "carrier": code,</div>
+<div class="line-explain">Carrier field.</div>
+</div><div class="line-block">
+<div class="line-header">Line 35</div>
+<div class="line-code">                "flight_no": f"{code}{random.randint(100, 999)}",</div>
+<div class="line-explain">Flight number: carrier code plus 3-digit random number.</div>
+</div><div class="line-block">
+<div class="line-header">Line 36</div>
+<div class="line-code">                "date": (BASE_DATE + pd.Timedelta(days=day)).strftime("%Y-%m-%d"),</div>
+<div class="line-explain">Date field: offset from BASE_DATE.</div>
+</div><div class="line-block">
+<div class="line-header">Line 37</div>
+<div class="line-code">                "total_fare": round(fare, 2),</div>
+<div class="line-explain">Total fare rounded to 2 decimals.</div>
+</div><div class="line-block">
+<div class="line-header">Line 38</div>
+<div class="line-code">                "stops": random.choice([0, 0, 1, 2]),</div>
+<div class="line-explain">Stops: weighted toward 0 and 1.</div>
+</div><div class="line-block">
+<div class="line-header">Line 39</div>
+<div class="line-code">                "duration_mins": random.randint(95, 240),</div>
+<div class="line-explain">Duration between 95 and 240 minutes.</div>
+</div><div class="line-block">
+<div class="line-header">Line 40</div>
+<div class="line-code">                "status": "available",</div>
+<div class="line-explain">Status is 'available' for normal rows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 41</div>
+<div class="line-code">                "is_cancellation": False,</div>
+<div class="line-explain">Not a cancellation.</div>
+</div><div class="line-block">
+<div class="line-header">Line 42</div>
+<div class="line-code">            })</div>
+<div class="line-explain">Closes the row dict.</div>
+</div><div class="line-block">
+<div class="line-header">Line 43</div>
+<div class="line-code">    df = pd.DataFrame(rows)</div>
+<div class="line-explain">Closes the route loop and builds a DataFrame.</div>
+</div><div class="line-block">
+<div class="line-header">Line 44</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 45</div>
+<div class="line-code">    df = pd.concat([df, df.sample(15, random_state=seed).copy()], ignore_index=True)</div>
+<div class="line-explain">Adds 15 duplicate rows to test deduplication.</div>
+</div><div class="line-block">
+<div class="line-header">Line 46</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 47</div>
+<div class="line-code">    sold_out = df.sample(10, random_state=seed + 1).copy()</div>
+<div class="line-explain">Samples 10 rows and marks them as sold_out.</div>
+</div><div class="line-block">
+<div class="line-header">Line 48</div>
+<div class="line-code">    sold_out["status"] = "sold_out"</div>
+<div class="line-explain">Sets status to 'sold_out'.</div>
+</div><div class="line-block">
+<div class="line-header">Line 49</div>
+<div class="line-code">    df = pd.concat([df, sold_out], ignore_index=True)</div>
+<div class="line-explain">Appends the sold-out rows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 50</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 51</div>
+<div class="line-code">    cancelled = df.sample(6, random_state=seed + 2).copy()</div>
+<div class="line-explain">Samples 6 rows and marks them as cancellations.</div>
+</div><div class="line-block">
+<div class="line-header">Line 52</div>
+<div class="line-code">    cancelled["is_cancellation"] = True</div>
+<div class="line-explain">Sets is_cancellation to True.</div>
+</div><div class="line-block">
+<div class="line-header">Line 53</div>
+<div class="line-code">    df = pd.concat([df, cancelled], ignore_index=True)</div>
+<div class="line-explain">Appends the cancelled rows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 54</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 55</div>
+<div class="line-code">    null_fare = df.sample(8, random_state=seed + 3).copy()</div>
+<div class="line-explain">Samples 8 rows and nullifies their fares.</div>
+</div><div class="line-block">
+<div class="line-header">Line 56</div>
+<div class="line-code">    null_fare["total_fare"] = float("nan")</div>
+<div class="line-explain">Sets total_fare to NaN.</div>
+</div><div class="line-block">
+<div class="line-header">Line 57</div>
+<div class="line-code">    df = pd.concat([df, null_fare], ignore_index=True)</div>
+<div class="line-explain">Appends the null-fare rows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 58</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 59</div>
+<div class="line-code">    null_carrier = df.sample(6, random_state=seed + 4).copy()</div>
+<div class="line-explain">Samples 6 rows and nullifies their carriers.</div>
+</div><div class="line-block">
+<div class="line-header">Line 60</div>
+<div class="line-code">    null_carrier["carrier"] = None</div>
+<div class="line-explain">Sets carrier to None.</div>
+</div><div class="line-block">
+<div class="line-header">Line 61</div>
+<div class="line-code">    df = pd.concat([df, null_carrier], ignore_index=True)</div>
+<div class="line-explain">Appends the null-carrier rows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 62</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 63</div>
+<div class="line-code">    outliers = pd.DataFrame([</div>
+<div class="line-explain">Creates outlier rows with extreme fares from EXTREME_FARES.</div>
+</div><div class="line-block">
+<div class="line-header">Line 64</div>
+<div class="line-code">        {</div>
+<div class="line-explain">Dict for each outlier row.</div>
+</div><div class="line-block">
+<div class="line-header">Line 65</div>
+<div class="line-code">            "route": random.choice(ROUTES),</div>
+<div class="line-explain">Random route.</div>
+</div><div class="line-block">
+<div class="line-header">Line 66</div>
+<div class="line-code">            "carrier": random.choice(CARRIER_CODES),</div>
+<div class="line-explain">Random carrier.</div>
+</div><div class="line-block">
+<div class="line-header">Line 67</div>
+<div class="line-code">            "flight_no": "XX900",</div>
+<div class="line-explain">Fixed flight number XX900.</div>
+</div><div class="line-block">
+<div class="line-header">Line 68</div>
+<div class="line-code">            "date": (BASE_DATE + pd.Timedelta(days=2)).strftime("%Y-%m-%d"),</div>
+<div class="line-explain">Fixed date: 2 days after BASE_DATE.</div>
+</div><div class="line-block">
+<div class="line-header">Line 69</div>
+<div class="line-code">            "total_fare": fare,</div>
+<div class="line-explain">Fare from the EXTREME_FARES list.</div>
+</div><div class="line-block">
+<div class="line-header">Line 70</div>
+<div class="line-code">            "stops": random.choice([0, 1]),</div>
+<div class="line-explain">Random stops.</div>
+</div><div class="line-block">
+<div class="line-header">Line 71</div>
+<div class="line-code">            "duration_mins": random.randint(100, 220),</div>
+<div class="line-explain">Random duration.</div>
+</div><div class="line-block">
+<div class="line-header">Line 72</div>
+<div class="line-code">            "status": "available",</div>
+<div class="line-explain">Status available.</div>
+</div><div class="line-block">
+<div class="line-header">Line 73</div>
+<div class="line-code">            "is_cancellation": False,</div>
+<div class="line-explain">Not a cancellation.</div>
+</div><div class="line-block">
+<div class="line-header">Line 74</div>
+<div class="line-code">        }</div>
+<div class="line-explain">Closes the dict literal.</div>
+</div><div class="line-block">
+<div class="line-header">Line 75</div>
+<div class="line-code">        for fare in EXTREME_FARES</div>
+<div class="line-explain">List comprehension iterates over all extreme fares.</div>
+</div><div class="line-block">
+<div class="line-header">Line 76</div>
+<div class="line-code">    ])</div>
+<div class="line-explain">Closes the DataFrame constructor.</div>
+</div><div class="line-block">
+<div class="line-header">Line 77</div>
+<div class="line-code">    df = pd.concat([df, outliers], ignore_index=True)</div>
+<div class="line-explain">Appends the outlier rows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 78</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 79</div>
+<div class="line-code">    return df.sample(frac=1, random_state=seed).reset_index(drop=True)</div>
+<div class="line-explain">Shuffles all rows randomly and resets the index.</div>
+</div><div class="line-block">
+<div class="line-header">Line 80</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 81</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 82</div>
+<div class="line-code">def build_mock_db(db_path, seed=42):</div>
+<div class="line-explain">Defines build_mock_db: creates a fresh SQLite database with mock data.</div>
+</div><div class="line-block">
+<div class="line-header">Line 83</div>
+<div class="line-code">    if os.path.exists(db_path):</div>
+<div class="line-explain">Checks if the database file already exists.</div>
+</div><div class="line-block">
+<div class="line-header">Line 84</div>
+<div class="line-code">        os.remove(db_path)</div>
+<div class="line-explain">Deletes the existing file to start fresh.</div>
+</div><div class="line-block">
+<div class="line-header">Line 85</div>
+<div class="line-code">    df = build_mock_df(seed=seed)</div>
+<div class="line-explain">Builds the mock DataFrame.</div>
+</div><div class="line-block">
+<div class="line-header">Line 86</div>
+<div class="line-code">    engine = create_engine(f"sqlite:///{db_path}")</div>
+<div class="line-explain">Creates a SQLAlchemy engine.</div>
+</div><div class="line-block">
+<div class="line-header">Line 87</div>
+<div class="line-code">    df.to_sql("raw_flights", engine, if_exists="replace", index=False)</div>
+<div class="line-explain">Writes the DataFrame to the raw_flights table, replacing any existing data.</div>
+</div><div class="line-block">
+<div class="line-header">Line 88</div>
+<div class="line-code">    engine.dispose()</div>
+<div class="line-explain">Disposes the engine.</div>
+</div><div class="line-block">
+<div class="line-header">Line 89</div>
+<div class="line-code">    return df</div>
+<div class="line-explain">Returns the mock DataFrame for inspection.</div>
+</div>
+<div class="card">
+<h2>Summary</h2>
+<p>This file has <strong>89 lines</strong>, each explained above.</p>
+</div>
+<div class="nav"><a href="17-pipeline-py.html">&larr; Previous</a><a href="19-check-db-py.html">Next &rarr;</a></div>
+</div>
+</body>
+</html>

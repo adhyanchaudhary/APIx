@@ -37,96 +37,96 @@ header .sub{opacity:.75;margin-top:4px;font-size:.9rem}
 <div class="nav"><a href="04-routes-yaml.html">&larr; Previous</a><a href="06-indexer-yaml.html">Next &rarr;</a></div>
 <div class="card">
 <h2>File Overview</h2>
-<p>Below is every line of this file with an explanation of what it does and why.</p>
+<p>Every line of this file is explained in plain English below. Code shown is read directly from the current file on disk.</p>
 </div>
 <div class="line-block">
 <div class="line-header">Line 1</div>
-<div class="line-code"># -- Scraper Settings --</div>
-<div class="line-explain">Comment: all settings that control how the web scraper behaves.</div>
+<div class="line-code"># ── Scraper Settings ──</div>
+<div class="line-explain">Comment: everything in this file controls the web-scraper behaviour.</div>
 </div><div class="line-block">
 <div class="line-header">Line 2</div>
 <div class="line-code">scraper:</div>
-<div class="line-explain">Top-level YAML key. All scraper settings are children of this.</div>
+<div class="line-explain">Top-level key <code>scraper</code>. All following settings are children of it.</div>
 </div><div class="line-block">
 <div class="line-header">Line 3</div>
 <div class="line-code">  # Rate limiting</div>
-<div class="line-explain">Comment: speed limits to avoid being blocked.</div>
+<div class="line-explain">Comment: speed limits to avoid triggering anti-bot measures.</div>
 </div><div class="line-block">
 <div class="line-header">Line 4</div>
 <div class="line-code">  max_requests_per_hour: 60</div>
-<div class="line-explain">Hard limit: at most <strong>60 HTTP requests per hour</strong>. One request per minute on average.</div>
+<div class="line-explain">At most 60 requests per hour.</div>
 </div><div class="line-block">
 <div class="line-header">Line 5</div>
 <div class="line-code">  delay_between_requests:</div>
-<div class="line-explain">Sub-section defining the random delay range.</div>
+<div class="line-explain">Sub-section describing the random delay between requests.</div>
 </div><div class="line-block">
 <div class="line-header">Line 6</div>
 <div class="line-code">    min_seconds: 3</div>
-<div class="line-explain">Wait at least <strong>3 seconds</strong> between requests.</div>
+<div class="line-explain">Never wait less than 3 seconds between requests.</div>
 </div><div class="line-block">
 <div class="line-header">Line 7</div>
 <div class="line-code">    max_seconds: 8</div>
-<div class="line-explain">Wait at most <strong>8 seconds</strong>. A random value between 3-8 is picked each time.</div>
+<div class="line-explain">Never wait more than 8 seconds. The actual value is drawn uniformly at random.</div>
 </div><div class="line-block">
 <div class="line-header">Line 8</div>
 <div class="line-code"></div>
-<div class="line-explain">Empty line.</div>
+<div class="line-explain"></div>
 </div><div class="line-block">
 <div class="line-header">Line 9</div>
 <div class="line-code">  # Retry policy</div>
-<div class="line-explain">Comment: what happens when requests fail.</div>
+<div class="line-explain">Comment: what happens when a request fails.</div>
 </div><div class="line-block">
 <div class="line-header">Line 10</div>
 <div class="line-code">  max_retries: 3</div>
-<div class="line-explain">If a page fails to load, try <strong>up to 3 times</strong> before giving up.</div>
+<div class="line-explain">Try each request up to 3 times.</div>
 </div><div class="line-block">
 <div class="line-header">Line 11</div>
 <div class="line-code">  backoff_multiplier: 2     # 3s, 6s, 12s</div>
-<div class="line-explain">Each retry waits <strong>twice as long</strong> as the previous one. 1st retry: 3s. 2nd: 6s. 3rd: 12s. This is called 'exponential backoff.'</div>
+<div class="line-explain">Each retry waits twice as long: 3s, then 6s, then 12s (exponential backoff).</div>
 </div><div class="line-block">
 <div class="line-header">Line 12</div>
 <div class="line-code"></div>
-<div class="line-explain">Empty line.</div>
+<div class="line-explain"></div>
 </div><div class="line-block">
 <div class="line-header">Line 13</div>
 <div class="line-code">  # Browser settings</div>
-<div class="line-explain">Comment: how the invisible browser should behave.</div>
+<div class="line-explain">Comment: browser settings.</div>
 </div><div class="line-block">
 <div class="line-header">Line 14</div>
-<div class="line-code">  headless: true</div>
-<div class="line-explain">Run the browser <strong>without a visible window</strong>. The browser runs in the background. Set to false to watch the scraper work (useful for debugging).</div>
+<div class="line-code">  headless: false</div>
+<div class="line-explain">Run Chromium in headless mode (invisible). Set to false to watch it work while debugging.</div>
 </div><div class="line-block">
 <div class="line-header">Line 15</div>
 <div class="line-code">  viewport_width: 1280</div>
-<div class="line-explain">Browser window width in pixels. 1280 is a standard desktop width.</div>
+<div class="line-explain">Browser window width in pixels — 1280 simulates a desktop monitor.</div>
 </div><div class="line-block">
 <div class="line-header">Line 16</div>
 <div class="line-code">  viewport_height: 900</div>
-<div class="line-explain">Browser window height in pixels. Together with width, this simulates a typical monitor.</div>
+<div class="line-explain">Browser window height in pixels.</div>
 </div><div class="line-block">
 <div class="line-header">Line 17</div>
-<div class="line-code">  user_agent: "Mozilla/5.0 ..."</div>
-<div class="line-explain">The browser identifies itself to websites using a 'user agent' string. This one mimics Chrome on Windows. Some websites block requests that don't look like real browsers.</div>
+<div class="line-code">  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"</div>
+<div class="line-explain">The user-agent string identifying us as a normal Chrome/Windows browser, avoiding easy fingerprinting.</div>
 </div><div class="line-block">
 <div class="line-header">Line 18</div>
 <div class="line-code"></div>
-<div class="line-explain">Empty line.</div>
+<div class="line-explain"></div>
 </div><div class="line-block">
 <div class="line-header">Line 19</div>
 <div class="line-code">  # Timeouts (seconds)</div>
-<div class="line-explain">Comment: how long to wait before giving up.</div>
+<div class="line-explain">Comment: timeout limits in seconds.</div>
 </div><div class="line-block">
 <div class="line-header">Line 20</div>
 <div class="line-code">  page_load_timeout: 30</div>
-<div class="line-explain">If a page doesn't fully load within <strong>30 seconds</strong>, consider it failed.</div>
+<div class="line-explain">If a page has not loaded within 30 seconds, treat it as a failure.</div>
 </div><div class="line-block">
 <div class="line-header">Line 21</div>
 <div class="line-code">  element_wait_timeout: 15</div>
-<div class="line-explain">If a specific element (like a flight card) doesn't appear within <strong>15 seconds</strong>, stop waiting.</div>
+<div class="line-explain">If a specific element (like a flight card) does not appear within 15 seconds, stop waiting.</div>
 </div>
 <div class="card">
 <h2>Summary</h2>
-<p>This file has <strong>21 lines</strong>.</p>
+<p>This file has <strong>21 lines</strong>, each explained above.</p>
 </div>
 <div class="nav"><a href="04-routes-yaml.html">&larr; Previous</a><a href="06-indexer-yaml.html">Next &rarr;</a></div>
 </div>

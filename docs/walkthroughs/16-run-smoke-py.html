@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Walkthrough 16: src/scraper/run_smoke.py</title>
+<style>
+:root{--bg:#F08080;--card:rgba(255,255,255,0.92);--blue:#0D47A1;--blue-mid:#1565C0;--blue-light:#BBDEFB;--green:#1B5E20;--green-light:#C8E6C9;--red:#B71C1C;--red-light:#FFCDD2;--black:#1A1A2E;--grey:#546E7A}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--black);line-height:1.7}
+.wrap{max-width:900px;margin:0 auto;padding:20px}
+header{background:var(--blue);color:#fff;padding:24px 32px;border-radius:14px;margin-bottom:24px}
+header h1{font-size:1.6rem}
+header .sub{opacity:.75;margin-top:4px;font-size:.9rem}
+.card{background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:20px;border-left:6px solid var(--blue-mid)}
+.card h2{color:var(--blue);font-size:1.2rem;margin-bottom:8px}
+.line-block{margin:14px 0;border-radius:8px;overflow:hidden;border:1px solid #ddd}
+.line-header{background:var(--blue);color:#fff;padding:6px 14px;font-size:.85rem;font-weight:600}
+.line-code{background:#263238;color:#80CBC4;padding:10px 16px;font-family:'Courier New',monospace;font-size:.85rem;white-space:pre;overflow-x:auto}
+.line-explain{background:#E8F5E9;padding:10px 16px;font-size:.9rem;border-top:1px solid #C8E6C9}
+.line-explain strong{color:var(--green)}
+.line-explain code{background:#C8E6C9;padding:1px 5px;border-radius:3px;font-family:'Courier New',monospace;font-size:.85rem}
+.nav{display:flex;justify-content:space-between;margin:20px 0}
+.nav a{background:var(--blue);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem}
+.nav a:hover{background:var(--blue-mid)}
+.note{background:var(--blue-light);border-left:4px solid var(--blue);padding:10px 14px;border-radius:6px;margin:10px 0;font-size:.9rem}
+.summary{background:var(--green-light);border-left:4px solid var(--green);padding:12px 16px;border-radius:6px;margin:14px 0;color:var(--green)}
+.summary::before{content:"Key takeaway: ";font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Walkthrough 16: src/scraper/run_smoke.py</h1>
+<div class="sub">src/scraper/run_smoke.py</div>
+</header>
+<div class="nav"><a href="15-api-index-py.html">&larr; Previous</a><a href="17-pipeline-py.html">Next &rarr;</a></div>
+<div class="card">
+<h2>File Overview</h2>
+<p>Every line of this file is explained in plain English below. Code shown is read directly from the current file on disk.</p>
+</div>
+<div class="line-block">
+<div class="line-header">Line 1</div>
+<div class="line-code">"""Manual smoke test for the Google Flights scraper on one route.</div>
+<div class="line-explain">Module docstring: one-route smoke test.</div>
+</div><div class="line-block">
+<div class="line-header">Line 2</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 3</div>
+<div class="line-code">Run interactively (hits the live site and writes to the DB):</div>
+<div class="line-explain">Docstring: run interactively, hits the live site.</div>
+</div><div class="line-block">
+<div class="line-header">Line 4</div>
+<div class="line-code">    python -m src.scraper.run_smoke</div>
+<div class="line-explain">The command to run it.</div>
+</div><div class="line-block">
+<div class="line-header">Line 5</div>
+<div class="line-code">"""</div>
+<div class="line-explain">Close the docstring.</div>
+</div><div class="line-block">
+<div class="line-header">Line 6</div>
+<div class="line-code">import asyncio</div>
+<div class="line-explain">asyncio for the async scraper.</div>
+</div><div class="line-block">
+<div class="line-header">Line 7</div>
+<div class="line-code">import sys</div>
+<div class="line-explain">sys: lets us inject the repo root for imports.</div>
+</div><div class="line-block">
+<div class="line-header">Line 8</div>
+<div class="line-code">from pathlib import Path</div>
+<div class="line-explain">pathlib to build paths.</div>
+</div><div class="line-block">
+<div class="line-header">Line 9</div>
+<div class="line-code">from datetime import date, timedelta</div>
+<div class="line-explain">Date helpers.</div>
+</div><div class="line-block">
+<div class="line-header">Line 10</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 11</div>
+<div class="line-code">sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))</div>
+<div class="line-explain">Insert the project root at the front of sys.path so src.* imports resolve.</div>
+</div><div class="line-block">
+<div class="line-header">Line 12</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 13</div>
+<div class="line-code">from src.scraper.google_flights import GoogleFlightsScraper</div>
+<div class="line-explain">The scraper class.</div>
+</div><div class="line-block">
+<div class="line-header">Line 14</div>
+<div class="line-code">from src.scraper.run_scrape import _insert_records</div>
+<div class="line-explain">Reuse run_scrape's batch-insert helper.</div>
+</div><div class="line-block">
+<div class="line-header">Line 15</div>
+<div class="line-code">from src.storage.database import init_db</div>
+<div class="line-explain">Database init.</div>
+</div><div class="line-block">
+<div class="line-header">Line 16</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 17</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 18</div>
+<div class="line-code">async def test():</div>
+<div class="line-explain">Async test routine.</div>
+</div><div class="line-block">
+<div class="line-header">Line 19</div>
+<div class="line-code">    init_db()</div>
+<div class="line-explain">Create tables.</div>
+</div><div class="line-block">
+<div class="line-header">Line 20</div>
+<div class="line-code">    scraper = GoogleFlightsScraper()</div>
+<div class="line-explain">Instantiate the scraper.</div>
+</div><div class="line-block">
+<div class="line-header">Line 21</div>
+<div class="line-code">    travel = date.today() + timedelta(days=7)</div>
+<div class="line-explain">Travel date: 7 days from now.</div>
+</div><div class="line-block">
+<div class="line-header">Line 22</div>
+<div class="line-code">    print(f"Testing DEL -&gt; BOM, travel: {travel}")</div>
+<div class="line-explain">Print what we are testing.</div>
+</div><div class="line-block">
+<div class="line-header">Line 23</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 24</div>
+<div class="line-code">    records = await scraper.fetch_flights("DEL", "BOM", travel, 7)</div>
+<div class="line-explain">Scrape DEL -> BOM for the window-7 date.</div>
+</div><div class="line-block">
+<div class="line-header">Line 25</div>
+<div class="line-code">    print(f"\nGot {len(records)} flights\n")</div>
+<div class="line-explain">Report how many flights we got.</div>
+</div><div class="line-block">
+<div class="line-header">Line 26</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 27</div>
+<div class="line-code">    for i, r in enumerate(records[:5], 1):</div>
+<div class="line-explain">Print the first five flights.</div>
+</div><div class="line-block">
+<div class="line-header">Line 28</div>
+<div class="line-code">        print(</div>
+<div class="line-explain">Open the print call.</div>
+</div><div class="line-block">
+<div class="line-header">Line 29</div>
+<div class="line-code">            f"  {i}. {r.carrier:20s} | Rs.{r.total_fare:&gt;8.0f} "</div>
+<div class="line-explain">Rank + carrier + fare.</div>
+</div><div class="line-block">
+<div class="line-header">Line 30</div>
+<div class="line-code">            f"| {r.duration_mins:&gt;3d}min | {r.stops} stops "</div>
+<div class="line-explain">Duration + stops.</div>
+</div><div class="line-block">
+<div class="line-header">Line 31</div>
+<div class="line-code">            f"| dep {r.depart_time.strftime('%H:%M')} "</div>
+<div class="line-explain">Departure time.</div>
+</div><div class="line-block">
+<div class="line-header">Line 32</div>
+<div class="line-code">            f"| arr {r.arrive_time.strftime('%H:%M')}"</div>
+<div class="line-explain">Arrival time.</div>
+</div><div class="line-block">
+<div class="line-header">Line 33</div>
+<div class="line-code">        )</div>
+<div class="line-explain">Close the print call.</div>
+</div><div class="line-block">
+<div class="line-header">Line 34</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 35</div>
+<div class="line-code">    if records:</div>
+<div class="line-explain">If we got any records...</div>
+</div><div class="line-block">
+<div class="line-header">Line 36</div>
+<div class="line-code">        count = _insert_records(records, date.today().isoformat())</div>
+<div class="line-explain">...persist them under today's date.</div>
+</div><div class="line-block">
+<div class="line-header">Line 37</div>
+<div class="line-code">        print(f"\nInserted {count} rows into raw_flights")</div>
+<div class="line-explain">...report the inserted row count.</div>
+</div><div class="line-block">
+<div class="line-header">Line 38</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 39</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 40</div>
+<div class="line-code">if __name__ == "__main__":</div>
+<div class="line-explain">Run only when executed directly.</div>
+</div><div class="line-block">
+<div class="line-header">Line 41</div>
+<div class="line-code">    asyncio.run(test())</div>
+<div class="line-explain">Launch the async test.</div>
+</div>
+<div class="card">
+<h2>Summary</h2>
+<p>This file has <strong>41 lines</strong>, each explained above.</p>
+</div>
+<div class="nav"><a href="15-api-index-py.html">&larr; Previous</a><a href="17-pipeline-py.html">Next &rarr;</a></div>
+</div>
+</body>
+</html>

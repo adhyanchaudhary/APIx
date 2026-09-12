@@ -3,362 +3,150 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>APIx Database Visual Guide</title>
+<title>APIx — Database Visual &amp; Index Math</title>
 <style>
-:root{--bg:#F08080;--card:rgba(255,255,255,0.92);--blue:#0D47A1;--blue-mid:#1565C0;--blue-light:#BBDEFB;--green:#1B5E20;--green-light:#C8E6C9;--red:#B71C1C;--red-light:#FFCDD2;--black:#1A1A2E;--grey:#546E7A;--orange:#E65100;--orange-light:#FFE0B2;--purple:#4A148C;--purple-light:#E1BEE7}
+:root{--bg:#F08080;--card:rgba(255,255,255,0.94);--blue:#0D47A1;--blue-mid:#1565C0;--blue-light:#BBDEFB;--green:#1B5E20;--green-light:#C8E6C9;--orange:#E65100;--orange-light:#FFE0B2;--black:#1A1A2E;--grey:#546E7A}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--black);line-height:1.7}
-.wrap{max-width:1100px;margin:0 auto;padding:20px}
-header{background:var(--blue);color:#fff;padding:30px 36px;border-radius:14px;margin-bottom:28px}
-header h1{font-size:1.8rem}
-header p{opacity:.8;margin-top:6px}
-.subtitle{font-size:.95rem;opacity:.9;margin-top:4px}
-
-/* Flow diagram */
-.flow{display:flex;align-items:center;justify-content:center;gap:0;margin:30px 0;flex-wrap:wrap}
-.flow-box{background:var(--card);border-radius:14px;padding:18px 22px;text-align:center;border:3px solid var(--blue-mid);min-width:160px;position:relative}
-.flow-box h3{color:var(--blue);font-size:1rem;margin-bottom:4px}
-.flow-box p{color:var(--grey);font-size:.82rem}
-.flow-box.raw{border-color:var(--red)}
-.flow-box.raw h3{color:var(--red)}
-.flow-box.clean{border-color:var(--green)}
-.flow-box.clean h3{color:var(--green)}
-.flow-box.index{border-color:var(--orange)}
-.flow-box.index h3{color:var(--orange)}
-.flow-box.dash{border-color:var(--purple)}
-.flow-box.dash h3{color:var(--purple)}
-.arrow{font-size:1.8rem;color:var(--grey);margin:0 8px;font-weight:700}
-
-/* Table diagrams */
-.tables{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:24px 0}
-.table-box{background:var(--card);border-radius:14px;overflow:hidden;border:2px solid #ddd}
-.table-box.raw-t{border-color:var(--red)}
-.table-box.clean-t{border-color:var(--green)}
-.table-box.idx-t{border-color:var(--orange)}
-.table-box.full{grid-column:1/-1}
-.table-head{padding:14px 18px;color:#fff;font-weight:700;font-size:1rem;display:flex;align-items:center;gap:8px}
-.table-head.raw-h{background:var(--red)}
-.table-head.clean-h{background:var(--green)}
-.table-head.idx-h{background:var(--orange)}
-.table-head .badge{background:rgba(255,255,255,0.25);padding:2px 8px;border-radius:8px;font-size:.75rem;font-weight:400}
-table{width:100%;border-collapse:collapse;font-size:.88rem}
-th{background:#f5f5f5;text-align:left;padding:8px 14px;color:var(--grey);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.5px}
-td{padding:8px 14px;border-top:1px solid #eee}
-td:first-child{font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap}
-.pk{color:var(--red) !important;font-weight:700}
-.fk{color:var(--orange) !important}
-.type{color:var(--grey);font-family:'Courier New',monospace;font-size:.8rem}
-.note{background:var(--blue-light);border-left:4px solid var(--blue);padding:12px 16px;border-radius:6px;margin:14px 0;font-size:.9rem}
-.note strong{color:var(--blue)}
-.note.warn{background:var(--orange-light);border-color:var(--orange)}
-.note.warn strong{color:var(--orange)}
-.note.ok{background:var(--green-light);border-color:var(--green)}
-.note.ok strong{color:var(--green)}
-.summary-box{background:var(--card);border-radius:14px;padding:24px 28px;margin:24px 0;border-left:6px solid var(--green)}
-.summary-box h2{color:var(--green);margin-bottom:12px}
-.summary-box ul{padding-left:20px}
-.summary-box li{margin-bottom:6px}
-
-/* Column highlight */
-.col-pk{background:#FFEBEE !important}
-.col-fk{background:#FFF3E0 !important}
-.col-null{font-style:italic;color:var(--grey)}
-
-/* SQL box */
-.sql-box{background:#263238;color:#80CBC4;border-radius:10px;padding:16px 20px;margin:14px 0;font-family:'Courier New',monospace;font-size:.85rem;white-space:pre;overflow-x:auto;line-height:1.6}
-.sql-box .kw{color:#C792EA}
-.sql-box .fn{color:#82AAFF}
-.sql-box .cm{color:#546E7A;font-style:italic}
-.sql-box .st{color:#C3E88D}
-
-/* Navigation */
-.nav{display:flex;justify-content:space-between;margin:20px 0}
-.nav a{background:var(--blue);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--black);line-height:1.75}
+.wrap{max-width:960px;margin:0 auto;padding:24px}
+header{background:var(--blue);color:#fff;padding:30px 36px;border-radius:16px;margin-bottom:26px}
+header h1{font-size:2rem}
+header .sub{opacity:.82;margin-top:6px}
+.nav{display:flex;justify-content:space-between;margin:18px 0;gap:10px;flex-wrap:wrap}
+.nav a{background:var(--blue);color:#fff;padding:9px 20px;border-radius:9px;text-decoration:none;font-weight:600;font-size:.92rem}
 .nav a:hover{background:var(--blue-mid)}
-
-/* Row count visual */
-.row-bar{display:flex;align-items:center;gap:10px;margin:6px 0}
-.bar{height:22px;border-radius:6px;background:var(--blue);display:flex;align-items:center;padding:0 10px;color:#fff;font-size:.75rem;font-weight:600;min-width:30px}
-.bar-label{font-size:.85rem;color:var(--grey);min-width:100px}
+.card{background:var(--card);border-radius:16px;padding:26px 30px;margin-bottom:22px;border-left:6px solid var(--blue-mid)}
+.card h2{color:var(--blue);font-size:1.3rem;margin-bottom:12px}
+p{margin-bottom:10px}
+code{background:var(--blue-light);padding:1px 6px;border-radius:4px;font-family:'Courier New',monospace;font-size:.9em}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.88rem}
+th{background:var(--blue);color:#fff;text-align:left;padding:9px 13px;font-size:.75rem;text-transform:uppercase;letter-spacing:.5px}
+td{padding:9px 13px;border-bottom:1px solid #eee}
+tr:nth-child(even) td{background:#FAFAFA}
+.mono{font-family:'Courier New',monospace;font-weight:600;color:var(--blue);white-space:nowrap}
+.pk{color:var(--orange) !important;font-weight:700}
+.type{color:var(--grey);font-size:.8rem;font-family:'Courier New',monospace}
+.flow{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:16px 0}
+.node{background:var(--blue);color:#fff;border-radius:10px;padding:12px 14px;text-align:center;font-weight:600;font-size:.85rem;flex:1;min-width:120px}
+.node small{display:block;font-weight:400;opacity:.8}
+.arrow{color:var(--blue);font-weight:700;font-size:1.25rem}
+.formula{background:var(--green-light);border-left:5px solid var(--green);padding:14px 18px;border-radius:10px;margin:14px 0;font-family:'Courier New',monospace;font-size:.95rem;color:var(--green)}
+.note{background:var(--orange-light);border-left:4px solid var(--orange);padding:12px 16px;border-radius:8px;margin:12px 0;font-size:.92rem}
+.summary{background:var(--green-light);border-left:5px solid var(--green);padding:14px 18px;border-radius:10px;margin:14px 0;color:var(--green)}
+.math{margin:6px 0}
 </style>
 </head>
 <body>
 <div class="wrap">
-
 <header>
-<h1>APIx Database — Visual Guide</h1>
-<p>All 5 tables, their columns, relationships, and how data flows through them.</p>
-<div class="subtitle">data/apix.db — SQLite single-file database</div>
+<h1>Database Visual &amp; Index Math</h1>
+<div class="sub">Five tables in one SQLite file, and how the APIx number is actually computed</div>
 </header>
 
-<div class="nav"><a href="08-database-py.html">← Code Walkthrough</a><a href="../index.html">Back to Index →</a></div>
+<div class="nav">
+<a href="phase1-explained.html">&larr; Phase 1</a>
+<a href="scraping-flowchart.html">Scraping Flowchart &rarr;</a>
+</div>
 
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- DATA FLOW -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="table-box full" style="border-color:var(--blue)">
-<div class="table-head" style="background:var(--blue)">Data Flow — How data moves through the system</div>
-<div style="padding:20px">
+<div class="card">
+<h2>The Data Flow</h2>
 <div class="flow">
-  <div class="flow-box raw">
-    <h3>Google Flights</h3>
-    <p>Website with flight<br>prices and schedules</p>
-  </div>
-  <div class="arrow">→</div>
-  <div class="flow-box raw">
-    <h3>Scraper</h3>
-    <p>Scrapes flight data<br>from aria-labels</p>
-  </div>
-  <div class="arrow">→</div>
-  <div class="flow-box raw">
-    <h3>raw_flights</h3>
-    <p>238 rows<br>Unprocessed data</p>
-  </div>
-  <div class="arrow">→</div>
-  <div class="flow-box clean">
-    <h3>Cleaner</h3>
-    <p>Dedup, outliers,<br>quality scoring</p>
-  </div>
-  <div class="arrow">→</div>
-  <div class="flow-box clean">
-    <h3>cleaned_flights</h3>
-    <p>75 rows<br>Ready for indexing</p>
-  </div>
-  <div class="arrow">→</div>
-  <div class="flow-box index">
-    <h3>Indexer</h3>
-    <p>Weighted price<br>index formula</p>
-  </div>
-  <div class="arrow">→</div>
-  <div class="flow-box index">
-    <h3>daily_index</h3>
-    <p>Price index<br>per day per route</p>
-  </div>
-  <div class="arrow">→</div>
-  <div class="flow-box dash">
-    <h3>Dashboard</h3>
-    <p>Streamlit charts<br>and graphs</p>
-  </div>
+<div class="node">raw_flights<small>scraper output</small></div>
+<div class="arrow">&rarr;</div>
+<div class="node">cleaned_flights<small>cleaner output</small></div>
+<div class="arrow">&rarr;</div>
+<div class="node">daily_index<small>indexer</small></div>
+<div class="arrow">&rarr;</div>
+<div class="node">weekly_index<small>7-day rolling</small></div>
+<div class="arrow">&rarr;</div>
+<div class="node">monthly_index<small>30-day rolling</small></div>
 </div>
-</div>
+<p>All five tables live in <strong>one</strong> SQLite file: <code>data/apix.db</code> (created by <code>init_db()</code> in <code>src/storage/database.py</code>, 120 lines).</p>
 </div>
 
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- TABLE 1: RAW FLIGHTS -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="tables">
-<div class="table-box raw-t">
-<div class="table-head raw-h">
-  raw_flights
-  <span class="badge">Scraper writes here</span>
-</div>
+<div class="card">
+<h2>Table 1 — raw_flights (16 columns)</h2>
 <table>
-<tr><th>Column</th><th>Type</th><th>Description</th></tr>
-<tr class="col-pk"><td class="pk">id</td><td class="type">INTEGER PK</td><td>Auto-increment: 1, 2, 3...</td></tr>
-<tr><td>scrape_date</td><td class="type">TEXT NOT NULL</td><td>When scraped: "2026-09-04"</td></tr>
-<tr><td>route</td><td class="type">TEXT NOT NULL</td><td>Route code: "DEL-BOM"</td></tr>
-<tr><td>origin</td><td class="type">TEXT NOT NULL</td><td>Origin airport: "DEL"</td></tr>
-<tr><td>dest</td><td class="type">TEXT NOT NULL</td><td>Destination airport: "BOM"</td></tr>
-<tr><td>carrier</td><td class="type">TEXT</td><td>Airline: "IndiGo"</td></tr>
-<tr><td>flight_no</td><td class="type">TEXT</td><td>Flight number: "6E-201"</td></tr>
-<tr><td>depart_time</td><td class="type">TEXT</td><td>Departure: "2026-09-11 08:45:00"</td></tr>
-<tr><td>arrive_time</td><td class="type">TEXT</td><td>Arrival: "2026-09-11 10:30:00"</td></tr>
-<tr><td>duration_mins</td><td class="type">INTEGER</td><td>Flight time in minutes</td></tr>
-<tr><td>stops</td><td class="type">INTEGER</td><td>Number of stops (0, 1, 2)</td></tr>
-<tr><td>base_fare</td><td class="type">REAL</td><td>Base fare (usually 0)</td></tr>
-<tr><td>taxes</td><td class="type">REAL</td><td>Tax amount (usually 0)</td></tr>
-<tr><td>total_fare</td><td class="type">REAL</td><td>Total price in INR</td></tr>
-<tr><td>currency</td><td class="type">TEXT</td><td>"INR" (default)</td></tr>
-<tr><td>lead_window_days</td><td class="type">INTEGER NOT NULL</td><td>Days ahead: 1, 7, or 30</td></tr>
-<tr><td>scrape_timestamp</td><td class="type">TEXT NOT NULL</td><td>Full timestamp</td></tr>
+<tr><th>Column</th><th>Type</th><th>Notes</th></tr>
+<tr><td class="mono pk">id</td><td class="type">INTEGER PRIMARY KEY</td><td>auto-increment</td></tr>
+<tr><td class="mono">scrape_date</td><td class="type">TEXT NOT NULL</td><td>the day we scraped</td></tr>
+<tr><td class="mono">route</td><td class="type">TEXT NOT NULL</td><td>e.g. "DEL-BOM"</td></tr>
+<tr><td class="mono">origin</td><td class="type">TEXT NOT NULL</td><td>"DEL"</td></tr>
+<tr><td class="mono">dest</td><td class="type">TEXT NOT NULL</td><td>"BOM"</td></tr>
+<tr><td class="mono">carrier</td><td class="type">TEXT</td><td>e.g. "IndiGo"</td></tr>
+<tr><td class="mono">flight_no</td><td class="type">TEXT</td><td>e.g. "6E-201" (may be "N/A")</td></tr>
+<tr><td class="mono">depart_time</td><td class="type">TEXT</td><td>"YYYY-MM-DD HH:MM:SS"</td></tr>
+<tr><td class="mono">arrive_time</td><td class="type">TEXT</td><td>"YYYY-MM-DD HH:MM:SS"</td></tr>
+<tr><td class="mono">duration_mins</td><td class="type">INTEGER</td><td>minutes</td></tr>
+<tr><td class="mono">stops</td><td class="type">INTEGER</td><td>0&ndash;2</td></tr>
+<tr><td class="mono">base_fare</td><td class="type">REAL</td><td></td></tr>
+<tr><td class="mono">taxes</td><td class="type">REAL</td><td></td></tr>
+<tr><td class="mono">total_fare</td><td class="type">REAL</td><td>the price we index on</td></tr>
+<tr><td class="mono">currency</td><td class="type">TEXT DEFAULT 'INR'</td><td></td></tr>
+<tr><td class="mono">lead_window_days</td><td class="type">INTEGER NOT NULL</td><td>1, 7, or 30</td></tr>
+<tr><td class="mono">scrape_timestamp</td><td class="type">TEXT NOT NULL</td><td>full timestamp</td></tr>
 </table>
 </div>
 
-<div class="table-box clean-t">
-<div class="table-head clean-h">
-  cleaned_flights
-  <span class="badge">Cleaner writes here</span>
-</div>
+<div class="card">
+<h2>Table 2 — cleaned_flights (21 columns)</h2>
 <table>
-<tr><th>Column</th><th>Type</th><th>Description</th></tr>
-<tr class="col-pk"><td class="pk">id</td><td class="type">INTEGER PK</td><td>Auto-increment</td></tr>
-<tr><td>scrape_date</td><td class="type">TEXT NOT NULL</td><td>When scraped</td></tr>
-<tr><td>route</td><td class="type">TEXT NOT NULL</td><td>Route code</td></tr>
-<tr><td>origin</td><td class="type">TEXT NOT NULL</td><td>Origin airport</td></tr>
-<tr><td>dest</td><td class="type">TEXT NOT NULL</td><td>Destination airport</td></tr>
-<tr><td>carrier</td><td class="type">TEXT</td><td>Airline name</td></tr>
-<tr><td>flight_no</td><td class="type">TEXT</td><td>Flight number</td></tr>
-<tr><td>depart_time</td><td class="type">TEXT</td><td>Departure time</td></tr>
-<tr><td>arrive_time</td><td class="type">TEXT</td><td>Arrival time</td></tr>
-<tr><td>duration_mins</td><td class="type">INTEGER</td><td>Duration in minutes</td></tr>
-<tr><td>stops</td><td class="type">INTEGER</td><td>Number of stops</td></tr>
-<tr><td>base_fare</td><td class="type">REAL</td><td>Base fare</td></tr>
-<tr><td>taxes</td><td class="type">REAL</td><td>Taxes</td></tr>
-<tr><td>total_fare</td><td class="type">REAL</td><td>Total fare in INR</td></tr>
-<tr><td>currency</td><td class="type">TEXT</td><td>"INR"</td></tr>
-<tr><td>lead_window_days</td><td class="type">INTEGER NOT NULL</td><td>Days ahead</td></tr>
-<tr><td>scrape_timestamp</td><td class="type">TEXT NOT NULL</td><td>Full timestamp</td></tr>
-<tr style="background:#E8F5E9"><td><strong>quality_score</strong></td><td class="type">REAL</td><td>Data quality: 0.0 to 1.0</td></tr>
-<tr style="background:#E8F5E9"><td><strong>is_outlier</strong></td><td class="type">INTEGER</td><td>0 = normal, 1 = outlier</td></tr>
-<tr style="background:#E8F5E9"><td><strong>dedup_hash</strong></td><td class="type">TEXT</td><td>MD5 fingerprint for dedup</td></tr>
-</table>
-</div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- TABLE 2: DAILY INDEX -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="tables">
-<div class="table-box idx-t full">
-<div class="table-head idx-h">
-  daily_index
-  <span class="badge">Indexer writes here — one row per route per day</span>
-</div>
-<table>
-<tr><th>Column</th><th>Type</th><th>Description</th></tr>
-<tr class="col-pk"><td class="pk">id</td><td class="type">INTEGER PK</td><td>Auto-increment</td></tr>
-<tr><td>index_date</td><td class="type">TEXT NOT NULL</td><td>The date this index was calculated: "2026-09-04"</td></tr>
-<tr><td>route</td><td class="type">TEXT NOT NULL</td><td>Which route: "DEL-BOM"</td></tr>
-<tr><td>weight</td><td class="type">REAL</td><td>Traffic share weight: 0.30 for DEL-BOM</td></tr>
-<tr><td>route_price</td><td class="type">REAL</td><td>Lowest fare on this route today</td></tr>
-<tr><td>route_index</td><td class="type">REAL</td><td>This route's index: (today_price / base_price) × 100</td></tr>
-<tr><td>aggregate_index</td><td class="type">REAL</td><td>Overall weighted index across all routes</td></tr>
-<tr><td>base_period</td><td class="type">TEXT</td><td>Reference date for index = 100</td></tr>
-</table>
-</div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- WEEKLY & MONTHLY INDEX -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="tables">
-<div class="table-box idx-t">
-<div class="table-head idx-h">
-  weekly_index
-  <span class="badge">Same structure as daily_index</span>
-</div>
-<table>
-<tr><th>Column</th><th>Type</th><th>Description</th></tr>
-<tr class="col-pk"><td class="pk">id</td><td class="type">INTEGER PK</td><td>Auto-increment</td></tr>
-<tr><td>index_date</td><td class="type">TEXT NOT NULL</td><td>Week ending date</td></tr>
-<tr><td>route</td><td class="type">TEXT NOT NULL</td><td>Route code</td></tr>
-<tr><td>weight</td><td class="type">REAL</td><td>Traffic weight</td></tr>
-<tr><td>route_price</td><td class="type">REAL</td><td>Avg lowest fare for the week</td></tr>
-<tr><td>route_index</td><td class="type">REAL</td><td>Route index for the week</td></tr>
-<tr><td>aggregate_index</td><td class="type">REAL</td><td>Weighted aggregate for the week</td></tr>
-<tr><td>base_period</td><td class="type">TEXT</td><td>Reference date</td></tr>
+<tr><th>Column</th><th>Type</th><th>Notes</th></tr>
+<tr><td class="mono pk">id</td><td class="type">INTEGER PRIMARY KEY</td><td></td></tr>
+<tr><td class="mono">scrape_date &hellip; scrape_timestamp</td><td class="type">&hellip;</td><td>same base columns as raw_flights</td></tr>
+<tr><td class="mono">quality_score</td><td class="type">REAL</td><td>1.0 &minus; penalties for missing fields / bad stops</td></tr>
+<tr><td class="mono">is_outlier</td><td class="type">INTEGER DEFAULT 0</td><td>1 if flagged by IQR</td></tr>
+<tr><td class="mono">dedup_hash</td><td class="type">TEXT</td><td>MD5 of route|carrier|depart_time|fare|window</td></tr>
+<tr><td class="mono">extraction_batch_id</td><td class="type">TEXT</td><td>(placeholder for future batches)</td></tr>
 </table>
 </div>
 
-<div class="table-box idx-t">
-<div class="table-head idx-h">
-  monthly_index
-  <span class="badge">Same structure as daily_index</span>
-</div>
+<div class="card">
+<h2>Tables 3&ndash;5 — daily / weekly / monthly index (8 columns each)</h2>
 <table>
-<tr><th>Column</th><th>Type</th><th>Description</th></tr>
-<tr class="col-pk"><td class="pk">id</td><td class="type">INTEGER PK</td><td>Auto-increment</td></tr>
-<tr><td>index_date</td><td class="type">TEXT NOT NULL</td><td>Month: "2026-09"</td></tr>
-<tr><td>route</td><td class="type">TEXT NOT NULL</td><td>Route code</td></tr>
-<tr><td>weight</td><td class="type">REAL</td><td>Traffic weight</td></tr>
-<tr><td>route_price</td><td class="type">REAL</td><td>Avg lowest fare for the month</td></tr>
-<tr><td>route_index</td><td class="type">REAL</td><td>Route index for the month</td></tr>
-<tr><td>aggregate_index</td><td class="type">REAL</td><td>Weighted aggregate for the month</td></tr>
-<tr><td>base_period</td><td class="type">TEXT</td><td>Reference date</td></tr>
+<tr><th>Column</th><th>Type</th><th>Example</th></tr>
+<tr><td class="mono pk">id</td><td class="type">INTEGER PRIMARY KEY</td><td></td></tr>
+<tr><td class="mono">index_date</td><td class="type">TEXT NOT NULL</td><td>"2026-09-05"</td></tr>
+<tr><td class="mono">lead_window_days</td><td class="type">INTEGER NOT NULL</td><td>7</td></tr>
+<tr><td class="mono">route</td><td class="type">TEXT NOT NULL</td><td>"DEL-BOM"</td></tr>
+<tr><td class="mono">weight</td><td class="type">REAL</td><td>0.10</td></tr>
+<tr><td class="mono">route_price</td><td class="type">REAL</td><td>12000.0 (min fare)</td></tr>
+<tr><td class="mono">route_index</td><td class="type">REAL</td><td>100.0 on base day</td></tr>
+<tr><td class="mono">aggregate_index</td><td class="type">REAL</td><td>weighted basket value</td></tr>
+<tr><td class="mono">base_period</td><td class="type">TEXT</td><td>"2026-09-01" (first date with data)</td></tr>
 </table>
-</div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- INDEX FORMULA -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="table-box full" style="border-color:var(--orange)">
-<div class="table-head" style="background:var(--orange)">How the Index is Calculated</div>
-<div style="padding:20px">
-<p style="margin-bottom:12px"><strong>Step 1:</strong> For each route, find the lowest fare today:</p>
-<div class="sql-box"><span class="kw">SELECT</span> route, <span class="fn">MIN</span>(total_fare) <span class="kw">AS</span> route_price
-<span class="kw">FROM</span> cleaned_flights
-<span class="kw">WHERE</span> scrape_date = <span class="st">'2026-09-04'</span>
-<span class="kw">GROUP BY</span> route;</div>
-
-<p style="margin:12px 0"><strong>Step 2:</strong> Calculate route index (base day = 100):</p>
-<div class="sql-box">route_index = (today_price / base_price) × 100
-
-<span class="cm">Example: DEL-BOM</span>
-<span class="cm">Base price (day 1): ₹12,442  →  route_index = 100.00</span>
-<span class="cm">Today's price:      ₹12,882  →  route_index = 103.54</span>
-<span class="cm">                    (12882 / 12442) × 100 = 103.54</span></div>
-
-<p style="margin:12px 0"><strong>Step 3:</strong> Calculate aggregate index (weighted average):</p>
-<div class="sql-box">aggregate_index = Σ (route_index × weight) / Σ weight
-
-<span class="cm">Example with 4 routes:</span>
-<span class="cm">DEL-BOM:  route_index=103.54, weight=0.30  →  31.06</span>
-<span class="cm">DEL-BLR:  route_index=98.20,  weight=0.20  →  19.64</span>
-<span class="cm">BOM-BLR:  route_index=101.80, weight=0.25  →  25.45</span>
-<span class="cm">BOM-MAA:  route_index=99.50,  weight=0.15  →  14.93</span>
-<span class="cm">────────────────────────────────────────────────────</span>
-<span class="cm">aggregate_index = (31.06 + 19.64 + 25.45 + 14.93) / (0.30+0.20+0.25+0.15)</span>
-<span class="cm">                = 91.08 / 0.90 = 101.20</span></div>
-</div>
+<div class="note"><strong>Idempotency:</strong> <code>write_index()</code> deletes the existing rows for a given <code>(index_date, lead_window_days)</code> before inserting, so re-running a day replaces rather than duplicates.</div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- ROUTE WEIGHTS -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="table-box full" style="border-color:var(--green)">
-<div class="table-head" style="background:var(--green)">Route Weights — From DGCA Passenger Traffic Data</div>
-<div style="padding:20px">
-<p style="margin-bottom:14px">These weights represent what % of India's air traffic each route carries:</p>
+<div class="card">
+<h2>Step-by-Step: How a Daily Index Row Is Computed</h2>
+<p><span class="arrow">&rarr;</span> <strong>Step 1</strong> — Collapse cleaned rows to the <em>minimum</em> fare per <code>(route, lead_window_days, scrape_date)</code>. Rows with <code>is_outlier = 1</code> are excluded.</p>
+<p><span class="arrow">&rarr;</span> <strong>Step 2</strong> — Within each window, the <em>first date with data</em> becomes the base period: <code>P&#8320;</code> per route.</p>
+<p><span class="arrow">&rarr;</span> <strong>Step 3</strong> — For each later day, compute the route index and the weighted aggregate:</p>
 
-<div class="row-bar">
-  <div class="bar-label"><strong>DEL ↔ BOM</strong></div>
-  <div class="bar" style="width:300px;background:var(--red)">30% — Heaviest route</div>
-</div>
-<div class="row-bar">
-  <div class="bar-label"><strong>BOM ↔ BLR</strong></div>
-  <div class="bar" style="width:250px;background:var(--orange)">25%</div>
-</div>
-<div class="row-bar">
-  <div class="bar-label"><strong>DEL ↔ BLR</strong></div>
-  <div class="bar" style="width:200px;background:var(--blue-mid)">20%</div>
-</div>
-<div class="row-bar">
-  <div class="bar-label"><strong>DEL ↔ MAA</strong></div>
-  <div class="bar" style="width:100px;background:var(--green)">10%</div>
-</div>
-<div class="row-bar">
-  <div class="bar-label"><strong>BOM ↔ MAA</strong></div>
-  <div class="bar" style="width:100px;background:var(--green)">10%</div>
-</div>
-<div class="row-bar">
-  <div class="bar-label"><strong>BLR ↔ MAA</strong></div>
-  <div class="bar" style="width:50px;background:var(--grey)">5%</div>
+<div class="formula">route_index<sub>i</sub>(t) = P<sub>i</sub>(t) / P<sub>i</sub>(0) &times; 100<br>aggregate_index(t) = &Sigma;<sub>i</sub> route_index<sub>i</sub>(t) &times; w<sub>i</sub></div>
+
+<p><strong>Worked example</strong> — day 3, window 1, using the <em>current</em> weight basket (3 of the 12 routes shown):</p>
+<table>
+<tr><th>Route</th><th>P(0) base</th><th>P(t) today</th><th>route_index</th><th>weight</th><th>contribution</th></tr>
+<tr><td class="mono">DEL-BOM</td><td>5000</td><td>4900</td><td>98.00</td><td>0.10</td><td>9.80</td></tr>
+<tr><td class="mono">DEL-BLR</td><td>6000</td><td>6100</td><td>101.67</td><td>0.09</td><td>9.15</td></tr>
+<tr><td class="mono">BOM-BLR</td><td>3500</td><td>3700</td><td>105.71</td><td>0.10</td><td>10.57</td></tr>
+<tr><td colspan="5" style="text-align:right"><strong>aggregate (partial, 3 routes)</strong></td><td><strong>29.52</strong></td></tr>
+</table>
+<p>In the real code, the aggregate is summed over <em>all available</em> routes; missing routes contribute 0 and weights are <strong>never re-normalised</strong>.</p>
 </div>
 
-<div class="note" style="margin-top:16px">
-<strong>Why weights matter:</strong> A price jump on DEL-BOM (30%) affects the index 6× more than the same jump on BLR-MAA (5%). This mirrors real economic impact — more passengers = more consumer spending affected.
-</div>
-</div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- SUMMARY -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="summary-box">
-<h2>Summary</h2>
+<div class="card">
+<h2>Rolling Views</h2>
+<p>Weekly and monthly indices are simply moving means of the daily <code>route_price</code>, <code>route_index</code>, and <code>aggregate_index</code>, computed per window with <code>window=7</code> and <code>window=30</code> respectively, and <code>min_periods=1</code> so early days still produce a value.</p>
 <ul>
-<li><strong>5 tables</strong>, all in one SQLite file: <code>data/apix.db</code></li>
-<li><strong>raw_flights</strong> — Scraper dumps everything here (238 rows now)</li>
-<li><strong>cleaned_flights</strong> — After dedup + outlier detection (75 rows now)</li>
-<li><strong>daily_index</strong> — The actual APIx index number, per route, per day</li>
-<li><strong>weekly_index</strong> / <strong>monthly_index</strong> — Aggregated versions</li>
-<li><strong>Index formula:</strong> (today_price / base_price) × 100, weighted by traffic share</li>
-<li><strong>Index = 100</strong> on the first day of data. Above 100 = prices went up. Below = prices went down.</li>
+<li><code>run_index.py</code> reads cleaned_flights &rarr; computes daily &rarr; rolls to weekly/monthly &rarr; writes all three tables.</li>
+<li>All math lives in <code>src/indexer/api_index.py</code> (204 lines); the CLI wrapper is <code>src/indexer/run_index.py</code> (80 lines).</li>
 </ul>
 </div>
 
-<div class="nav" style="margin-top:30px"><a href="08-database-py.html">← Code Walkthrough</a><a href="../index.html">Back to Index →</a></div>
+<div class="summary"><strong>Key takeaway:</strong> one SQLite file &rarr; one progression. raw &rarr; cleaned &rarr; daily &rarr; weekly &rarr; monthly. The base day is always 100, and the weights in <code>config/indexer.yaml</code> decide exactly how much each route moves the aggregate.</div>
 
 </div>
 </body>

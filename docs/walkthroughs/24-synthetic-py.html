@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Walkthrough 24: src/indexer/synthetic.py</title>
+<style>
+:root{--bg:#F08080;--card:rgba(255,255,255,0.92);--blue:#0D47A1;--blue-mid:#1565C0;--blue-light:#BBDEFB;--green:#1B5E20;--green-light:#C8E6C9;--red:#B71C1C;--red-light:#FFCDD2;--black:#1A1A2E;--grey:#546E7A}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--black);line-height:1.7}
+.wrap{max-width:900px;margin:0 auto;padding:20px}
+header{background:var(--blue);color:#fff;padding:24px 32px;border-radius:14px;margin-bottom:24px}
+header h1{font-size:1.6rem}
+header .sub{opacity:.75;margin-top:4px;font-size:.9rem}
+.card{background:var(--card);border-radius:14px;padding:24px 28px;margin-bottom:20px;border-left:6px solid var(--blue-mid)}
+.card h2{color:var(--blue);font-size:1.2rem;margin-bottom:8px}
+.line-block{margin:14px 0;border-radius:8px;overflow:hidden;border:1px solid #ddd}
+.line-header{background:var(--blue);color:#fff;padding:6px 14px;font-size:.85rem;font-weight:600}
+.line-code{background:#263238;color:#80CBC4;padding:10px 16px;font-family:'Courier New',monospace;font-size:.85rem;white-space:pre;overflow-x:auto}
+.line-explain{background:#E8F5E9;padding:10px 16px;font-size:.9rem;border-top:1px solid #C8E6C9}
+.line-explain strong{color:var(--green)}
+.line-explain code{background:#C8E6C9;padding:1px 5px;border-radius:3px;font-family:'Courier New',monospace;font-size:.85rem}
+.nav{display:flex;justify-content:space-between;margin:20px 0}
+.nav a{background:var(--blue);color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem}
+.nav a:hover{background:var(--blue-mid)}
+.note{background:var(--blue-light);border-left:4px solid var(--blue);padding:10px 14px;border-radius:6px;margin:10px 0;font-size:.9rem}
+.summary{background:var(--green-light);border-left:4px solid var(--green);padding:12px 16px;border-radius:6px;margin:14px 0;color:var(--green)}
+.summary::before{content:"Key takeaway: ";font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Walkthrough 24: src/indexer/synthetic.py</h1>
+<div class="sub">src/indexer/synthetic.py</div>
+</header>
+<div class="nav"><a href="23-estimators-py.html">&larr; Previous</a><a href="25-metrics-py.html">Next &rarr;</a></div>
+<div class="card">
+<h2>File Overview</h2>
+<p>Every line of this file is explained in plain English below. Code shown is read directly from the current file on disk.</p>
+</div>
+<div class="line-block">
+<div class="line-header">Line 1</div>
+<div class="line-code">"""Deterministic synthetic cleaned-flights generator for estimator research.</div>
+<div class="line-explain">Module docstring: a deterministic synthetic cleaned-flights generator for estimator research.</div>
+</div><div class="line-block">
+<div class="line-header">Line 2</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 3</div>
+<div class="line-code">Produces a realistic-ish multi-route multi-window scrape: an upward price</div>
+<div class="line-explain">Docstring: produces a realistic multi-route multi-window scrape...</div>
+</div><div class="line-block">
+<div class="line-header">Line 4</div>
+<div class="line-code">drift, weekly seasonality (weekends cost more), small route-level wobble,</div>
+<div class="line-explain">...with an upward price drift, weekly seasonality (weekends cost more)...</div>
+</div><div class="line-block">
+<div class="line-header">Line 5</div>
+<div class="line-code">occasional sharp spikes, and deliberate coverage gaps so the carry-forward</div>
+<div class="line-explain">...small route-level wobble, occasional sharp spikes...</div>
+</div><div class="line-block">
+<div class="line-header">Line 6</div>
+<div class="line-code">logic gets exercised. Output uses the ``cleaned_flights`` column schema.</div>
+<div class="line-explain">...and deliberate coverage gaps so carry-forward gets exercised.</div>
+</div><div class="line-block">
+<div class="line-header">Line 7</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 8</div>
+<div class="line-code">Seeded, so re-running yields identical data — the mean-vs-trimmed-vs-median</div>
+<div class="line-explain">Docstring: output uses the cleaned_flights column schema.</div>
+</div><div class="line-block">
+<div class="line-header">Line 9</div>
+<div class="line-code">comparison in ``report.py`` is reproducible.</div>
+<div class="line-explain">Docstring: seeded, so re-running yields identical data...</div>
+</div><div class="line-block">
+<div class="line-header">Line 10</div>
+<div class="line-code">"""</div>
+<div class="line-explain">...making the mean-vs-trimmed-vs-median comparison reproducible.</div>
+</div><div class="line-block">
+<div class="line-header">Line 11</div>
+<div class="line-code">from __future__ import annotations</div>
+<div class="line-explain">Closes the module docstring.</div>
+</div><div class="line-block">
+<div class="line-header">Line 12</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 13</div>
+<div class="line-code">import random</div>
+<div class="line-explain">Enables forward type annotations.</div>
+</div><div class="line-block">
+<div class="line-header">Line 14</div>
+<div class="line-code">from datetime import date, timedelta</div>
+<div class="line-explain">Imports random for the seeded generator.</div>
+</div><div class="line-block">
+<div class="line-header">Line 15</div>
+<div class="line-code">from typing import Sequence</div>
+<div class="line-explain">Imports date and timedelta for date arithmetic.</div>
+</div><div class="line-block">
+<div class="line-header">Line 16</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 17</div>
+<div class="line-code">import pandas as pd</div>
+<div class="line-explain">Imports Sequence for the windows parameter.</div>
+</div><div class="line-block">
+<div class="line-header">Line 18</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 19</div>
+<div class="line-code">ROUTES = [</div>
+<div class="line-explain">Imports pandas for DataFrame construction.</div>
+</div><div class="line-block">
+<div class="line-header">Line 20</div>
+<div class="line-code">    "DEL-BOM", "BOM-DEL", "DEL-BLR", "BLR-DEL", "DEL-MAA", "MAA-DEL",</div>
+<div class="line-explain">ROUTES: the 12 directional city-pair routes (opened).</div>
+</div><div class="line-block">
+<div class="line-header">Line 21</div>
+<div class="line-code">    "BOM-BLR", "BLR-BOM", "BOM-MAA", "MAA-BOM", "BLR-MAA", "MAA-BLR",</div>
+<div class="line-explain">First six routes — Delhi outbound and return legs.</div>
+</div><div class="line-block">
+<div class="line-header">Line 22</div>
+<div class="line-code">]</div>
+<div class="line-explain">Second six routes — the rest of the city pairs.</div>
+</div><div class="line-block">
+<div class="line-header">Line 23</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 24</div>
+<div class="line-code">BASE_PRICES = {</div>
+<div class="line-explain">Closes the ROUTES list.</div>
+</div><div class="line-block">
+<div class="line-header">Line 25</div>
+<div class="line-code">    "DEL-BOM": 5200, "BOM-DEL": 5100, "DEL-BLR": 4600, "BLR-DEL": 4500,</div>
+<div class="line-explain">BASE_PRICES: a realistic base fare per route (opened).</div>
+</div><div class="line-block">
+<div class="line-header">Line 26</div>
+<div class="line-code">    "DEL-MAA": 4800, "MAA-DEL": 4700, "BOM-BLR": 4200, "BLR-BOM": 4100,</div>
+<div class="line-explain">DEL routes ~5100-5200, BLR routes ~4500-4600.</div>
+</div><div class="line-block">
+<div class="line-header">Line 27</div>
+<div class="line-code">    "BOM-MAA": 4400, "MAA-BOM": 4300, "BLR-MAA": 3900, "MAA-BLR": 3800,</div>
+<div class="line-explain">MAA and BOM routes ~4300-4800.</div>
+</div><div class="line-block">
+<div class="line-header">Line 28</div>
+<div class="line-code">}</div>
+<div class="line-explain">MAA-BLR routes ~3800-3900.</div>
+</div><div class="line-block">
+<div class="line-header">Line 29</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 30</div>
+<div class="line-code">WINDOWS = [1, 7, 30]</div>
+<div class="line-explain">Closes the BASE_PRICES dict.</div>
+</div><div class="line-block">
+<div class="line-header">Line 31</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 32</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 33</div>
+<div class="line-code">def _base_date() -&gt; date:</div>
+<div class="line-explain">WINDOWS: the three booking lead windows to generate.</div>
+</div><div class="line-block">
+<div class="line-header">Line 34</div>
+<div class="line-code">    return date(2026, 8, 1)</div>
+<div class="line-explain">Defines _base_date: the anchor date of the synthetic period.</div>
+</div><div class="line-block">
+<div class="line-header">Line 35</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 36</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 37</div>
+<div class="line-code">def make_synthetic_cleaned(</div>
+<div class="line-explain">August 1st, 2026 — the shared base for every series.</div>
+</div><div class="line-block">
+<div class="line-header">Line 38</div>
+<div class="line-code">    seed: int = 7,</div>
+<div class="line-explain">Defines make_synthetic_cleaned: the public seeded generator.</div>
+</div><div class="line-block">
+<div class="line-header">Line 39</div>
+<div class="line-code">    days: int = 15,</div>
+<div class="line-explain">Parameter: the random seed (default 7).</div>
+</div><div class="line-block">
+<div class="line-header">Line 40</div>
+<div class="line-code">    windows: Sequence[int] = WINDOWS,</div>
+<div class="line-explain">Parameter: number of days per route+window (default 15).</div>
+</div><div class="line-block">
+<div class="line-header">Line 41</div>
+<div class="line-code">    spike_prob: float = 0.03,</div>
+<div class="line-explain">Parameter: the lead windows to simulate.</div>
+</div><div class="line-block">
+<div class="line-header">Line 42</div>
+<div class="line-code">) -&gt; pd.DataFrame:</div>
+<div class="line-explain">Parameter: probability of a sharp fare spike (default 3%).</div>
+</div><div class="line-block">
+<div class="line-header">Line 43</div>
+<div class="line-code">    """Build a seeded cleaned_flights DataFrame.</div>
+<div class="line-explain">Return type: a cleaned_flights-shaped DataFrame.</div>
+</div><div class="line-block">
+<div class="line-header">Line 44</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 45</div>
+<div class="line-code">    Price model per (route, window, day):</div>
+<div class="line-explain">Docstring (first line).</div>
+</div><div class="line-block">
+<div class="line-header">Line 46</div>
+<div class="line-code">        drift (slow rise) × weekend bump × small wobble,</div>
+<div class="line-explain">Docstring: price model per (route, window, day).</div>
+</div><div class="line-block">
+<div class="line-header">Line 47</div>
+<div class="line-code">    plus a ~``spike_prob`` chance of a sharp spike (a promo/fare glitch),</div>
+<div class="line-explain">Docstring: drift (slow rise) × weekend bump × small wobble.</div>
+</div><div class="line-block">
+<div class="line-header">Line 48</div>
+<div class="line-code">    and one deliberate coverage gap day per route+window.</div>
+<div class="line-explain">Docstring: plus a chance of a sharp spike (promo/fare glitch)...</div>
+</div><div class="line-block">
+<div class="line-header">Line 49</div>
+<div class="line-code">    """</div>
+<div class="line-explain">...and one deliberate coverage gap day per route+window.</div>
+</div><div class="line-block">
+<div class="line-header">Line 50</div>
+<div class="line-code">    rng = random.Random(seed)</div>
+<div class="line-explain">Closes the docstring.</div>
+</div><div class="line-block">
+<div class="line-header">Line 51</div>
+<div class="line-code">    start = _base_date()</div>
+<div class="line-explain">Seeded random generator — reproducible output.</div>
+</div><div class="line-block">
+<div class="line-header">Line 52</div>
+<div class="line-code">    rows: list[dict] = []</div>
+<div class="line-explain">The anchor date for all series.</div>
+</div><div class="line-block">
+<div class="line-header">Line 53</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 54</div>
+<div class="line-code">    for window in windows:</div>
+<div class="line-explain">Row accumulator.</div>
+</div><div class="line-block">
+<div class="line-header">Line 55</div>
+<div class="line-code">        for gap_offset, route in enumerate(ROUTES):</div>
+<div class="line-explain">Loops over each lead window.</div>
+</div><div class="line-block">
+<div class="line-header">Line 56</div>
+<div class="line-code">            # Coverage gap mid-series (never day 0 — that would orphan the</div>
+<div class="line-explain">Loops over the routes, with an offset per route.</div>
+</div><div class="line-block">
+<div class="line-header">Line 57</div>
+<div class="line-code">            # route from the base period — and never the last day).</div>
+<div class="line-explain">Comment: coverage gap mid-series (never day 0, never the last day)...</div>
+</div><div class="line-block">
+<div class="line-header">Line 58</div>
+<div class="line-code">            gap_day = 1 + (gap_offset % max(days - 3, 1))</div>
+<div class="line-explain">...so the route is never orphaned from its base period.</div>
+</div><div class="line-block">
+<div class="line-header">Line 59</div>
+<div class="line-code">            for d in range(days):</div>
+<div class="line-explain">The gap day for this route, cycled so it stays inside the window.</div>
+</div><div class="line-block">
+<div class="line-header">Line 60</div>
+<div class="line-code">                # Deliberate coverage gap: one missing day per route+window.</div>
+<div class="line-explain">Loops over each day in the window.</div>
+</div><div class="line-block">
+<div class="line-header">Line 61</div>
+<div class="line-code">                if d == gap_day:</div>
+<div class="line-explain">Comment: deliberate coverage gap — one missing day per route+window.</div>
+</div><div class="line-block">
+<div class="line-header">Line 62</div>
+<div class="line-code">                    continue</div>
+<div class="line-explain">This is the gap day...</div>
+</div><div class="line-block">
+<div class="line-header">Line 63</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 64</div>
+<div class="line-code">                year, month, day = _add_days(start, d).timetuple()[:3]</div>
+<div class="line-explain">...skip it.</div>
+</div><div class="line-block">
+<div class="line-header">Line 65</div>
+<div class="line-code">                date_str = f"{year:04d}-{month:02d}-{day:02d}"</div>
+<div class="line-explain">Splits the shifted date into year, month, day components.</div>
+</div><div class="line-block">
+<div class="line-header">Line 66</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 67</div>
+<div class="line-code">                base = BASE_PRICES[route]</div>
+<div class="line-explain">Formats the date as YYYY-MM-DD.</div>
+</div><div class="line-block">
+<div class="line-header">Line 68</div>
+<div class="line-code">                drift = 1.0 + 0.015 * d</div>
+<div class="line-explain">The route's base price.</div>
+</div><div class="line-block">
+<div class="line-header">Line 69</div>
+<div class="line-code">                weekend = 1.08 if d % 7 in (5, 6) else 1.0</div>
+<div class="line-explain">Slow upward drift over time.</div>
+</div><div class="line-block">
+<div class="line-header">Line 70</div>
+<div class="line-code">                wobble = 1.0 + (rng.random() - 0.5) * 0.06</div>
+<div class="line-explain">Weekend bump: 8% higher on Friday/Saturday.</div>
+</div><div class="line-block">
+<div class="line-header">Line 71</div>
+<div class="line-code">                fare = base * drift * weekend * wobble</div>
+<div class="line-explain">Small random wobble around the trend.</div>
+</div><div class="line-block">
+<div class="line-header">Line 72</div>
+<div class="line-code">                if rng.random() &lt; spike_prob:</div>
+<div class="line-explain">Combines all four components into the fare.</div>
+</div><div class="line-block">
+<div class="line-header">Line 73</div>
+<div class="line-code">                    fare *= 1.6</div>
+<div class="line-explain">Random chance of a spike...</div>
+</div><div class="line-block">
+<div class="line-header">Line 74</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 75</div>
+<div class="line-code">                rows.append(</div>
+<div class="line-explain">...multiplies the fare by 1.6.</div>
+</div><div class="line-block">
+<div class="line-header">Line 76</div>
+<div class="line-code">                    {</div>
+<div class="line-explain">Opens the row dict...</div>
+</div><div class="line-block">
+<div class="line-header">Line 77</div>
+<div class="line-code">                        "scrape_date": date_str,</div>
+<div class="line-explain">scrape_date.</div>
+</div><div class="line-block">
+<div class="line-header">Line 78</div>
+<div class="line-code">                        "route": route,</div>
+<div class="line-explain">route.</div>
+</div><div class="line-block">
+<div class="line-header">Line 79</div>
+<div class="line-code">                        "origin": route.split("-")[0],</div>
+<div class="line-explain">origin — first half of the route code.</div>
+</div><div class="line-block">
+<div class="line-header">Line 80</div>
+<div class="line-code">                        "dest": route.split("-")[1],</div>
+<div class="line-explain">dest — second half of the route code.</div>
+</div><div class="line-block">
+<div class="line-header">Line 81</div>
+<div class="line-code">                        "carrier": "SyntheticAir",</div>
+<div class="line-explain">carrier — a fixed synthetic carrier.</div>
+</div><div class="line-block">
+<div class="line-header">Line 82</div>
+<div class="line-code">                        "flight_no": f"SA-{rng.randint(1000, 9999)}",</div>
+<div class="line-explain">flight_no — synthetic flight number.</div>
+</div><div class="line-block">
+<div class="line-header">Line 83</div>
+<div class="line-code">                        "depart_time": f"{date_str} 08:00:00",</div>
+<div class="line-explain">depart_time — a fixed 08:00 departure.</div>
+</div><div class="line-block">
+<div class="line-header">Line 84</div>
+<div class="line-code">                        "arrive_time": f"{date_str} 10:30:00",</div>
+<div class="line-explain">arrive_time — a fixed 10:30 arrival.</div>
+</div><div class="line-block">
+<div class="line-header">Line 85</div>
+<div class="line-code">                        "duration_mins": 150,</div>
+<div class="line-explain">duration_mins — fixed 150 minutes.</div>
+</div><div class="line-block">
+<div class="line-header">Line 86</div>
+<div class="line-code">                        "stops": 0,</div>
+<div class="line-explain">stops — always 0 for synthetic rows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 87</div>
+<div class="line-code">                        "base_fare": round(fare * 0.85, 2),</div>
+<div class="line-explain">base_fare — 85% of the total fare.</div>
+</div><div class="line-block">
+<div class="line-header">Line 88</div>
+<div class="line-code">                        "taxes": round(fare * 0.15, 2),</div>
+<div class="line-explain">taxes — the remaining 15%.</div>
+</div><div class="line-block">
+<div class="line-header">Line 89</div>
+<div class="line-code">                        "total_fare": round(fare, 2),</div>
+<div class="line-explain">total_fare — the combined fare, rounded.</div>
+</div><div class="line-block">
+<div class="line-header">Line 90</div>
+<div class="line-code">                        "currency": "INR",</div>
+<div class="line-explain">currency — INR.</div>
+</div><div class="line-block">
+<div class="line-header">Line 91</div>
+<div class="line-code">                        "lead_window_days": int(window),</div>
+<div class="line-explain">lead_window_days — the current window.</div>
+</div><div class="line-block">
+<div class="line-header">Line 92</div>
+<div class="line-code">                        "scrape_timestamp": f"{date_str} 06:00:00",</div>
+<div class="line-explain">scrape_timestamp — 06:00 on the same day.</div>
+</div><div class="line-block">
+<div class="line-header">Line 93</div>
+<div class="line-code">                        "quality_score": 1.0,</div>
+<div class="line-explain">quality_score — always perfect (1.0).</div>
+</div><div class="line-block">
+<div class="line-header">Line 94</div>
+<div class="line-code">                        "is_outlier": 0,</div>
+<div class="line-explain">is_outlier — never flagged.</div>
+</div><div class="line-block">
+<div class="line-header">Line 95</div>
+<div class="line-code">                        "dedup_hash": f"{route}|{window}|{date_str}",</div>
+<div class="line-explain">dedup_hash — a stable synthetic key.</div>
+</div><div class="line-block">
+<div class="line-header">Line 96</div>
+<div class="line-code">                    }</div>
+<div class="line-explain">Closes the row dict.</div>
+</div><div class="line-block">
+<div class="line-header">Line 97</div>
+<div class="line-code">                )</div>
+<div class="line-explain">Appends it to the rows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 98</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 99</div>
+<div class="line-code">    return pd.DataFrame(rows)</div>
+<div class="line-explain">Builds the DataFrame from all generated rows.</div>
+</div><div class="line-block">
+<div class="line-header">Line 100</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 101</div>
+<div class="line-code"></div>
+<div class="line-explain"></div>
+</div><div class="line-block">
+<div class="line-header">Line 102</div>
+<div class="line-code">def _add_days(base: date, n: int) -&gt; date:</div>
+<div class="line-explain">Defines _add_days: adds n days to a base date.</div>
+</div><div class="line-block">
+<div class="line-header">Line 103</div>
+<div class="line-code">    return base + timedelta(days=n)</div>
+<div class="line-explain">Returns the shifted date via timedelta.</div>
+</div>
+<div class="card">
+<h2>Summary</h2>
+<p>This file has <strong>103 lines</strong>, each explained above.</p>
+</div>
+<div class="nav"><a href="23-estimators-py.html">&larr; Previous</a><a href="25-metrics-py.html">Next &rarr;</a></div>
+</div>
+</body>
+</html>

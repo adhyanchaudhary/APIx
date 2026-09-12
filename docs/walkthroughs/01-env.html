@@ -37,56 +37,56 @@ header .sub{opacity:.75;margin-top:4px;font-size:.9rem}
 <div class="nav"><span></span><a href="02-gitignore.html">Next &rarr;</a></div>
 <div class="card">
 <h2>File Overview</h2>
-<p>Below is every line of this file with an explanation of what it does and why.</p>
+<p>Every line of this file is explained in plain English below. Code shown is read directly from the current file on disk.</p>
 </div>
 <div class="line-block">
 <div class="line-header">Line 1</div>
 <div class="line-code"># Playwright browser storage location</div>
-<div class="line-explain">A comment line. The <code>#</code> symbol means this line is ignored by the computer. It's just a note for humans reading the file.</div>
+<div class="line-explain">Comment line marking the first setting: where Playwright stores its browser binaries.</div>
 </div><div class="line-block">
 <div class="line-header">Line 2</div>
 <div class="line-code">PLAYWRIGHT_BROWSERS_PATH=0</div>
-<div class="line-explain">Tells Playwright where to store browser files. The value <code>0</code> means 'use the default location inside the project folder.' This way the browser files live with your project, not scattered across your system.</div>
+<div class="line-explain">Installation choice. A value of <code>0</code> tells Playwright to keep browser files inside the project (the virtual environment), rather than a shared global cache. This keeps the project self-contained.</div>
 </div><div class="line-block">
 <div class="line-header">Line 3</div>
 <div class="line-code"></div>
-<div class="line-explain">Empty line. Used to separate sections for readability.</div>
+<div class="line-explain"></div>
 </div><div class="line-block">
 <div class="line-header">Line 4</div>
 <div class="line-code"># Logging level: DEBUG, INFO, WARNING, ERROR</div>
-<div class="line-explain">Comment explaining the possible values for the next setting. Logging level controls how much detail the program prints while running.</div>
+<div class="line-explain">Comment documenting the four possible verbosity levels: DEBUG, INFO, WARNING, ERROR.</div>
 </div><div class="line-block">
 <div class="line-header">Line 5</div>
 <div class="line-code">LOG_LEVEL=INFO</div>
-<div class="line-explain">Sets the program to print <strong>Info-level</strong> messages: things like 'scrape started,' '120 flights saved.' <code>DEBUG</code> would be much more verbose. <code>WARNING</code> would only show problems.</div>
+<div class="line-explain">Sets the logging threshold to INFO — normal progress messages print (scrape started, N flights saved) but DEBUG details are suppressed.</div>
 </div><div class="line-block">
 <div class="line-header">Line 6</div>
 <div class="line-code"></div>
-<div class="line-explain">Empty line separating sections.</div>
+<div class="line-explain"></div>
 </div><div class="line-block">
 <div class="line-header">Line 7</div>
 <div class="line-code"># Scraper settings</div>
-<div class="line-explain">Comment labeling the scraper configuration section.</div>
+<div class="line-explain">Comment heading for the scraper behaviour settings.</div>
 </div><div class="line-block">
 <div class="line-header">Line 8</div>
 <div class="line-code">MAX_REQUESTS_PER_HOUR=60</div>
-<div class="line-explain">Speed limit: the scraper will make <strong>at most 60 requests per hour</strong> to Google Flights. That's one every minute. This prevents Google from blocking us.</div>
+<div class="line-explain">Hard cap: at most <strong>60 requests per hour</strong> to Google Flights (about one per minute) so we never hammer the site.</div>
 </div><div class="line-block">
 <div class="line-header">Line 9</div>
 <div class="line-code">REQUEST_DELAY_MIN=3</div>
-<div class="line-explain">Minimum wait time (in seconds) between consecutive requests. The scraper will wait at least 3 seconds.</div>
+<div class="line-explain">Minimum wait of 3 seconds between requests.</div>
 </div><div class="line-block">
 <div class="line-header">Line 10</div>
 <div class="line-code">REQUEST_DELAY_MAX=8</div>
-<div class="line-explain">Maximum wait time between requests. The scraper picks a <strong>random</strong> delay between 3 and 8 seconds to look like a human.</div>
+<div class="line-explain">Maximum wait of 8 seconds. The scraper picks a random value in this [3, 8] range each time so traffic looks human.</div>
 </div><div class="line-block">
 <div class="line-header">Line 11</div>
 <div class="line-code">MAX_RETRIES=3</div>
-<div class="line-explain">If a request fails (page doesn't load), the scraper will try up to <strong>3 times</strong> before giving up on that route.</div>
+<div class="line-explain">If a request fails, retry up to <strong>3 times</strong> before giving up on that route x window.</div>
 </div>
 <div class="card">
 <h2>Summary</h2>
-<p>This file has <strong>11 lines</strong>.</p>
+<p>This file has <strong>11 lines</strong>, each explained above.</p>
 </div>
 <div class="nav"><span></span><a href="02-gitignore.html">Next &rarr;</a></div>
 </div>

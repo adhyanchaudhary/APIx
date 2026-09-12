@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>APIx Project Flowchart</title>
+<style>
+:root{
+  --bg:#F5F6FA; --ink:#1A1A2E; --muted:#546E7A;
+  --p0:#607D8B;  --p0-lt:#ECEFF1;
+  --p1:#1565C0;  --p1-lt:#E3F2FD;
+  --p2:#2E7D32;  --p2-lt:#E8F5E9;
+  --p3:#6A1B9A;  --p3-lt:#F3E5F5;
+  --p4:#EF6C00;  --p4-lt:#FFF3E0;
+  --db:#37474F;  --db-lt:#ECEFF1;
+  --card:#FFFFFF; --line:#E0E0E0;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;padding:24px}
+.wrap{max-width:1080px;margin:0 auto}
+header{background:linear-gradient(135deg,#0D47A1,#1565C0);color:#fff;border-radius:14px;padding:26px 32px;margin-bottom:22px}
+header h1{font-size:1.7rem}
+header p{opacity:.85;margin-top:6px;font-size:.95rem}
+.card{background:var(--card);border-radius:14px;padding:22px 26px;margin-bottom:20px;border:1px solid var(--line);box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.card h2{font-size:1.15rem;margin-bottom:12px;color:#0D47A1}
+
+/* ── legend ── */
+.legend{display:flex;flex-wrap:wrap;gap:10px}
+.legend .chip{display:inline-flex;align-items:center;gap:7px;font-size:.8rem;color:var(--muted);background:#fafafa;border:1px solid var(--line);border-radius:20px;padding:5px 12px}
+.legend .dot{width:12px;height:12px;border-radius:4px;flex:0 0 auto}
+
+/* ── flowchart column ── */
+.flow{display:flex;flex-direction:column;align-items:stretch;gap:0}
+.arrow{text-align:center;color:var(--muted);font-size:1.3rem;line-height:1;padding:6px 0;user-select:none}
+.stage{display:flex;flex-direction:column;gap:10px}
+.pill{display:inline-flex;align-items:center;gap:8px;font-size:.72rem;font-weight:700;letter-spacing:.5px;padding:3px 10px;border-radius:12px;align-self:flex-start;text-transform:uppercase}
+.stage-box{display:flex;flex-wrap:wrap;gap:12px}
+.node{background:#fafafa;border:1px solid var(--line);border-left:5px solid var(--phase);border-radius:10px;padding:12px 14px;flex:1 1 300px}
+.node .titre{font-weight:700;font-size:.95rem;color:var(--phase)}
+.node .fichier{font-family:'Courier New',monospace;font-size:.8rem;color:var(--muted);margin:4px 0}
+.node p{font-size:.85rem;margin-top:4px}
+.node ul{margin:6px 0 0 18px;font-size:.83rem;color:var(--ink)}
+.node li{margin-bottom:3px}
+.node code,.ml{font-family:'Courier New',monospace;font-size:.8rem;background:#f0f0f0;padding:0 4px;border-radius:3px}
+.node b{color:var(--ink)}
+
+/* db cylinders */
+.dbrow{display:flex;flex-wrap:wrap;gap:14px}
+.db{background:var(--db-lt);border:1px solid var(--db);border-radius:8px;padding:14px 16px;flex:1 1 190px}
+.db .dbname{font-family:'Courier New',monospace;font-weight:700;color:var(--db);font-size:.88rem;border-bottom:2px dashed var(--db);padding-bottom:4px;margin-bottom:6px}
+.db ul{margin:0 0 0 16px;font-size:.8rem;color:#455A64}
+.writer{font-size:.75rem;color:var(--muted);margin-top:6px}
+
+/* phase colouring utilities */
+.stage.p0{--phase:var(--p0)}
+.stage.p1{--phase:var(--p1)}
+.stage.p2{--phase:var(--p2)}
+.stage.p3{--phase:var(--p3)}
+.stage.p4{--phase:var(--p4)}
+
+/* highlight box for key fact */
+.fact{background:var(--p3-lt);border-left:5px solid var(--p3);border-radius:8px;padding:12px 16px;margin-top:14px;font-size:.85rem;color:#4A148C}
+.fact b{color:#6A1B9A}
+
+.note2{font-size:.8rem;color:var(--muted);text-align:center;margin-top:14px}
+.grid2{display:flex;flex-wrap:wrap;gap:14px}
+.grid2>div{flex:1 1 300px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>APIx Project — How the Full System Works</h1>
+  <p>Twelve directional city-pairs are scraped from Google Flights, cleaned, and blended into a 36-cell weighted price index (daily / weekly / monthly), then evaluated with estimator-stability research.</p>
+</header>
+
+<!-- legend -->
+<div class="card">
+  <h2>Flow &amp; Legend</h2>
+  <div class="legend">
+    <span class="chip"><span class="dot" style="background:var(--p0)"></span> Phase 0 — Config</span>
+    <span class="chip"><span class="dot" style="background:var(--p1)"></span> Phase 1 — Scraper</span>
+    <span class="chip"><span class="dot" style="background:var(--p2)"></span> Phase 2 — Cleaning</span>
+    <span class="chip"><span class="dot" style="background:var(--p3)"></span> Phase 3 — Index Builder</span>
+    <span class="chip"><span class="dot" style="background:var(--p4)"></span> Phase 4 — Research / Models</span>
+    <span class="chip"><span class="dot" style="background:var(--db)"></span> Storage (SQLite <code>data/apix.db</code>)</span>
+  </div>
+  <p class="note2" style="text-align:left;margin-top:10px">Arrows show data flow. Each box lists the script(s) that do the work and the key settings that shape it.</p>
+</div>
+
+<!-- ── FLOWCHART ── -->
+<div class="card">
+  <h2>The Pipeline</h2>
+  <div class="flow">
+
+    <!-- PHASE 0 -->
+    <div class="stage p0">
+      <span class="pill" style="background:var(--p0);color:#fff">Phase 0 · Configuration &amp; Storage</span>
+      <div class="stage-box">
+        <div class="node">
+          <div class="titre">Config files — the "what" of the index</div>
+          <div class="fichier">config/routes.yaml · config/scraper.yaml · config/indexer.yaml · .env</div>
+          <ul>
+            <li><b>4 cities</b> (DEL, BOM, BLR, MAA) with DGCA weight shares</li>
+            <li><b>12 directional routes</b> (6 city-pairs &times; 2 directions)</li>
+            <li><b>Scrape horizon:</b> 30 days of departure dates ahead</li>
+            <li><b>Lead windows:</b> 1 / 7 / 30 days before departure</li>
+            <li><b>36-cell basket:</b> window weights 0.20 / 0.30 / 0.50, route weights normalised to sum 1.0</li>
+            <li><b>Estimators:</b> aggregation <code>weighted_trimmed_mean</code> (CPI-style), rolling <code>mean</code>, price method <code>median</code></li>
+            <li><b>Cleaner:</b> IQR outlier method (&times;1.5), null-fare drop</li>
+            <li><b>Scraper:</b> 60 req/hour max, 3&ndash;8&nbsp;s delay, 3 retries</li>
+          </ul>
+        </div>
+        <div class="node">
+          <div class="titre">Storage layer</div>
+          <div class="fichier">src/storage/database.py · .env</div>
+          <ul>
+            <li>Creates the <code>apix.db</code> schema on first use</li>
+            <li>Connection + init helpers used by every stage</li>
+            <li>5 tables: <code>raw_flights</code>, <code>cleaned_flights</code>, <code>daily_index</code>, <code>weekly_index</code>, <code>monthly_index</code></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">&#9660;</div>
+
+    <!-- PHASE 1 -->
+    <div class="stage p1">
+      <span class="pill" style="background:var(--p1);color:#fff">Phase 1 · Scraper</span>
+      <div class="stage-box">
+        <div class="node">
+          <div class="titre">Google Flights scraper</div>
+          <div class="fichier">src/scraper/google_flights.py · src/scraper/base.py · src/scraper/driver.py</div>
+          <p>Opens Playwright (Chrome, human-like), builds the search URL for each route &times; departure date, and parses fares out of the page's <code>aria-label</code> attributes.</p>
+        </div>
+        <div class="node">
+          <div class="titre">Batch runner / smoke test</div>
+          <div class="fichier">src/scraper/run_scrape.py · src/scraper/run_smoke.py</div>
+          <ul>
+            <li>Loops <b>12 routes &times; 30 horizon days</b> every run (plus the t+1/t+7/t+30 anchor windows)</li>
+            <li>Enforces <b>rate limits</b>, jittered delays, and exponential <b>backoff retries</b></li>
+            <li><code>run_smoke.py</code> = one-route sanity check of the live scraper</li>
+            <li>Writes every scrape into <code>raw_flights</code></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">&#9660;</div>
+
+    <!-- STORAGE: raw -->
+    <div class="stage p1"><div class="dbrow">
+      <div class="db" style="flex:1">
+        <div class="dbname">apix.db &#8594; raw_flights</div>
+        <ul>
+          <li>Every scraped fare: route, origin, dest, carrier, times, base/taxes/total fare, currency, lead_window_days, quality_score, dedup_hash</li>
+        </ul>
+        <div class="writer">written by: scraper &#124; read by: cleaner</div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&#9660;</div>
+
+    <!-- PHASE 2 -->
+    <div class="stage p2">
+      <span class="pill" style="background:var(--p2);color:#fff">Phase 2 · Cleaning</span>
+      <div class="stage-box">
+        <div class="node">
+          <div class="titre">Cleaning pipeline</div>
+          <div class="fichier">src/cleaner/clean.py · src/cleaner/pipeline.py</div>
+          <ul>
+            <li><b>Cast</b> columns to the right types</li>
+            <li><b>Deduplicate</b> rows on <code>dedup_hash</code></li>
+            <li><b>Drop null fares</b> (per config: <code>null_fare_action: drop</code>)</li>
+            <li><b>Flag outliers</b> with the IQR fence (&times;1.5) — <code>is_outlier=1</code>, kept but excluded from prices</li>
+            <li><b>Quality score</b> per row</li>
+          </ul>
+        </div>
+        <div class="node">
+          <div class="titre">Verification</div>
+          <div class="fichier">src/cleaner/check_db.py · src/cleaner/test_run.py · src/cleaner/mock_data.py</div>
+          <p><code>check_db.py</code> prints raw vs cleaned counts and outliers; <code>test_run.py</code> exercises the pipeline on deliberately-defective mock data.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">&#9660;</div>
+
+    <!-- STORAGE: cleaned -->
+    <div class="stage p2"><div class="dbrow">
+      <div class="db" style="flex:1">
+        <div class="dbname">apix.db &#8594; cleaned_flights</div>
+        <ul>
+          <li>Deduped, clean rows, one fare per scrape with outlier flag &amp; quality score</li>
+        </ul>
+        <div class="writer">written by: cleaner &#124; read by: indexer</div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&#9660;</div>
+
+    <!-- PHASE 3 -->
+    <div class="stage p3">
+      <span class="pill" style="background:var(--p3);color:#fff">Phase 3 · Index Builder (the core)</span>
+      <div class="stage-box">
+        <div class="node">
+          <div class="titre">1 · Collapse fares to cells</div>
+          <div class="fichier">src/indexer/api_index.py &#8594; route_price_per_day()</div>
+          <ul>
+            <li>One price per <code>(route, lead_window, date)</code> cell = <b>median</b> of the scraped fares</li>
+            <li>Outlier-flagged rows are excluded from the price</li>
+            <li><b>Carry-forward</b> fills calendar gaps with the last known fare</li>
+          </ul>
+        </div>
+        <div class="node">
+          <div class="titre">2 · Daily composite (36-cell basket)</div>
+          <div class="fichier">compute_daily_index()</div>
+          <ul>
+            <li><b>Shared base date</b> = first date with any data; that day's composite <b>= 100</b></li>
+            <li>Each cell prices itself against its own base fare; late-starting cells join at 100</li>
+            <li>Cell weight = route weight &times; window share</li>
+            <li>Headline = <code>aggregate()</code> over present cells — a <b>single</b> number per date (weighted_mean / trimmed / median)</li>
+          </ul>
+        </div>
+        <div class="node">
+          <div class="titre">3 · Weekly &amp; monthly rollups + save</div>
+          <div class="fichier">compute_rolling_index() · write_index()</div>
+          <ul>
+            <li>7-day rolling &#8594; <code>weekly_index</code>, 30-day rolling &#8594; <code>monthly_index</code></li>
+            <li>Same estimator choice (mean / trimmed_mean / median), min_periods=1</li>
+            <li>Re-running a date <b>overwrites</b> instead of duplicating</li>
+          </ul>
+        </div>
+      </div>
+      <div class="fact">
+        <b>Key takeaway:</b> the daily APIx headline is a single weighted composite over the
+        <b>36 cells</b> (12 routes &times; 3 lead windows). Window shares (0.2 / 0.3 / 0.5) mean
+        month-ahead prices dominate; median cell pricing stops one ultra-cheap fare from dragging a cell down.
+      </div>
+    </div>
+
+    <div class="arrow">&#9660;</div>
+
+    <!-- STORAGE: indices -->
+    <div class="stage p3"><div class="dbrow">
+      <div class="db">
+        <div class="dbname">apix.db &#8594; daily_index</div>
+        <ul><li>index_date, window, route, weight, price, route_index, aggregate_index, base_period</li></ul>
+        <div class="writer">written by: run_index.py</div>
+      </div>
+      <div class="db">
+        <div class="dbname">apix.db &#8594; weekly_index</div>
+        <ul><li>7-day rolling of the daily series</li></ul>
+        <div class="writer">written by: run_index.py</div>
+      </div>
+      <div class="db">
+        <div class="dbname">apix.db &#8594; monthly_index</div>
+        <ul><li>30-day rolling of the daily series</li></ul>
+        <div class="writer">written by: run_index.py</div>
+      </div>
+    </div></div>
+
+    <div class="arrow">&#9660;</div>
+
+    <!-- PHASE 4 -->
+    <div class="stage p4">
+      <span class="pill" style="background:var(--p4);color:#fff">Phase 4 · Research, Reporting &amp; Models</span>
+      <div class="stage-box">
+        <div class="node">
+          <div class="titre">Synthetic data (offline research)</div>
+          <div class="fichier">src/indexer/synthetic.py</div>
+          <p>Seeded generator shaped like real scrapes (drift, weekend bumps, spikes, coverage gaps) so the estimator work is reproducible before real 30-day data arrives.</p>
+        </div>
+        <div class="node">
+          <div class="titre">Stability metrics + report</div>
+          <div class="fichier">src/indexer/metrics.py · src/indexer/report.py</div>
+          <ul>
+            <li>Compares aggregation &amp; rolling estimators across windows</li>
+            <li>Measures <b>day-to-day volatility</b> of the headline</li>
+            <li><b>Route sensitivity</b> = headline move when a route loses data (robustness)</li>
+            <li><b>Weight elasticity</b> = headline move per +0.01 weight (which DGCA weights matter)</li>
+            <li>Falls back to synthetic when real data is too sparse (&lt;3 routes / &lt;5 dates)</li>
+          </ul>
+        </div>
+        <div class="node">
+          <div class="titre">Optional fare-direction model</div>
+          <div class="fichier">src/models/price_predictor.py</div>
+          <p>A standalone TensorFlow classifier (input: 20 features &rarr; 2 &times; 64&ndash;32 ReLU+Dropout layers &rarr; softmax over DOWN / STABLE / UP). <b>Not wired into the MVP</b> — future Phase-2 work.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">&#9660;</div>
+
+    <!-- TESTS -->
+    <div class="stage" style="--phase:var(--db)">
+      <span class="pill" style="background:var(--db);color:#fff">Quality Gate · Tests</span>
+      <div class="stage-box">
+        <div class="node">
+          <div class="titre">Offline test suites (run with pytest)</div>
+          <div class="fichier">tests/test_indexer.py · tests/test_estimators.py · tests/test_metrics.py</div>
+          <ul>
+            <li><code>test_indexer.py</code> — 36-cell basket math, base=100, carry-forward, idempotent writes, end-to-end <code>run_index</code></li>
+            <li><code>test_estimators.py</code> — weighted mean / trimmed mean / weighted median against hand-computed examples</li>
+            <li><code>test_metrics.py</code> — stability stats, synthetic generator, sensitivity &amp; elasticity</li>
+            <li>Fixtures: <code>tests/fixtures/sample_cleaned.csv</code></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <p class="note2">Docs: every file also has a line-by-line walkthrough in <code>docs/walkthroughs/index.html</code>. The deck <code>docs/sih-deck.html</code> is the mentor-facing pitch.</p>
+</div>
+
+<!-- how to run -->
+<div class="card">
+  <h2>Common Commands</h2>
+  <div class="grid2">
+    <div>
+      <p class="ml" style="font-size:.82rem">
+        python -m src.scraper.run_smoke<br>
+        python -m src.scraper.run_scrape<br>
+        python -m src.cleaner.clean<br>
+        python -m src.cleaner.check_db<br>
+        python -m src.indexer.run_index<br>
+        python -m src.indexer.report --synthetic
+      </p>
+    </div>
+    <div>
+      <ul style="font-size:.85rem;color:var(--ink);margin-left:18px">
+        <li>Each stage reads its input from <code>data/apix.db</code> and writes its output there</li>
+        <li>Run daily: scrape &#8594; clean &#8594; index keeps the 30-day horizon and indices current</li>
+        <li>Run <code>python src/generate_walkthroughs.py</code> to rebuild the docs</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

@@ -46,8 +46,15 @@ routes:
   - origin: MAA
     dest: BLR
 
-# ── Advance-Purchase Windows ──
-# Number of days before departure to search
+# ── Scrape Horizon ──
+# Scrape every departure date from tomorrow out to horizon_days ahead.
+# Each day the batch picks up the new date entering the window, so coverage
+# is maintained by running daily.
+horizon_days: 30
+
+# ── Anchor Windows (indexer) ──
+# The lead windows the indexer builds indices for. Mirrors
+# config/indexer.yaml `index.active_windows`. Kept here for documentation.
 lead_windows:
   - 1     # T+1  (last-minute)
   - 7     # T+7  (one week out)

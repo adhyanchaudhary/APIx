@@ -66,18 +66,18 @@ def _insert_records(records: list[FlightRecord], scrape_date: str) -> int:
 
 
 async def run_scrape(target_date: date | None = None) -> None:
-    """Main scrape loop: every route × every lead window."""
-    _setup_logging()
+    """Main scrape loop: every route × every day offset in the horizon."""
     _setup_logging()
     init_db()
 
     cfg = _load_routes()
     routes = cfg["routes"]
-    windows = cfg["lead_windows"]
+    horizon = int(cfg.get("horizon_days", 30))
+    offsets = list(range(1, horizon + 1))
     scrape_date_str = (target_date or date.today()).isoformat()
 
-    log.info("═══ Scrape run: %s ═══", scrape_date_str)
-    log.info("Routes: %d | Windows: %s", len(routes), windows)
+    log.info("=== Scrape run: %s ===", scrape_date_str)
+    log.info("Routes: %d | Horizon: %d days (offsets 1..%d)", len(routes), horizon, horizon)
 
     scraper = GoogleFlightsScraper()
     total_inserted = 0
@@ -85,21 +85,21 @@ async def run_scrape(target_date: date | None = None) -> None:
 
     for route in routes:
         origin, dest = route["origin"], route["dest"]
-        for lead in windows:
+        for lead in offsets:
             travel = (target_date or date.today()) + timedelta(days=lead)
-            log.info("── %s→%s  T+%d  (travel: %s) ──", origin, dest, lead, travel)
+            log.info("-- %s->%s  T+%d  (travel: %s) --", origin, dest, lead, travel)
 
             try:
                 records = await scraper.fetch_flights(origin, dest, travel, lead)
                 count = _insert_records(records, scrape_date_str)
                 total_inserted += count
-                log.info("  ✓ %d flights saved", count)
+                log.info("  OK %d flights saved", count)
             except Exception as exc:
                 total_failed += 1
-                log.error("  ✗ FAILED: %s", exc)
+                log.error("  FAILED: %s", exc)
 
     log.info(
-        "═══ Run complete: %d flights saved, %d route×window failures ═══",
+        "=== Run complete: %d flights saved, %d routeXday failures ===",
         total_inserted, total_failed,
     )
 
