@@ -1,0 +1,22 @@
+2026-09-14 22:19:52 | INFO    | daily_pipeline | === DAILY E2E PIPELINE START  db=C:\Users\LENOVO\Desktop\SIH-2026\data\e2e_real.db  date=2026-09-14 ===
+2026-09-14 22:19:52 | INFO    | daily_pipeline | === DAILY E2E PIPELINE START  db=C:\Users\LENOVO\Desktop\SIH-2026\data\e2e_real.db  date=2026-09-14 ===
+2026-09-14 22:19:52 | INFO    | daily_pipeline | --- STAGE 1/3: SCRAPE ---
+2026-09-14 22:19:52 | INFO    | daily_pipeline | --- STAGE 1/3: SCRAPE ---
+2026-09-14 22:30:53 | INFO    | daily_pipeline | --- STAGE 2/3: CLEAN ---
+2026-09-14 22:30:53 | INFO    | daily_pipeline | --- STAGE 2/3: CLEAN ---
+2026-09-14 22:30:53 | INFO    | daily_pipeline | --- STAGE 3/3: INDEX ---
+2026-09-14 22:30:53 | INFO    | daily_pipeline | --- STAGE 3/3: INDEX ---
+2026-09-14 22:30:54 | INFO    | daily_pipeline | === DAILY E2E PIPELINE DONE  {'db': 'C:\\Users\\LENOVO\\Desktop\\SIH-2026\\data\\e2e_real.db', 'date': '2026-09-14', 'started': '2026-09-14T22:19:52', 'finished': '2026-09-14T22:30:54', 'clean': {'raw': 2220, 'cleaned': 1109, 'duplicates': 1111, 'outliers': 100, 'nulls': 0}, 'index': {'daily': 36, 'weekly': 36, 'monthly': 36}} ===
+2026-09-14 22:30:54 | INFO    | daily_pipeline | === DAILY E2E PIPELINE DONE  {'db': 'C:\\Users\\LENOVO\\Desktop\\SIH-2026\\data\\e2e_real.db', 'date': '2026-09-14', 'started': '2026-09-14T22:19:52', 'finished': '2026-09-14T22:30:54', 'clean': {'raw': 2220, 'cleaned': 1109, 'duplicates': 1111, 'outliers': 100, 'nulls': 0}, 'index': {'daily': 36, 'weekly': 36, 'monthly': 36}} ===
+2026-09-14 22:33:51 | INFO    | daily_pipeline | === DAILY E2E PIPELINE START  db=C:\Users\LENOVO\Desktop\SIH-2026\data\e2e_real.db  date=2026-09-13 ===
+2026-09-14 22:33:51 | INFO    | daily_pipeline | === DAILY E2E PIPELINE START  db=C:\Users\LENOVO\Desktop\SIH-2026\data\e2e_real.db  date=2026-09-13 ===
+2026-09-14 22:33:51 | INFO    | daily_pipeline | --- STAGE 1/3: SCRAPE ---
+2026-09-14 22:33:51 | INFO    | daily_pipeline | --- STAGE 1/3: SCRAPE ---
+2026-09-14 22:42:28 | WARNING | src.scraper.google_flights | No result selector matched after 15s - page may have no flights
+2026-09-14 22:45:09 | WARNING | src.scraper.google_flights | No result selector matched after 15s - page may have no flights
+2026-09-14 22:45:45 | INFO    | daily_pipeline | --- STAGE 2/3: CLEAN ---
+2026-09-14 22:45:45 | INFO    | daily_pipeline | --- STAGE 2/3: CLEAN ---
+2026-09-14 22:45:46 | INFO    | daily_pipeline | --- STAGE 3/3: INDEX ---
+2026-09-14 22:45:46 | INFO    | daily_pipeline | --- STAGE 3/3: INDEX ---
+2026-09-14 22:45:46 | INFO    | daily_pipeline | === DAILY E2E PIPELINE DONE  {'db': 'C:\\Users\\LENOVO\\Desktop\\SIH-2026\\data\\e2e_real.db', 'date': '2026-09-13', 'started': '2026-09-14T22:33:51', 'finished': '2026-09-14T22:45:46', 'clean': {'raw': 1500, 'cleaned': 750, 'duplicates': 750, 'outliers': 39, 'nulls': 0}, 'index': {'daily': 36, 'weekly': 36, 'monthly': 36}} ===
+2026-09-14 22:45:46 | INFO    | daily_pipeline | === DAILY E2E PIPELINE DONE  {'db': 'C:\\Users\\LENOVO\\Desktop\\SIH-2026\\data\\e2e_real.db', 'date': '2026-09-13', 'started': '2026-09-14T22:33:51', 'finished': '2026-09-14T22:45:46', 'clean': {'raw': 1500, 'cleaned': 750, 'duplicates': 750, 'outliers': 39, 'nulls': 0}, 'index': {'daily': 36, 'weekly': 36, 'monthly': 36}} ===
