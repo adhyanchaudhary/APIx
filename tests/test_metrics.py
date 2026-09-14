@@ -45,8 +45,15 @@ def test_make_synthetic_shape_and_uniques():
     assert set(df["route"]) == set(ROUTES)
     assert set(df["lead_window_days"]) == set(WINDOWS)
     assert df["scrape_date"].nunique() == 15  # all dates present across routes
-    assert len(df) == 504  # 12 routes × 14 dates × 3 windows
+    # 12 routes × 14 dates × 3 windows × 7 flights per cell (plus promos).
+    assert len(df) >= 12 * 14 * 3 * 7
+    # Every cell carries a realistic bucket of fares, not a single one.
+    per_cell = df.groupby(["route", "lead_window_days", "scrape_date"])["total_fare"]
+    assert per_cell.count().min() >= 7
+    # Median of each cell is strictly above the minimum → median-vs-min visible.
+    assert (per_cell.median() > per_cell.min()).mean() > 0.5
     assert df["total_fare"].min() > 0
+    assert df["dedup_hash"].is_unique
 
 
 # ── Aggregate by day ─────────────────────────────────────────────────────────

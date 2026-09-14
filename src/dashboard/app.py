@@ -1,9 +1,13 @@
 """APIx Real-Time Airfare Price Index Dashboard.
 
-<<<<<<< Updated upstream
-Renders pie charts, trend graphs, and tables from the SQLite database
-(``data/apix.db``) for each advance-purchase window — T+1, T+7, T+30 — in its
-own tab.
+Scientific / Institutional Light-Theme Dashboard:
+- Formulation for Ministry of Statistics (MoSPI), NSO, and Reserve Bank of India (RBI)
+- Original draft layout with long Teal top navigation bar
+- Self-explanatory table column names across all datasets
+- 3D Globe with geodesic curved flight arcs and Route Inspector Pop-up Card as DEFAULT tab
+- Dedicated "Flight Search by City" tab
+- Preserved brand typography (Eurostile Extended + Pacifico)
+- Professional scientific presentation without generic emojis
 
 Data source:
     - cleaned_flights      (cleaned flight rows, one per flight)
@@ -13,16 +17,6 @@ Data source:
 
 Run from the repo root:
     streamlit run src/dashboard/app.py
-=======
-Scientific / Institutional Light-Theme Dashboard:
-- Formulation for Ministry of Statistics (MoSPI), NSO, and Reserve Bank of India (RBI)
-- Original draft layout with long Teal top navigation bar
-- Self-explanatory table column names across all datasets
-- 3D Globe with geodesic curved flight arcs and Route Inspector Pop-up Card as DEFAULT tab
-- Dedicated "Flight Search by City" tab
-- Preserved brand typography (Eurostile Extended + Pacifico)
-- Professional scientific presentation without generic emojis
->>>>>>> Stashed changes
 """
 from __future__ import annotations
 
@@ -41,8 +35,6 @@ sys.path.insert(0, str(_REPO_ROOT))
 
 from src.storage.database import DB_PATH, get_connection, init_db
 
-<<<<<<< Updated upstream
-=======
 # ── Page Configuration ────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="APIx — Airfare Price Index Dashboard",
@@ -51,7 +43,6 @@ st.set_page_config(
 )
 
 # ── Constants & Route Metadata ───────────────────────────────────────────────
->>>>>>> Stashed changes
 WINDOWS = (1, 7, 30)
 WINDOW_LABELS = {
     1: "T+1 (last-minute)",
@@ -66,7 +57,6 @@ INDEX_TABLE_LABELS = {
     "monthly_index": "Monthly (30-day rolling)",
 }
 
-<<<<<<< Updated upstream
 ROUTE_COLORS = [
     "#6C5CE7",  # violet
     "#00CEC9",  # teal
@@ -85,11 +75,49 @@ ROUTE_COLORS = [
 ACCENT = "#6C5CE7"
 
 CITY_COORDS = {
-    "DEL": {"lat": 28.57, "lon": 77.09, "name": "New Delhi"},
-    "BOM": {"lat": 19.09, "lon": 72.87, "name": "Mumbai"},
-    "BLR": {"lat": 13.20, "lon": 77.71, "name": "Bengaluru"},
-    "MAA": {"lat": 12.99, "lon": 80.17, "name": "Chennai"},
+    "DEL": {"lat": 28.5562, "lon": 77.1000, "name": "New Delhi", "airport": "Indira Gandhi International (DEL)"},
+    "BOM": {"lat": 19.0896, "lon": 72.8656, "name": "Mumbai", "airport": "Chhatrapati Shivaji Maharaj Intl (BOM)"},
+    "BLR": {"lat": 13.1986, "lon": 77.7066, "name": "Bengaluru", "airport": "Kempegowda International (BLR)"},
+    "MAA": {"lat": 12.9941, "lon": 80.1709, "name": "Chennai", "airport": "Chennai International (MAA)"},
 }
+
+ROUTE_METADATA = {
+    "DEL-BOM": {"distance": "1,148 km", "flight_time": "2h 10m", "corridor": "New Delhi — Mumbai", "weight": "10.0%"},
+    "BOM-DEL": {"distance": "1,148 km", "flight_time": "2h 15m", "corridor": "Mumbai — New Delhi", "weight": "10.0%"},
+    "DEL-BLR": {"distance": "1,740 km", "flight_time": "2h 45m", "corridor": "New Delhi — Bengaluru", "weight": "9.0%"},
+    "BLR-DEL": {"distance": "1,740 km", "flight_time": "2h 50m", "corridor": "Bengaluru — New Delhi", "weight": "9.0%"},
+    "DEL-MAA": {"distance": "1,760 km", "flight_time": "2h 45m", "corridor": "New Delhi — Chennai", "weight": "6.0%"},
+    "MAA-DEL": {"distance": "1,760 km", "flight_time": "2h 50m", "corridor": "Chennai — New Delhi", "weight": "6.0%"},
+    "BOM-BLR": {"distance": "840 km", "flight_time": "1h 40m", "corridor": "Mumbai — Bengaluru", "weight": "10.0%"},
+    "BLR-BOM": {"distance": "840 km", "flight_time": "1h 45m", "corridor": "Bengaluru — Mumbai", "weight": "10.0%"},
+    "BOM-MAA": {"distance": "1,030 km", "flight_time": "2h 00m", "corridor": "Mumbai — Chennai", "weight": "8.0%"},
+    "MAA-BOM": {"distance": "1,030 km", "flight_time": "2h 05m", "corridor": "Chennai — Mumbai", "weight": "8.0%"},
+    "BLR-MAA": {"distance": "290 km", "flight_time": "1h 00m", "corridor": "Bengaluru — Chennai", "weight": "7.0%"},
+    "MAA-BLR": {"distance": "290 km", "flight_time": "1h 05m", "corridor": "Chennai — Bengaluru", "weight": "7.0%"},
+}
+
+TEAL_PALETTE = [
+    "#0D9488",  # Primary Teal
+    "#0F766E",  # Deep Teal
+    "#14B8A6",  # Light Teal
+    "#0284C7",  # Sky
+    "#3B82F6",  # Blue
+    "#6366F1",  # Indigo
+    "#D97706",  # Amber
+    "#475569",  # Slate
+    "#059669",  # Emerald
+    "#6D28D9",  # Purple
+    "#BE185D",  # Rose
+    "#0369A1",  # Ocean
+]
+
+DATA_DB_OPTIONS = {
+    "Production Database (data/apix.db)": str(DB_PATH),
+}
+_e2e = _REPO_ROOT / "data" / "e2e_real.db"
+if _e2e.exists():
+    DATA_DB_OPTIONS["Benchmark Dataset (data/e2e_real.db)"] = str(_e2e)
+
 
 DARK_CSS = """
 <style>
@@ -161,51 +189,8 @@ DARK_CSS = """
   [data-testid="stSidebar"] [data-testid="stCaptionContainer"] {
     color: #cbd5e1;
   }
-=======
-CITY_COORDS = {
-    "DEL": {"lat": 28.5562, "lon": 77.1000, "name": "New Delhi", "airport": "Indira Gandhi International (DEL)"},
-    "BOM": {"lat": 19.0896, "lon": 72.8656, "name": "Mumbai", "airport": "Chhatrapati Shivaji Maharaj Intl (BOM)"},
-    "BLR": {"lat": 13.1986, "lon": 77.7066, "name": "Bengaluru", "airport": "Kempegowda International (BLR)"},
-    "MAA": {"lat": 12.9941, "lon": 80.1709, "name": "Chennai", "airport": "Chennai International (MAA)"},
-}
-
-ROUTE_METADATA = {
-    "DEL-BOM": {"distance": "1,148 km", "flight_time": "2h 10m", "corridor": "New Delhi — Mumbai", "weight": "10.0%"},
-    "BOM-DEL": {"distance": "1,148 km", "flight_time": "2h 15m", "corridor": "Mumbai — New Delhi", "weight": "10.0%"},
-    "DEL-BLR": {"distance": "1,740 km", "flight_time": "2h 45m", "corridor": "New Delhi — Bengaluru", "weight": "9.0%"},
-    "BLR-DEL": {"distance": "1,740 km", "flight_time": "2h 50m", "corridor": "Bengaluru — New Delhi", "weight": "9.0%"},
-    "DEL-MAA": {"distance": "1,760 km", "flight_time": "2h 45m", "corridor": "New Delhi — Chennai", "weight": "6.0%"},
-    "MAA-DEL": {"distance": "1,760 km", "flight_time": "2h 50m", "corridor": "Chennai — New Delhi", "weight": "6.0%"},
-    "BOM-BLR": {"distance": "840 km", "flight_time": "1h 40m", "corridor": "Mumbai — Bengaluru", "weight": "10.0%"},
-    "BLR-BOM": {"distance": "840 km", "flight_time": "1h 45m", "corridor": "Bengaluru — Mumbai", "weight": "10.0%"},
-    "BOM-MAA": {"distance": "1,030 km", "flight_time": "2h 00m", "corridor": "Mumbai — Chennai", "weight": "8.0%"},
-    "MAA-BOM": {"distance": "1,030 km", "flight_time": "2h 05m", "corridor": "Chennai — Mumbai", "weight": "8.0%"},
-    "BLR-MAA": {"distance": "290 km", "flight_time": "1h 00m", "corridor": "Bengaluru — Chennai", "weight": "7.0%"},
-    "MAA-BLR": {"distance": "290 km", "flight_time": "1h 05m", "corridor": "Chennai — Bengaluru", "weight": "7.0%"},
-}
-
-TEAL_PALETTE = [
-    "#0D9488",  # Primary Teal
-    "#0F766E",  # Deep Teal
-    "#14B8A6",  # Light Teal
-    "#0284C7",  # Sky
-    "#3B82F6",  # Blue
-    "#6366F1",  # Indigo
-    "#D97706",  # Amber
-    "#475569",  # Slate
-    "#059669",  # Emerald
-    "#6D28D9",  # Purple
-    "#BE185D",  # Rose
-    "#0369A1",  # Ocean
-]
-
-DATA_DB_OPTIONS = {
-    "Production Database (data/apix.db)": str(DB_PATH),
-}
-_e2e = _REPO_ROOT / "data" / "e2e_real.db"
-if _e2e.exists():
-    DATA_DB_OPTIONS["Benchmark Dataset (data/e2e_real.db)"] = str(_e2e)
-
+</style>
+"""
 
 # ── Scientific Light Theme CSS with Teal Long Bar ────────────────────────────
 SCIENTIFIC_LIGHT_CSS = """
@@ -478,20 +463,22 @@ details[data-testid="stExpander"][open] summary {
     color: #0D9488 !important;
     border-bottom: 1px solid #F1F5F9 !important;
 }
->>>>>>> Stashed changes
 </style>
 """
 st.markdown(SCIENTIFIC_LIGHT_CSS, unsafe_allow_html=True)
 
 
-<<<<<<< Updated upstream
-# ── Data loading ─────────────────────────────────────────────────────────────
+# ── Theme ─────────────────────────────────────────────────────────────────────
 
-@st.cache_data(ttl=60, show_spinner=False)
-def load_cleaned() -> pd.DataFrame:
-    conn = get_connection()
-=======
-# ── Data Loading Functions (Draft 1 Compatible) ──────────────────────────────
+def is_dark() -> bool:
+    return st.session_state.get("dark_mode", False)
+
+
+def fig_name() -> str:
+    return "plotly_dark" if is_dark() else "plotly_white"
+
+
+# ── Data Loading Functions ────────────────────────────────────────────────────
 def _active_db() -> str:
     return st.session_state.get("db_path", str(DB_PATH))
 
@@ -499,7 +486,6 @@ def _active_db() -> str:
 @st.cache_data(ttl=60, show_spinner=False)
 def load_cleaned(db_path: str | None = None) -> pd.DataFrame:
     conn = get_connection(db_path)
->>>>>>> Stashed changes
     try:
         tables = {
             r[0] for r in conn.execute(
@@ -514,13 +500,8 @@ def load_cleaned(db_path: str | None = None) -> pd.DataFrame:
 
 
 @st.cache_data(ttl=60, show_spinner=False)
-<<<<<<< Updated upstream
-def load_index(table: str) -> pd.DataFrame:
-    conn = get_connection()
-=======
 def load_index(table: str, db_path: str | None = None) -> pd.DataFrame:
     conn = get_connection(db_path)
->>>>>>> Stashed changes
     try:
         tables = {
             r[0] for r in conn.execute(
@@ -560,93 +541,160 @@ def seed_demo_data() -> None:
     run_index(db_path=db)
 
 
-<<<<<<< Updated upstream
-# ── Theme ─────────────────────────────────────────────────────────────────────
-
-def is_dark() -> bool:
-    return st.session_state.get("dark_mode", False)
-
-
-def fig_name() -> str:
-    return "plotly_dark" if is_dark() else "plotly_white"
-
-
-# ── Shared chart builders ────────────────────────────────────────────────────
-
-def fig_base(fig) -> None:
+# ── Chart Theming Helpers (Scientific Light Palette) ──────────────────────────
+def fig_base(fig: go.Figure, height: int = 360) -> None:
     fig.update_layout(
-        template=fig_name(),
-        height=360,
-<<<<<<< Updated upstream
-        margin=dict(l=10, r=10, t=45, b=10),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0),
-=======
-        margin=dict(l=10, r=10, t=50, b=50),
-        legend=dict(orientation="h", yanchor="top", y=-0.18, x=0, font=dict(size=11)),
-        title_font_size=15,
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
->>>>>>> Stashed changes
+        template="plotly_white",
+        height=height,
+        margin=dict(l=15, r=15, t=40, b=40),
+        legend=dict(
+            orientation="h",
+            yanchor="top",
+            y=-0.15,
+            x=0,
+            font=dict(size=11, family="Inter", color="#475569"),
+        ),
+        title_font=dict(size=13, family="Inter", color="#0F172A"),
+        paper_bgcolor="#FFFFFF",
+        plot_bgcolor="#FFFFFF",
+        font=dict(family="Inter", color="#475569"),
+        xaxis=dict(gridcolor="#F1F5F9", zerolinecolor="#E2E8F0"),
+        yaxis=dict(gridcolor="#F1F5F9", zerolinecolor="#E2E8F0"),
     )
 
 
-def carrier_pie(cleaned_w: pd.DataFrame, key: str) -> None:
-    counts = (
-        cleaned_w["carrier"].fillna("UNKNOWN")
-        .value_counts()
-        .rename_axis("carrier")
-        .reset_index(name="count")
+def compute_curved_arc(
+    lon1: float, lat1: float, lon2: float, lat2: float, n_points: int = 35, bend: float = 0.16
+) -> tuple[list[float], list[float]]:
+    """Calculates smooth curved parabolic flight arc points between two coordinates."""
+    t = np.linspace(0, 1, n_points)
+    lons = (1 - t) * lon1 + t * lon2
+    lats = (1 - t) * lat1 + t * lat2
+    dx = lon2 - lon1
+    dy = lat2 - lat1
+    dist = math.hypot(dx, dy)
+    norm_x = -dy / (dist + 1e-7)
+    norm_y = dx / (dist + 1e-7)
+    curvature = np.sin(np.pi * t) * dist * bend
+    return (lons + norm_x * curvature).tolist(), (lats + norm_y * curvature).tolist()
+
+
+# ── Self-Explanatory Table Builders ───────────────────────────────────────────
+def composite_table(table: str) -> pd.DataFrame:
+    """Composite headline rows with self-explanatory column names."""
+    df = load_index(table, _active_db())
+    if df.empty:
+        return df
+    out = (
+        df.drop_duplicates("index_date")[["index_date", "aggregate_index", "base_period"]]
+        .copy()
+        .sort_values("index_date", ascending=False)
     )
-    fig = px.pie(
-        counts,
-        names="carrier",
-        values="count",
-        title="Flight share by carrier",
-        hole=0.35,
+    out["aggregate_index"] = out["aggregate_index"].round(2)
+    out["inflation_change"] = out["aggregate_index"].apply(
+        lambda v: f"+{v - 100.0:.2f}%" if v >= 100.0 else f"{v - 100.0:.2f}%"
     )
-    fig.update_traces(textinfo="percent+label", textposition="auto")
-    fig_base(fig)
-    st.plotly_chart(fig, key=key, width="stretch", config={"displayModeBar": False})
+    return out.rename(columns={
+        "index_date": "Index Date",
+        "aggregate_index": "National APIx Level (Base = 100.00)",
+        "inflation_change": "Inflation vs Base Period (%)",
+        "base_period": "Reference Base Date",
+    })
 
 
-def route_fare_pie(cleaned_w: pd.DataFrame, key: str) -> None:
-    fares = cleaned_w.groupby("route", as_index=False)["total_fare"].sum()
-    fig = px.pie(
-        fares,
-        names="route",
-        values="total_fare",
-        title="Fare value share by route",
-        hole=0.35,
+def route_price_table(cleaned_w: pd.DataFrame) -> pd.DataFrame:
+    """Per-route median fare summary with self-explanatory column names."""
+    latest_date = cleaned_w.groupby("route")["scrape_date"].transform("max")
+    latest = cleaned_w[cleaned_w["scrape_date"] == latest_date]
+    out = (
+        latest.groupby("route", as_index=False)
+        .agg(
+            flights=("total_fare", "size"),
+            min_fare=("total_fare", "min"),
+            median_fare=("total_fare", "median"),
+            max_fare=("total_fare", "max"),
+            scrape_date=("scrape_date", "max"),
+        )
+        .round({"min_fare": 2, "median_fare": 2, "max_fare": 2})
     )
-    fig.update_traces(textinfo="percent+label", textposition="auto")
-    fig_base(fig)
-    st.plotly_chart(fig, key=key, width="stretch", config={"displayModeBar": False})
+    out["min_fare"] = out["min_fare"].apply(lambda v: f"INR {v:,.2f}")
+    out["median_fare"] = out["median_fare"].apply(lambda v: f"INR {v:,.2f}")
+    out["max_fare"] = out["max_fare"].apply(lambda v: f"INR {v:,.2f}")
+    return out.rename(columns={
+        "route": "Route Corridor",
+        "flights": "Sampled Flights Count",
+        "min_fare": "Minimum Observed Fare (INR)",
+        "median_fare": "Typical Median Fare (INR)",
+        "max_fare": "Maximum Observed Fare (INR)",
+        "scrape_date": "Observation Date",
+    })
 
 
-def route_fare_bar(cleaned_w: pd.DataFrame, key: str) -> None:
-    avg = cleaned_w.groupby("route", as_index=False)["total_fare"].mean()
-    avg = avg.sort_values("total_fare", ascending=False)
-    fig = px.bar(
-        avg,
-        x="route",
-        y="total_fare",
-        title="Average fare by route (INR)",
-        text="total_fare",
-        color="route",
-        color_discrete_sequence=ROUTE_COLORS,
+def index_table(window: int, table: str) -> pd.DataFrame:
+    """Per-route index progression table with self-explanatory column names."""
+    df = load_index(table, _active_db())
+    df = df[df["lead_window_days"] == window] if not df.empty else df
+    if df.empty:
+        return df
+    out = df[["index_date", "route", "weight", "route_price", "route_index", "base_period"]].copy()
+    out["flight_date"] = (
+        pd.to_datetime(out["index_date"]) + pd.to_timedelta(int(window), unit="D")
+    ).dt.strftime("%Y-%m-%d")
+    out["weight"] = out["weight"].apply(lambda w: f"{w * 100:.1f}%")
+    out["route_price"] = out["route_price"].apply(lambda v: f"INR {v:,.2f}")
+    out["route_index"] = out["route_index"].round(2)
+    out["pct_change"] = out["route_index"].apply(
+        lambda v: f"+{v - 100.0:.2f}%" if v >= 100.0 else f"{v - 100.0:.2f}%"
     )
-    fig.update_traces(texttemplate="%{text:.0f}", textposition="outside")
-    fig_base(fig)
-    st.plotly_chart(fig, key=key, width="stretch", config={"displayModeBar": False})
+    ordered = out[[
+        "index_date", "flight_date", "route", "weight",
+        "route_price", "route_index", "pct_change", "base_period"
+    ]].sort_values(["index_date", "route"], ascending=[False, True])
+    return ordered.rename(columns={
+        "index_date": "Scrape Date",
+        "flight_date": "Flight Departure Date",
+        "route": "Route Corridor",
+        "weight": "DGCA Basket Weight (%)",
+        "route_price": "Typical Median Fare (INR)",
+        "route_index": "Route Index Level (Base = 100.00)",
+        "pct_change": "Inflation vs Base Period (%)",
+        "base_period": "Reference Base Date",
+    })
 
 
-<<<<<<< Updated upstream
-def aggregate_trend(window: int) -> None:
-=======
+def cleaned_table(cleaned_w: pd.DataFrame) -> pd.DataFrame:
+    """Sample of validated cleaned flights with self-explanatory column names."""
+    cols = [
+        "scrape_date", "route", "carrier", "flight_no",
+        "depart_time", "arrive_time", "stops", "duration_mins",
+        "total_fare", "quality_score", "is_outlier",
+    ]
+    cols = [c for c in cols if c in cleaned_w.columns]
+    out = cleaned_w.sort_values("scrape_date", ascending=False)[cols].copy()
+    if "total_fare" in out.columns:
+        out["total_fare"] = out["total_fare"].apply(lambda v: f"INR {v:,.2f}")
+    if "quality_score" in out.columns:
+        out["quality_score"] = out["quality_score"].apply(lambda q: f"{q * 100:.0f}%")
+    if "is_outlier" in out.columns:
+        out["is_outlier"] = out["is_outlier"].apply(lambda o: "Flagged Outlier" if o == 1 else "Normal")
+    return out.rename(columns={
+        "scrape_date": "Scrape Date",
+        "route": "Route Corridor",
+        "carrier": "Operating Carrier",
+        "flight_no": "Flight Number",
+        "depart_time": "Scheduled Departure",
+        "arrive_time": "Scheduled Arrival",
+        "stops": "Stops Count",
+        "duration_mins": "Duration (Minutes)",
+        "total_fare": "Total Fare (INR)",
+        "quality_score": "Data Quality Score",
+        "is_outlier": "Outlier Status",
+    })
+
+
+# ── Chart Builders ────────────────────────────────────────────────────────────
 def route_map(cleaned: pd.DataFrame) -> None:
     """Render an India map with all 12 flight routes and city markers."""
-    import plotly.graph_objects as go
-
     fig = go.Figure()
 
     route_srcs = [
@@ -739,298 +787,6 @@ def route_map(cleaned: pd.DataFrame) -> None:
     st.plotly_chart(fig, key="route_map", width="stretch", config={"displayModeBar": False})
 
 
-def aggregate_trend() -> None:
-    """Composite headline is ONE number per date (window-independent).
-
-    Deduplicate the per-route rows (aggregate_index is identical on a date),
-    then plot the daily headline alongside its 7-day and 30-day rolling means.
-    """
->>>>>>> Stashed changes
-    frames = []
-    for table in INDEX_TABLES:
-        df = load_index(table)
-        df = df[df["lead_window_days"] == window] if not df.empty else df
-        if df.empty:
-            continue
-        series = (
-            df.drop_duplicates("index_date")[["index_date", "aggregate_index"]]
-            .copy()
-            .sort_values("index_date")
-        )
-        series["series"] = INDEX_TABLE_LABELS[table]
-        frames.append(series)
-    if not frames:
-        return
-    trend = pd.concat(frames, ignore_index=True)
-    fig = px.line(
-        trend,
-        x="index_date",
-        y="aggregate_index",
-        color="series",
-        title="APIx composite headline over time",
-        markers=True,
-        color_discrete_sequence=ROUTE_COLORS,
-    )
-    fig_base(fig)
-    st.plotly_chart(fig, key=f"agg_trend_{window}", width="stretch", config={"displayModeBar": False})
-
-
-def route_index_trend(window: int) -> None:
-    daily = load_index("daily_index")
-    daily = daily[daily["lead_window_days"] == window] if not daily.empty else daily
-    if daily.empty:
-        return
-
-    all_routes = sorted(daily["route"].dropna().unique())
-    if not all_routes:
-        return
-
-    focus = st.multiselect(
-        "Filter routes",
-        options=all_routes,
-        default=all_routes[:3],
-        key=f"route_filter_{window}",
-        placeholder="Select routes to display",
-    )
-    if not focus:
-        st.caption("Select at least one route to see the trend.")
-        return
-
-    pivot = daily[daily["route"].isin(focus)].pivot_table(
-        index="index_date", columns="route", values="route_index"
-    ).sort_index()
-    fig = px.line(
-        pivot,
-        x=pivot.index,
-        y=pivot.columns,
-        title="Route-level index trend (base = 100)",
-        color_discrete_sequence=ROUTE_COLORS,
-        markers=True,
-    )
-    fig.update_xaxes(title_text="index_date")
-    fig.update_yaxes(title_text="route_index")
-<<<<<<< Updated upstream
-    fig_base(fig)
-    fig.update_layout(height=420)
-=======
-    fig.update_layout(
-        template=fig_name(),
-        legend=dict(orientation="v", yanchor="top", y=1, x=1.02, font=dict(size=10)),
-        margin=dict(l=10, r=10, t=60, b=10),
-        height=420,
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-    )
->>>>>>> Stashed changes
-    st.plotly_chart(fig, key=f"route_trend_{window}", width="stretch", config={"displayModeBar": False})
-
-
-# ── Tables ────────────────────────────────────────────────────────────────────
-
-def index_table(window: int, table: str) -> pd.DataFrame:
-    df = load_index(table)
-=======
-# ── Chart Theming Helpers (Scientific Light Palette) ──────────────────────────
-def fig_base(fig: go.Figure, height: int = 360) -> None:
-    fig.update_layout(
-        template="plotly_white",
-        height=height,
-        margin=dict(l=15, r=15, t=40, b=40),
-        legend=dict(
-            orientation="h",
-            yanchor="top",
-            y=-0.15,
-            x=0,
-            font=dict(size=11, family="Inter", color="#475569"),
-        ),
-        title_font=dict(size=13, family="Inter", color="#0F172A"),
-        paper_bgcolor="#FFFFFF",
-        plot_bgcolor="#FFFFFF",
-        font=dict(family="Inter", color="#475569"),
-        xaxis=dict(gridcolor="#F1F5F9", zerolinecolor="#E2E8F0"),
-        yaxis=dict(gridcolor="#F1F5F9", zerolinecolor="#E2E8F0"),
-    )
-
-
-def compute_curved_arc(
-    lon1: float, lat1: float, lon2: float, lat2: float, n_points: int = 35, bend: float = 0.16
-) -> tuple[list[float], list[float]]:
-    """Calculates smooth curved parabolic flight arc points between two coordinates."""
-    t = np.linspace(0, 1, n_points)
-    lons = (1 - t) * lon1 + t * lon2
-    lats = (1 - t) * lat1 + t * lat2
-    dx = lon2 - lon1
-    dy = lat2 - lat1
-    dist = math.hypot(dx, dy)
-    norm_x = -dy / (dist + 1e-7)
-    norm_y = dx / (dist + 1e-7)
-    curvature = np.sin(np.pi * t) * dist * bend
-    return (lons + norm_x * curvature).tolist(), (lats + norm_y * curvature).tolist()
-
-
-# ── Self-Explanatory Table Builders (Draft 1 Data Preserved) ───────────────────
-def composite_table(table: str) -> pd.DataFrame:
-    """Composite headline rows with self-explanatory column names."""
-    df = load_index(table, _active_db())
-    if df.empty:
-        return df
-    out = (
-        df.drop_duplicates("index_date")[["index_date", "aggregate_index", "base_period"]]
-        .copy()
-        .sort_values("index_date", ascending=False)
-    )
-    out["aggregate_index"] = out["aggregate_index"].round(2)
-    out["inflation_change"] = out["aggregate_index"].apply(
-        lambda v: f"+{v - 100.0:.2f}%" if v >= 100.0 else f"{v - 100.0:.2f}%"
-    )
-    return out.rename(columns={
-        "index_date": "Index Date",
-        "aggregate_index": "National APIx Level (Base = 100.00)",
-        "inflation_change": "Inflation vs Base Period (%)",
-        "base_period": "Reference Base Date",
-    })
-
-
-def route_price_table(cleaned_w: pd.DataFrame) -> pd.DataFrame:
-    """Per-route median fare summary with self-explanatory column names."""
-    latest_date = cleaned_w.groupby("route")["scrape_date"].transform("max")
-    latest = cleaned_w[cleaned_w["scrape_date"] == latest_date]
-    out = (
-        latest.groupby("route", as_index=False)
-        .agg(
-            flights=("total_fare", "size"),
-            min_fare=("total_fare", "min"),
-            median_fare=("total_fare", "median"),
-            max_fare=("total_fare", "max"),
-            scrape_date=("scrape_date", "max"),
-        )
-        .round({"min_fare": 2, "median_fare": 2, "max_fare": 2})
-    )
-    out["min_fare"] = out["min_fare"].apply(lambda v: f"INR {v:,.2f}")
-    out["median_fare"] = out["median_fare"].apply(lambda v: f"INR {v:,.2f}")
-    out["max_fare"] = out["max_fare"].apply(lambda v: f"INR {v:,.2f}")
-    return out.rename(columns={
-        "route": "Route Corridor",
-        "flights": "Sampled Flights Count",
-        "min_fare": "Minimum Observed Fare (INR)",
-        "median_fare": "Typical Median Fare (INR)",
-        "max_fare": "Maximum Observed Fare (INR)",
-        "scrape_date": "Observation Date",
-    })
-
-
-def index_table(window: int, table: str) -> pd.DataFrame:
-    """Per-route index progression table with self-explanatory column names."""
-    df = load_index(table, _active_db())
->>>>>>> Stashed changes
-    df = df[df["lead_window_days"] == window] if not df.empty else df
-    if df.empty:
-        return df
-<<<<<<< Updated upstream
-    return df[["index_date", "route", "weight", "route_price", "route_index", "aggregate_index", "base_period"]]
-=======
-    out = df[["index_date", "route", "weight", "route_price", "route_index", "base_period"]].copy()
-    out["flight_date"] = (
-        pd.to_datetime(out["index_date"]) + pd.to_timedelta(int(window), unit="D")
-    ).dt.strftime("%Y-%m-%d")
-<<<<<<< Updated upstream
-    out = out.rename(columns={"index_date": "scrape_date"})
-    out["route_price"] = out["route_price"].apply(lambda v: f"₹{v:,.0f}")
-    return out[["scrape_date", "flight_date", "route", "weight", "route_price", "route_index", "base_period"]]
->>>>>>> Stashed changes
-=======
-    out["weight"] = out["weight"].apply(lambda w: f"{w * 100:.1f}%")
-    out["route_price"] = out["route_price"].apply(lambda v: f"INR {v:,.2f}")
-    out["route_index"] = out["route_index"].round(2)
-    out["pct_change"] = out["route_index"].apply(
-        lambda v: f"+{v - 100.0:.2f}%" if v >= 100.0 else f"{v - 100.0:.2f}%"
-    )
-    ordered = out[[
-        "index_date", "flight_date", "route", "weight",
-        "route_price", "route_index", "pct_change", "base_period"
-    ]].sort_values(["index_date", "route"], ascending=[False, True])
-    return ordered.rename(columns={
-        "index_date": "Scrape Date",
-        "flight_date": "Flight Departure Date",
-        "route": "Route Corridor",
-        "weight": "DGCA Basket Weight (%)",
-        "route_price": "Typical Median Fare (INR)",
-        "route_index": "Route Index Level (Base = 100.00)",
-        "pct_change": "Inflation vs Base Period (%)",
-        "base_period": "Reference Base Date",
-    })
->>>>>>> Stashed changes
-
-
-def cleaned_table(cleaned_w: pd.DataFrame) -> pd.DataFrame:
-    """Sample of validated cleaned flights with self-explanatory column names."""
-    cols = [
-        "scrape_date", "route", "carrier", "flight_no",
-        "depart_time", "arrive_time", "stops", "duration_mins",
-        "total_fare", "quality_score", "is_outlier",
-    ]
-    cols = [c for c in cols if c in cleaned_w.columns]
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    return cleaned_w[cols]
-
-
-def route_price_table(cleaned_w: pd.DataFrame) -> pd.DataFrame:
-    agg = cleaned_w.groupby("route", as_index=False).agg(
-        flights=("total_fare", "size"),
-        min_fare=("total_fare", "min"),
-        median_fare=("total_fare", "median"),
-        avg_fare=("total_fare", "mean"),
-        max_fare=("total_fare", "max"),
-    )
-    return agg.round(2)
-=======
-    out = cleaned_w.sort_values("scrape_date", ascending=False)[cols]
-    if "total_fare" in out.columns:
-        out["total_fare"] = out["total_fare"].apply(lambda v: f"₹{v:,.2f}")
-    return out
-
-
-def route_price_table(cleaned_w: pd.DataFrame) -> pd.DataFrame:
-    """Per-route median fare on each route's single most recent scrape date.
-
-    Four plain columns only: route, flight count on that date, the cell
-    median fare, and the date itself. The median fare equals the last
-    ``route_price`` row for that route in the matching Route detail
-    (Daily APIx) table.
-    """
-    latest_date = cleaned_w.groupby("route")["scrape_date"].transform("max")
-    latest = cleaned_w[cleaned_w["scrape_date"] == latest_date]
-    out = (
-        latest.groupby("route", as_index=False)
-        .agg(
-            flights=("total_fare", "size"),
-            **{"Median fare (INR)": ("total_fare", "median")},
-            **{"Date": ("scrape_date", "max")},
-=======
-    out = cleaned_w.sort_values("scrape_date", ascending=False)[cols].copy()
-    if "total_fare" in out.columns:
-        out["total_fare"] = out["total_fare"].apply(lambda v: f"INR {v:,.2f}")
-    if "quality_score" in out.columns:
-        out["quality_score"] = out["quality_score"].apply(lambda q: f"{q * 100:.0f}%")
-    if "is_outlier" in out.columns:
-        out["is_outlier"] = out["is_outlier"].apply(lambda o: "Flagged Outlier" if o == 1 else "Normal")
-    return out.rename(columns={
-        "scrape_date": "Scrape Date",
-        "route": "Route Corridor",
-        "carrier": "Operating Carrier",
-        "flight_no": "Flight Number",
-        "depart_time": "Scheduled Departure",
-        "arrive_time": "Scheduled Arrival",
-        "stops": "Stops Count",
-        "duration_mins": "Duration (Minutes)",
-        "total_fare": "Total Fare (INR)",
-        "quality_score": "Data Quality Score",
-        "is_outlier": "Outlier Status",
-    })
-
-
-# ── Chart Builders (Draft 1 Preserved) ───────────────────────────────────────
 def aggregate_trend(key: str = "main_composite_trend") -> None:
     """Composite headline plotted with 7-day and 30-day rolling averages."""
     frames = []
@@ -1042,7 +798,6 @@ def aggregate_trend(key: str = "main_composite_trend") -> None:
             df.drop_duplicates("index_date")[["index_date", "aggregate_index"]]
             .copy()
             .sort_values("index_date")
->>>>>>> Stashed changes
         )
         series["Series"] = INDEX_TABLE_LABELS[tbl]
         frames.append(series)
@@ -1058,15 +813,9 @@ def aggregate_trend(key: str = "main_composite_trend") -> None:
         markers=True,
         color_discrete_sequence=["#0D9488", "#0284C7", "#D97706"],
     )
-<<<<<<< Updated upstream
-    out["Median fare (INR)"] = out["Median fare (INR)"].apply(lambda v: f"₹{v:,.2f}")
-    return out
->>>>>>> Stashed changes
-=======
     fig.update_layout(xaxis_title="Calculation Date", yaxis_title="Index Level")
     fig_base(fig, height=360)
     st.plotly_chart(fig, key=key, use_container_width=True, config={"displayModeBar": False})
->>>>>>> Stashed changes
 
 
 def carrier_pie(cleaned_w: pd.DataFrame, key: str) -> None:
@@ -1158,29 +907,11 @@ def route_index_trend(window: int) -> None:
     st.plotly_chart(fig, key=f"route_trend_{window}", use_container_width=True, config={"displayModeBar": False})
 
 
-# ── Render One Window Tab (Draft 1 Preserved) ─────────────────────────────────
+# ── Render One Window Tab ─────────────────────────────────────────────────────
 def render_window_tab(cleaned_data: pd.DataFrame, window: int) -> None:
     st.header(WINDOW_LABELS[window])
     cleaned_w = cleaned_data[cleaned_data["lead_window_days"] == window]
 
-<<<<<<< Updated upstream
-    daily = load_index("daily_index")
-    daily_w = daily[daily["lead_window_days"] == window] if not daily.empty else daily
-
-    # KPIs
-    latest_date = None
-    latest_api = None
-    if not daily_w.empty:
-        latest = daily_w.drop_duplicates("index_date").sort_values("index_date").iloc[-1]
-        latest_date = latest["index_date"]
-        latest_api = float(latest["aggregate_index"])
-
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Latest composite APIx", f"{latest_api:.2f}" if latest_api is not None else "—")
-    c2.metric("Latest index date", str(latest_date) if latest_date else "—")
-    c3.metric("Cleaned flights", f"{len(cleaned_w):,}")
-    c4.metric("Routes in data", f"{cleaned_w['route'].nunique() if not cleaned_w.empty else 0}")
-=======
     daily = load_index("daily_index", _active_db())
     daily_w = daily[daily["lead_window_days"] == window] if not daily.empty else daily
 
@@ -1197,7 +928,6 @@ def render_window_tab(cleaned_data: pd.DataFrame, window: int) -> None:
     c2.metric("Latest Index Date", str(latest_d) if latest_d else "—")
     c3.metric("Cleaned Flights", f"{len(cleaned_w):,}")
     c4.metric("Routes in Basket", f"{cleaned_w['route'].nunique() if not cleaned_w.empty else 0}")
->>>>>>> Stashed changes
 
     # Pie charts
     st.subheader("Distribution")
@@ -1212,14 +942,10 @@ def render_window_tab(cleaned_data: pd.DataFrame, window: int) -> None:
 
     # Graphs
     st.subheader("Trends")
-    aggregate_trend(window)
+    aggregate_trend(key=f"window_composite_trend_{window}")
     route_index_trend(window)
 
-<<<<<<< Updated upstream
-    st.subheader("Average fare by route")
-=======
     st.subheader("Average Fare by Route")
->>>>>>> Stashed changes
     route_fare_bar(cleaned_w, key=f"route_fare_bar_{window}")
 
     # Tables with self-explanatory column names
@@ -1231,28 +957,13 @@ def render_window_tab(cleaned_data: pd.DataFrame, window: int) -> None:
         else:
             st.dataframe(df_cl.head(250), use_container_width=True, hide_index=True)
 
-<<<<<<< Updated upstream
-    with st.expander("Route price summary", expanded=False):
-        df = route_price_table(cleaned_w)
-        if df.empty:
-=======
     with st.expander("Route Price Summary (Latest Observation Day)", expanded=False):
         df_rp = route_price_table(cleaned_w)
         if df_rp.empty:
->>>>>>> Stashed changes
             _empty_state()
         else:
             st.dataframe(df_rp, use_container_width=True, hide_index=True)
 
-<<<<<<< Updated upstream
-    for table in INDEX_TABLES:
-        with st.expander(f"{INDEX_TABLE_LABELS[table]} — rows for {WINDOW_LABELS[window]}", expanded=False):
-            df = index_table(window, table)
-            if df.empty:
-                _empty_state()
-            else:
-                st.dataframe(df.sort_values(["index_date", "route"]), width="stretch", hide_index=True)
-=======
     for tbl in INDEX_TABLES:
         with st.expander(f"{INDEX_TABLE_LABELS[tbl]} — Rows for {WINDOW_LABELS[window]}", expanded=False):
             df_idx = index_table(window, tbl)
@@ -1260,7 +971,6 @@ def render_window_tab(cleaned_data: pd.DataFrame, window: int) -> None:
                 _empty_state()
             else:
                 st.dataframe(df_idx.head(250), use_container_width=True, hide_index=True)
->>>>>>> Stashed changes
 
 
 # ── Sidebar Controls ──────────────────────────────────────────────────────────
@@ -1290,169 +1000,6 @@ with st.sidebar:
     st.session_state["db_path"] = DATA_DB_OPTIONS[_db_label]
     st.caption(f"Path: `{DATA_DB_OPTIONS[_db_label]}`")
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-with st.sidebar:
-    st.title("APIx Dashboard")
-    st.caption("Real-time Airfare Price Index — MoSPI / NSO / RBI")
-    st.divider()
-    st.subheader("Data source")
-    st.code(str(DB_PATH))
-=======
-st.markdown(
-    """
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap');
-      [id] { scroll-margin-top: 7.5rem; }
-      .topbar {
-        position: fixed; top: 3.5rem; left: 0; right: 0; z-index: 1000;
-        display: flex; align-items: center; gap: 4px;
-        background: #f4f8fcee; border-bottom: 1px solid #c7d2e0;
-        box-shadow: 0 3px 12px rgba(15, 40, 80, .08);
-        padding: 6px 16px;
-        font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif;
-      }
-      [data-testid="stHeading"] {
-        transition: color 0.15s ease;
-        cursor: default;
-      }
-      [data-testid="stHeading"]:hover {
-        color: #6C5CE7;
-      }
-      .topbar .rnav-title {
-        font-size: 0.65rem; font-weight: 700; letter-spacing: 1.2px;
-        color: #52606d; text-transform: uppercase;
-        margin-right: 10px; padding-right: 12px;
-        border-right: 1px solid #e3e8ef; white-space: nowrap;
-      }
-      .topbar a {
-        display: inline-flex; align-items: center; gap: 6px;
-        font-size: 0.78rem; font-weight: 500;
-        color: #1f2933; text-decoration: none;
-        padding: 7px 12px; border-radius: 8px; margin: 2px 0;
-        transition: background 0.15s, color 0.15s;
-      }
-      .topbar a:hover { background: #ECE9FF; color: #6C5CE7; }
-      .topbar .rnav-dot {
-        display: inline-block; width: 6px; height: 6px;
-        border-radius: 50%; background: #c3cfd9;
-        transition: background 0.15s;
-      }
-      .topbar a:hover .rnav-dot { background: #6C5CE7; }
-      @media (max-width: 1100px) { .topbar { display: none; } }
-      .stMultiSelect [data-baseweb="select"] > div {
-        border: 1.5px solid #6C5CE7;
-        border-radius: 10px;
-        background: linear-gradient(180deg, #ffffff 0%, #f7f5ff 100%);
-        box-shadow: 0 2px 10px rgba(108, 92, 231, 0.12);
-        transition: box-shadow 0.15s ease, border-color 0.15s ease;
-      }
-      .stMultiSelect [data-baseweb="select"] > div:focus-within {
-        border-color: #00CEC9;
-        box-shadow: 0 0 0 3px rgba(0, 206, 201, 0.20);
-      }
-      .stMultiSelect [data-baseweb="tag"] {
-        background: linear-gradient(90deg, #6C5CE7, #0984E3);
-        color: #ffffff;
-        border-radius: 999px;
-        font-weight: 600;
-      }
-      .stMultiSelect [data-baseweb="tag"] span[aria-hidden="true"] {
-        color: #ffffff;
-      }
-
-      /* ── Window tabs ─────────────────────────────────────────────────── */
-      [data-testid="stTabs"] {
-        background: rgba(255, 255, 255, 0.55);
-        padding: 8px 10px;
-        border-radius: 16px;
-        box-shadow: inset 0 1px 3px rgba(15, 40, 80, .06);
-      }
-      [data-testid="stTabs"] [data-baseweb="tab-highlight"],
-      [data-testid="stTabs"] [data-baseweb="tab-border"] {
-        display: none;
-      }
-      [data-testid="stTabs"] button[data-baseweb="tab"] {
-        border: 1.5px solid #d4dcea;
-        border-radius: 12px;
-        padding: 10px 22px;
-        font-weight: 600;
-        letter-spacing: 0.3px;
-        color: #475569;
-        background: #ffffff;
-        margin: 0 6px;
-        box-shadow: 0 1px 4px rgba(15, 40, 80, .05);
-        transition: all 0.2s ease;
-      }
-      [data-testid="stTabs"] button[data-baseweb="tab"]:hover {
-        border-color: #6C5CE7;
-        color: #6C5CE7;
-        box-shadow: 0 2px 10px rgba(108, 92, 231, .15);
-      }
-      [data-testid="stTabs"] button[data-baseweb="tab"][aria-selected="true"] {
-        background: linear-gradient(135deg, #6C5CE7, #0984E3);
-        color: #ffffff !important;
-        border-color: transparent;
-        box-shadow: 0 4px 16px rgba(108, 92, 231, .35);
-        position: relative;
-      }
-      [data-testid="stTabs"] button[data-baseweb="tab"][aria-selected="true"]::after {
-        content: "";
-        position: absolute;
-        bottom: -2px;
-        left: 25%;
-        width: 50%;
-        height: 3px;
-        border-radius: 2px;
-        background: rgba(255, 255, 255, .7);
-      }
-
-      /* ── Expanders (table containers) ────────────────────────────────── */
-      details[data-testid="stExpander"] {
-        border: 1px solid #d0daea;
-        border-radius: 14px;
-        background: #ffffff;
-        box-shadow: 0 2px 12px rgba(15, 40, 80, .05);
-        margin-bottom: 0.6rem;
-        overflow: hidden;
-      }
-      details[data-testid="stExpander"] summary {
-        font-weight: 600;
-        color: #1e3a5f;
-        padding: 0.5rem 0.3rem;
-      }
-      details[data-testid="stExpander"][open] summary {
-        color: #6C5CE7;
-        border-bottom: 1px solid #e8ecf3;
-      }
-
-      /* ── Dataframe tables ─────────────────────────────────────────────── */
-      [data-testid="stDataFrame"] {
-        border: 1px solid #d5dce6;
-        border-radius: 12px;
-        box-shadow: 0 3px 14px rgba(15, 40, 80, .07);
-        overflow: hidden;
-        background: #ffffff;
-      }
-
-      /* ── Section subheadings ──────────────────────────────────────────── */
-      [data-testid="stHeading"] h3,
-      [data-testid="stHeading"] h2 {
-        color: #1e3a5f;
-        border-left: 4px solid #6C5CE7;
-        padding-left: 10px;
-        border-radius: 0 4px 4px 0;
-        margin-bottom: 0.3rem;
-      }
-    </style>
-    <nav class="topbar">
-      <span class="rnav-title">Navigate</span>
-      <a href="#sec-headline"><span class="rnav-dot"></span>Headline</a>
-      <a href="#sec-search"><span class="rnav-dot"></span>Search</a>
-      <a href="#sec-trend"><span class="rnav-dot"></span>Trend</a>
-      <a href="#sec-composite-tables"><span class="rnav-dot"></span>Composite tables</a>
-      <a href="#sec-tabs"><span class="rnav-dot"></span>Windows</a>
-=======
     if st.button("Refresh Data", key="sidebar_refresh_btn", use_container_width=True):
         st.cache_data.clear()
         st.rerun()
@@ -1491,110 +1038,33 @@ st.markdown(
         <a href="#sec-trend"><span class="rnav-dot"></span>Trend</a>
         <a href="#sec-composite-tables"><span class="rnav-dot"></span>Composite Tables</a>
         <a href="#sec-tabs"><span class="rnav-dot"></span>Globe, Windows & Search</a>
->>>>>>> Stashed changes
     </nav>
     """,
     unsafe_allow_html=True,
 )
 
-<<<<<<< Updated upstream
-with st.sidebar:
-    st.markdown(
-        '<h1 style="font-family:\'Eurostile Extended\', \'Poppins\', \'Segoe UI\', system-ui, sans-serif;'
-        ' font-weight:700; letter-spacing:1px;">'
-        '<em style="font-family:\'Pacifico\', \'Segoe Script\', cursive;'
-        ' font-style:italic; color:#6C5CE7;">APIx</em> Dashboard</h1>',
-        unsafe_allow_html=True,
-    )
-    st.caption("Real-time Airfare Price Index — MoSPI / NSO / RBI")
-    st.divider()
-    dark_mode = st.toggle(
-        "Dark theme",
-        value=st.session_state.get("dark_mode", False),
-        help="Switch the dashboard to a dark color scheme.",
-    )
-    st.session_state["dark_mode"] = dark_mode
-    st.divider()
-    st.subheader("Database")
-    _db_label = st.radio(
-        "Which dataset to view",
-        list(DATA_DB_OPTIONS.keys()),
-        index=0,
-        help="Demo = synthetic 30-day series. Live = today's real scraped fares."
-    )
-    st.session_state["db_path"] = DATA_DB_OPTIONS[_db_label]
-    st.caption(str(DATA_DB_OPTIONS[_db_label]))
->>>>>>> Stashed changes
-    if st.button("Refresh data", use_container_width=True):
-        st.cache_data.clear()
-        st.rerun()
-    st.divider()
-    st.subheader("Demo data")
-    st.caption("Populate the DB with 30 days of seeded synthetic fares + built indices.")
-    if st.button("Load synthetic demo data", use_container_width=True):
-        with st.spinner("Seeding demo data and building indices..."):
-            seed_demo_data()
-        st.cache_data.clear()
-        st.success("Demo data ready!")
-        st.rerun()
-
-<<<<<<< Updated upstream
-st.title("APIx — Airfare Price Index Dashboard")
-=======
 if is_dark():
     st.markdown(DARK_CSS, unsafe_allow_html=True)
 
 st.markdown('<div style="height:2.9rem"></div>', unsafe_allow_html=True)
-st.markdown(
-    """
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&family=Pacifico&display=swap');
-      @import url('https://fonts.cdnfonts.com/css/eurostile-extended');
-      h1.apihead {
-        font-family: 'Eurostile Extended', 'Poppins', 'Segoe UI', system-ui, sans-serif;
-        font-weight: 700;
-        letter-spacing: 1px;
-        margin-bottom: 0;
-      }
-      h1.apihead em {
-        font-family: 'Pacifico', 'Segoe Script', cursive;
-        font-style: italic;
-        color: #6C5CE7;
-      }
-    </style>
-    <h1 class="apihead"><em>APIx</em> — Airfare Price Index Dashboard</h1>
-=======
+
 # ── Main Header (Preserved Typography) ────────────────────────────────────────
 st.markdown(
     """
     <h1 class="apihead"><em style="font-family:'Pacifico', cursive; color:#0D9488;">APIx</em> — Airfare Price Index Dashboard</h1>
->>>>>>> Stashed changes
     """,
     unsafe_allow_html=True,
 )
->>>>>>> Stashed changes
 st.caption(
     "Automated high-frequency airfare inflation measurement across major Indian domestic corridors."
 )
 
-<<<<<<< Updated upstream
-cleaned = load_cleaned()
-=======
 cleaned = load_cleaned(_active_db())
 
->>>>>>> Stashed changes
 if cleaned.empty:
     _empty_state()
 else:
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    tab1, tab7, tab30 = st.tabs([WINDOW_LABELS[1], WINDOW_LABELS[7], WINDOW_LABELS[30]])
-=======
-    # Composite APIx is a SINGLE headline number per date (identical across
-    # windows), so it is shown once above the tabs rather than per window.
-=======
     # Composite headline metrics
->>>>>>> Stashed changes
     composite = load_index("daily_index", _active_db())
     latest_date = None
     latest_api = None
@@ -1605,96 +1075,11 @@ else:
 
     st.markdown('<div id="sec-headline"></div>', unsafe_allow_html=True)
     c1, c2 = st.columns(2)
-<<<<<<< Updated upstream
-    c1.metric("Latest composite APIx", f"{latest_api:.2f}" if latest_api is not None else "—")
-    c2.metric("Latest index date", str(latest_date) if latest_date else "—")
-
-# ── City-based flight search (only highlighted cities) ──────────────
-    st.subheader("Search flights by city")
-    st.markdown('<div id="sec-search"></div>', unsafe_allow_html=True)
-
-    city_order = [c for c in CITY_COORDS]
-    city_names = {c: CITY_COORDS[c]["name"] for c in CITY_COORDS}
-
-    s1, s2, s3 = st.columns([1.2, 1.2, 1])
-    origin_code = s1.selectbox(
-        "Origin city",
-        options=city_order,
-        format_func=lambda c: f"{c} — {city_names[c]}",
-        key="city_search_origin",
-    )
-    dest_code = s2.selectbox(
-        "Destination city",
-        options=city_order,
-        index=1,
-        format_func=lambda c: f"{c} — {city_names[c]}",
-        key="city_search_dest",
-    )
-    flat = s3.toggle(
-        "Both directions",
-        value=True,
-        help="Also show flights on the reverse route (dest → origin).",
-    )
-
-    window_filter = st.selectbox(
-        "Lead window",
-        options=["All"] + [f"T+{w}" for w in WINDOWS],
-        key="city_search_window",
-    )
-
-    if origin_code == dest_code:
-        st.warning("Origin and destination are the same city. Pick two different cities.")
-    else:
-        region = cleaned[
-            ((cleaned["origin"] == origin_code) & (cleaned["dest"] == dest_code))
-            | (
-                flat
-                & (cleaned["origin"] == dest_code)
-                & (cleaned["dest"] == origin_code)
-            )
-        ]
-
-        if window_filter != "All":
-            lead = int(window_filter.replace("T+", ""))
-            region = region[region["lead_window_days"] == lead]
-
-        st.caption(
-            f"{len(region):,} flight{'s' if len(region) != 1 else ''} on the "
-            f"{origin_code} ⇄ {dest_code} corridor of {len(cleaned):,} total."
-        )
-
-        if region.empty:
-            _empty_state()
-        else:
-            carrier_sel = st.pills(
-                "Carrier",
-                options=["All"] + sorted(region["carrier"].dropna().unique().tolist()),
-                default="All",
-                key="city_search_carrier",
-            )
-            show = region.sort_values("scrape_date", ascending=False)
-            if carrier_sel != "All":
-                show = show[show["carrier"] == carrier_sel]
-            cols = [
-                "scrape_date", "origin", "dest", "route", "carrier", "flight_no",
-                "depart_time", "arrive_time", "duration_mins", "stops",
-                "total_fare", "lead_window_days", "quality_score",
-            ]
-            cols = [c for c in cols if c in show.columns]
-            show = show[cols]
-            if "total_fare" in show.columns:
-                show = show.copy()
-                show["total_fare"] = show["total_fare"].apply(lambda v: f"₹{v:,.2f}")
-            st.dataframe(show.head(500), width="stretch", hide_index=True)
-
-    st.subheader("Composite trend")
-=======
     c1.metric("Latest Composite APIx", f"{latest_api:.2f}" if latest_api is not None else "—")
     c2.metric("Latest Index Date", str(latest_date) if latest_date else "—")
 
     # ── Composite Trend Section (Macro Headline) ──────────────────────────────
     st.subheader("Composite Trend")
->>>>>>> Stashed changes
     st.markdown('<div id="sec-trend"></div>', unsafe_allow_html=True)
     aggregate_trend()
 
@@ -1711,11 +1096,6 @@ else:
 
     # ── Tabs Section: Globe (Default), Windows, and Dedicated Search ──────────
     st.markdown('<div id="sec-tabs"></div>', unsafe_allow_html=True)
-<<<<<<< Updated upstream
-    tab1, tab7, tab30, tab_map = st.tabs(
-        [WINDOW_LABELS[1], WINDOW_LABELS[7], WINDOW_LABELS[30], "🗺️ Route Map"]
-    )
-=======
     tab_globe, tab1, tab7, tab30, tab_search = st.tabs([
         "Air Corridor Globe & Network",
         WINDOW_LABELS[1],
@@ -1723,13 +1103,9 @@ else:
         WINDOW_LABELS[30],
         "Flight Search by City",
     ])
->>>>>>> Stashed changes
     st.caption(
         "Tabs = Air corridor network on interactive globe (default), advance purchase lead windows (T+1, T+7, T+30), and city-pair search."
     )
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
 
     # ── TAB 1: 3D Globe Feature with Curved Flight Arcs (DEFAULT TAB) ─────────
     with tab_globe:
@@ -1924,7 +1300,6 @@ else:
             st.plotly_chart(fig_globe, key="globe_map_chart", use_container_width=True, config={"scrollZoom": True, "displayModeBar": True, "modeBarButtonsToAdd": ["zoomIn", "zoomOut"], "displaylogo": False})
 
     # ── TAB 2: T+1 (Last-Minute Booking) ───────────────────────────────────────
->>>>>>> Stashed changes
     with tab1:
         render_window_tab(cleaned, 1)
 
@@ -1935,23 +1310,6 @@ else:
     # ── TAB 4: T+30 (1-Month Advance) ──────────────────────────────────────────
     with tab30:
         render_window_tab(cleaned, 30)
-<<<<<<< Updated upstream
-    with tab_map:
-        st.header("Flight routes across India")
-        c1, c2, c3 = st.columns(3)
-        c1.metric("Cities served", f"{len(CITY_COORDS)}")
-        c2.metric("Routes tracked", "12")
-        c3.metric(
-            "Flights in latest scrape",
-            f"{len(cleaned):,}" if not cleaned.empty else "0",
-        )
-        st.caption(
-            "Each line shows a directional route (origin → destination). Line "
-            "thickness reflects the number of flights scraped; hover a city "
-            "marker or route for details. Landing on the map is fixed to India."
-        )
-        route_map(cleaned)
-=======
 
     # ── TAB 5: Dedicated Flight Search by City ─────────────────────────────────
     with tab_search:
@@ -2050,4 +1408,3 @@ else:
                 ]
                 search_cols = [c for c in search_cols if c in show.columns]
                 st.dataframe(show[search_cols].head(350), use_container_width=True, hide_index=True)
->>>>>>> Stashed changes
