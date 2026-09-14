@@ -29,12 +29,12 @@ def _setup_logging() -> None:
     )
 
 
-def _insert_records(records: list[FlightRecord], scrape_date: str) -> int:
+def _insert_records(records: list[FlightRecord], scrape_date: str, db_path: Path | str | None = None) -> int:
     """Batch-insert FlightRecords into raw_flights. Returns row count."""
     if not records:
         return 0
 
-    conn = get_connection()
+    conn = get_connection(db_path)
     try:
         sql = """
             INSERT INTO raw_flights
@@ -65,19 +65,18 @@ def _insert_records(records: list[FlightRecord], scrape_date: str) -> int:
         conn.close()
 
 
-async def run_scrape(target_date: date | None = None) -> None:
-    """Main scrape loop: every route × every day offset in the horizon."""
+async def run_scrape(target_date: date | None = None, db_path: Path | str | None = None) -> None:
+    """Main scrape loop: every route × every configured lead window."""
     _setup_logging()
-    init_db()
+    init_db(db_path)
 
     cfg = _load_routes()
     routes = cfg["routes"]
-    horizon = int(cfg.get("horizon_days", 30))
-    offsets = list(range(1, horizon + 1))
+    offsets = [int(w) for w in cfg.get("lead_windows", [1, 7, 30])]
     scrape_date_str = (target_date or date.today()).isoformat()
 
     log.info("=== Scrape run: %s ===", scrape_date_str)
-    log.info("Routes: %d | Horizon: %d days (offsets 1..%d)", len(routes), horizon, horizon)
+    log.info("Routes: %d | Lead windows: %s", len(routes), offsets)
 
     scraper = GoogleFlightsScraper()
     total_inserted = 0
@@ -91,7 +90,7 @@ async def run_scrape(target_date: date | None = None) -> None:
 
             try:
                 records = await scraper.fetch_flights(origin, dest, travel, lead)
-                count = _insert_records(records, scrape_date_str)
+                count = _insert_records(records, scrape_date_str, db_path)
                 total_inserted += count
                 log.info("  OK %d flights saved", count)
             except Exception as exc:
@@ -108,10 +107,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run flight scrape")
     parser.add_argument("--date", type=str, default=None,
                         help="Scrape date as YYYY-MM-DD (default: today)")
+    parser.add_argument("--db", type=str, default=None,
+                        help="Path to SQLite db (default: data/apix.db)")
     args = parser.parse_args()
 
     target = date.fromisoformat(args.date) if args.date else None
-    asyncio.run(run_scrape(target))
+    asyncio.run(run_scrape(target, args.db))
 
 
 if __name__ == "__main__":

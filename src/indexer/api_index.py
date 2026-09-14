@@ -315,9 +315,22 @@ def compute_rolling_index(
         df.groupby(["lead_window_days", "route"])["route_index"]
         .transform(lambda s: _rolling_agg(s, window_days, estimator, trim_frac))
     )
-    df["agg_roll"] = (
-        df.groupby("lead_window_days")["aggregate_index"]
+    # The composite headline is ONE value per date (identical across routes and
+    # windows), so the rolling aggregate must run over date-deduped values.
+    # Rolling over the route-major frame would sweep across route blocks.
+    unique_agg = (
+        df.drop_duplicates(["lead_window_days", "index_date"])
+        [["lead_window_days", "index_date", "aggregate_index"]]
+        .copy()
+    )
+    unique_agg["agg_roll"] = (
+        unique_agg.groupby("lead_window_days")["aggregate_index"]
         .transform(lambda s: _rolling_agg(s, window_days, estimator, trim_frac))
+    )
+    df = df.merge(
+        unique_agg[["lead_window_days", "index_date", "agg_roll"]],
+        on=["lead_window_days", "index_date"],
+        how="left",
     )
 
     out = pd.DataFrame(
