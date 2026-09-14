@@ -43,6 +43,7 @@ def _compute_quality_score(df: pd.DataFrame) -> pd.Series:
 def clean_raw_data(
     db_path: str | Path | None = None,
     cfg_path: Path | None = None,
+    scrape_date: str | None = None,
 ) -> dict:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
     from src.storage.database import DB_PATH, get_connection
@@ -57,6 +58,10 @@ def clean_raw_data(
     conn = get_connection(path)
     df = pd.read_sql("SELECT * FROM raw_flights", conn)
     conn.close()
+
+    if scrape_date:
+        df = df[df["scrape_date"] == scrape_date].copy()
+        log.info("Filtering to scrape_date=%s (%d rows)", scrape_date, len(df))
 
     if df.empty:
         log.warning("raw_flights is empty - nothing to clean")
@@ -93,7 +98,6 @@ def clean_raw_data(
     log.info("Flagged %d outliers via IQR (x%.1f)", outlier_count, multiplier)
 
     df["quality_score"] = _compute_quality_score(df)
-    df["scrape_date"] = pd.to_datetime(df["scrape_timestamp"]).dt.date.astype(str)
     df["scrape_timestamp"] = pd.to_datetime(df["scrape_timestamp"]).dt.strftime("%Y-%m-%d %H:%M:%S")
     df["depart_time"] = pd.to_datetime(df["depart_time"], errors="coerce").dt.strftime("%Y-%m-%d %H:%M:%S")
     df["arrive_time"] = pd.to_datetime(df["arrive_time"], errors="coerce").dt.strftime("%Y-%m-%d %H:%M:%S")
