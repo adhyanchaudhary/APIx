@@ -3,11 +3,7 @@
 Predicts whether a flight's fare will go DOWN / stay STABLE / go UP over the
 next sampling point, given the cleared flight row plus market context.
 
-INTENTIONALLY NOT WIRED into the MVP pipeline. This module exists as the
-open-ended Phase 2 model. It is not imported anywhere in the app, and it
-depends on a future `tensorflow` install (see PRD roadmap — not in
-requirements.txt for the MVP).
-
+INTENTIONALLY NOT WIRED into the MVP pipeline.
 Architecture (per the agreed spec):
     Input  : 20 features (see FEATURES)
     Hidden : 2 Dense layers, ReLU activation, Dropout(0.3) after each

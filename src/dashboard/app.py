@@ -22,6 +22,8 @@ from __future__ import annotations
 
 import math
 import sys
+import threading
+from datetime import datetime
 from pathlib import Path
 
 import numpy as np
@@ -34,6 +36,8 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(_REPO_ROOT))
 
 from src.storage.database import DB_PATH, get_connection, init_db
+from src.indexer.api_index import cell_staleness_days, load_stale_cap
+from src.live.run_live import live_engine
 
 # ── Page Configuration ────────────────────────────────────────────────────────
 st.set_page_config(
@@ -74,6 +78,8 @@ ROUTE_COLORS = [
 
 ACCENT = "#6C5CE7"
 
+TOTAL_BASKET_CELLS = 12 * 3  # 12 directional routes × 3 lead windows
+
 CITY_COORDS = {
     "DEL": {"lat": 28.5562, "lon": 77.1000, "name": "New Delhi", "airport": "Indira Gandhi International (DEL)"},
     "BOM": {"lat": 19.0896, "lon": 72.8656, "name": "Mumbai", "airport": "Chhatrapati Shivaji Maharaj Intl (BOM)"},
@@ -111,12 +117,11 @@ TEAL_PALETTE = [
     "#0369A1",  # Ocean
 ]
 
-DATA_DB_OPTIONS = {
-    "Production Database (data/apix.db)": str(DB_PATH),
-}
+DATA_DB_OPTIONS: dict[str, str] = {}
 _e2e = _REPO_ROOT / "data" / "e2e_real.db"
 if _e2e.exists():
-    DATA_DB_OPTIONS["Benchmark Dataset (data/e2e_real.db)"] = str(_e2e)
+    DATA_DB_OPTIONS["Real Scraped Database (data/e2e_real.db)"] = str(_e2e)
+DATA_DB_OPTIONS["Synthetic Demo Database (data/apix.db)"] = str(DB_PATH)
 
 
 DARK_CSS = """
@@ -541,6 +546,74 @@ def seed_demo_data() -> None:
     run_index(db_path=db)
 
 
+# ── Live Scrape Engine (background thread) ───────────────────────────────────
+# One daemon thread drives the live_engine loop; the dashboard only reads the
+# resulting tables, so the UI never blocks on Google Flights.
+_LIVE = {"stop": None, "thread": None, "started_at": None, "error": None}
+
+
+def _live_thread_target(db: str, interval: int, rotate: int) -> None:
+    _LIVE["error"] = None
+    try:
+        live_engine(
+            db_path=Path(db),
+            interval=interval,
+            no_scrape=False,
+            rotate=rotate,
+            stop_event=_LIVE["stop"],
+        )
+    except Exception as exc:  # noqa: BLE001 - surface, never crash the app
+        _LIVE["error"] = f"{type(exc).__name__}: {exc}"
+    finally:
+        _LIVE["thread"] = None
+
+
+def _live_is_running() -> bool:
+    return _LIVE["thread"] is not None and _LIVE["thread"].is_alive()
+
+
+def _start_live(interval: int, rotate: int) -> None:
+    if _live_is_running():
+        return
+    if _LIVE["stop"] is None:
+        _LIVE["stop"] = threading.Event()
+    else:
+        _LIVE["stop"].clear()
+    _LIVE["started_at"] = datetime.now()
+    _LIVE["thread"] = threading.Thread(
+        target=_live_thread_target,
+        args=(_active_db(), interval, rotate),
+        daemon=True,
+        name="api-live-engine",
+    )
+    _LIVE["thread"].start()
+
+
+def _stop_live() -> None:
+    if _LIVE["stop"] is not None:
+        _LIVE["stop"].set()
+
+
+def _load_live_tape(limit: int = 500) -> pd.DataFrame:
+    conn = get_connection(_active_db())
+    try:
+        tables = {
+            r[0] for r in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            ).fetchall()
+        }
+        if "live_index" not in tables:
+            return pd.DataFrame()
+        df = pd.read_sql(
+            "SELECT * FROM live_index ORDER BY id DESC LIMIT ?",
+            conn,
+            params=(limit,),
+        )
+        return df.sort_values("id").reset_index(drop=True)
+    finally:
+        conn.close()
+
+
 # ── Chart Theming Helpers (Scientific Light Palette) ──────────────────────────
 def fig_base(fig: go.Figure, height: int = 360) -> None:
     fig.update_layout(
@@ -581,25 +654,38 @@ def compute_curved_arc(
 
 # ── Self-Explanatory Table Builders ───────────────────────────────────────────
 def composite_table(table: str) -> pd.DataFrame:
-    """Composite headline rows with self-explanatory column names."""
+    """Composite headline rows with self-explanatory column names (daily shows
+    the Open/Close session bracket; weekly/monthly show the rolling-from-close)."""
     df = load_index(table, _active_db())
     if df.empty:
         return df
-    out = (
-        df.drop_duplicates("index_date")[["index_date", "aggregate_index", "base_period"]]
-        .copy()
-        .sort_values("index_date", ascending=False)
-    )
-    out["aggregate_index"] = out["aggregate_index"].round(2)
+    uniq = df.drop_duplicates("index_date")
+    has_oc = {"open_index", "close_index"}.issubset(df.columns)
+    cols = ["index_date", "base_period"]
+    if has_oc:
+        cols += ["open_index", "close_index", "aggregate_index"]
+    else:
+        cols += ["aggregate_index"]
+    out = uniq[cols].copy().sort_values("index_date", ascending=False)
+    out["aggregate_index"] = pd.to_numeric(out["aggregate_index"], errors="coerce").round(2)
+    if has_oc:
+        out["open_index"] = pd.to_numeric(out["open_index"], errors="coerce").round(2)
+        out["close_index"] = pd.to_numeric(out["close_index"], errors="coerce").round(2)
+        out["day_movement"] = out["close_index"] - out["open_index"]
     out["inflation_change"] = out["aggregate_index"].apply(
         lambda v: f"+{v - 100.0:.2f}%" if v >= 100.0 else f"{v - 100.0:.2f}%"
     )
-    return out.rename(columns={
+    rename_map = {
         "index_date": "Index Date",
-        "aggregate_index": "National APIx Level (Base = 100.00)",
+        "aggregate_index": "APIx Level (Base = 100.00)",
         "inflation_change": "Inflation vs Base Period (%)",
         "base_period": "Reference Base Date",
-    })
+    }
+    if has_oc:
+        rename_map["open_index"] = "APIx Open (session start)"
+        rename_map["close_index"] = "APIx Close (session end)"
+        rename_map["day_movement"] = "Day Movement (Close − Open)"
+    return out.rename(columns=rename_map)
 
 
 def route_price_table(cleaned_w: pd.DataFrame) -> pd.DataFrame:
@@ -788,30 +874,44 @@ def route_map(cleaned: pd.DataFrame) -> None:
 
 
 def aggregate_trend(key: str = "main_composite_trend") -> None:
-    """Composite headline plotted with 7-day and 30-day rolling averages."""
+    """Composite headline: daily Open + Close lines, weekly/monthly rolling
+    averages computed from the daily CLOSES (stock-index style)."""
     frames = []
     for tbl in INDEX_TABLES:
         df = load_index(tbl, _active_db())
         if df.empty:
             continue
-        series = (
-            df.drop_duplicates("index_date")[["index_date", "aggregate_index"]]
-            .copy()
-            .sort_values("index_date")
-        )
-        series["Series"] = INDEX_TABLE_LABELS[tbl]
-        frames.append(series)
+        uniq = df.drop_duplicates("index_date").sort_values("index_date")
+        if tbl == "daily_index" and {"open_index", "close_index"}.issubset(df.columns):
+            op = uniq[["index_date", "open_index"]].copy()
+            op = op.rename(columns={"open_index": "value"})
+            op["value"] = pd.to_numeric(op["value"], errors="coerce")
+            op["Series"] = "Daily Open (session start)"
+            cl = uniq[["index_date", "close_index"]].copy()
+            cl = cl.rename(columns={"close_index": "value"})
+            cl["value"] = pd.to_numeric(cl["value"], errors="coerce")
+            cl["Series"] = "Daily Close (session end)"
+            frames.append(op)
+            frames.append(cl)
+        else:
+            series = (
+                uniq[["index_date", "aggregate_index"]]
+                .rename(columns={"aggregate_index": "value"})
+                .copy()
+            )
+            series["Series"] = INDEX_TABLE_LABELS[tbl]
+            frames.append(series)
     if not frames:
         return
     trend = pd.concat(frames, ignore_index=True)
     fig = px.line(
         trend,
         x="index_date",
-        y="aggregate_index",
+        y="value",
         color="Series",
-        title="National APIx Headline Index Over Time (Base = 100.00)",
+        title="National APIx Headline (Base = 100.00) — Daily Open/Close & Rolling-from-Close",
         markers=True,
-        color_discrete_sequence=["#0D9488", "#0284C7", "#D97706"],
+        color_discrete_sequence=["#94A3B8", "#0D9488", "#0284C7", "#D97706"],
     )
     fig.update_layout(xaxis_title="Calculation Date", yaxis_title="Index Level")
     fig_base(fig, height=360)
@@ -999,6 +1099,7 @@ with st.sidebar:
     )
     st.session_state["db_path"] = DATA_DB_OPTIONS[_db_label]
     st.caption(f"Path: `{DATA_DB_OPTIONS[_db_label]}`")
+    init_db(st.session_state["db_path"])
 
     if st.button("Refresh Data", key="sidebar_refresh_btn", use_container_width=True):
         st.cache_data.clear()
@@ -1015,6 +1116,56 @@ with st.sidebar:
         st.rerun()
 
     st.divider()
+    st.subheader("Live Scrape Engine")
+    st.caption(
+        "Runs the real Google Flights scrape loop in a background thread. Each "
+        "cycle scrapes a rotating route subset, cleans, recomputes the index, and "
+        "writes a tick — the tape below refreshes automatically."
+    )
+    if _live_is_running():
+        since = _LIVE.get("started_at")
+        st.success(f"RUNNING since {since:%H:%M:%S}" if since else "RUNNING")
+    elif _LIVE.get("started_at"):
+        st.info("engine stopped")
+    if _LIVE.get("error"):
+        st.error(_LIVE["error"])
+    st.number_input(
+        "Cycle interval (seconds)",
+        min_value=30,
+        max_value=3600,
+        value=180,
+        step=30,
+        key="live_interval",
+    )
+    st.slider(
+        "Routes scraped per cycle",
+        min_value=1,
+        max_value=12,
+        value=2,
+        key="live_rotate",
+    )
+    c_start, c_stop = st.columns(2)
+    c_start.button(
+        "Start Live",
+        key="live_start_btn",
+        use_container_width=True,
+        disabled=_live_is_running(),
+    )
+    c_stop.button(
+        "Stop",
+        key="live_stop_btn",
+        use_container_width=True,
+        disabled=not _live_is_running(),
+    )
+    if st.session_state.get("live_start_btn"):
+        _start_live(int(st.session_state.get("live_interval", 180)),
+                    int(st.session_state.get("live_rotate", 2)))
+        st.rerun()
+    if st.session_state.get("live_stop_btn"):
+        _stop_live()
+        st.rerun()
+
+    st.divider()
     st.subheader("Index Specification")
     st.markdown(
         """
@@ -1028,6 +1179,134 @@ with st.sidebar:
     st.caption("SIH-2026 Innovation Project · Institutional Release")
 
 
+@st.fragment(run_every=10)
+def live_tape_fragment() -> None:
+    """Auto-refreshing live tick tape: engine status, session bracket, and the
+    most recent scraped ticks straight from live_index."""
+    db = _active_db()
+    tape = _load_live_tape()
+    today = datetime.now().date().isoformat()
+
+    conn = get_connection(db)
+    try:
+        cols = {r[1] for r in conn.execute("PRAGMA table_info(daily_index)").fetchall()}
+        has_oc = {"open_index", "close_index"}.issubset(cols)
+        if has_oc:
+            row = conn.execute(
+                "SELECT open_index, close_index FROM daily_index"
+                " WHERE index_date = ? ORDER BY id LIMIT 1",
+                (today,),
+            ).fetchone()
+            open_today = float(row[0]) if row and row[0] is not None else None
+            close_today = float(row[1]) if row and row[1] is not None else None
+        else:
+            row = conn.execute(
+                "SELECT aggregate_index FROM daily_index"
+                " WHERE index_date = ? ORDER BY id LIMIT 1",
+                (today,),
+            ).fetchone()
+            open_today = None
+            close_today = float(row[0]) if row and row[0] is not None else None
+    finally:
+        conn.close()
+
+    running = _live_is_running()
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Engine", "LIVE scraping" if running else "Idle")
+    c2.metric("Ticks Recorded", f"{len(tape)}")
+    c3.metric("Session Open", f"{open_today:.2f}" if open_today is not None else "—")
+    c4.metric("Latest Headline", f"{close_today:.2f}" if close_today is not None else "—")
+
+    # ── Basket coverage & staleness (data freshness) ─────────────────────────
+    # Coverage % = cells with a price today / full 36-cell basket. With
+    # carry-forward, every ever-observed cell is present; coverage then measures
+    # basket completeness. Max staleness = oldest price_obs_date among today's
+    # cells; turns orange when it exceeds indexer's stale_cap_days (keep-but-flag).
+    coverage = None
+    max_stale = None
+    present_cells = 0
+    daily_today = pd.DataFrame()
+    if today:
+        daily_today = load_index("daily_index", db)
+    if not daily_today.empty:
+        today_rows = daily_today[daily_today["index_date"] == today]
+        present = today_rows.drop_duplicates(["route", "lead_window_days"])
+        present_cells = len(present)
+        coverage = present_cells / TOTAL_BASKET_CELLS
+        stale = cell_staleness_days(present.reset_index(drop=True))
+        max_stale = int(stale.max()) if not stale.empty else 0
+    cap = load_stale_cap()
+    stale_over = cap is not None and max_stale is not None and max_stale > cap
+
+    c5, c6 = st.columns(2)
+    c5.metric(
+        "Basket Coverage",
+        f"{coverage:.0%}" if coverage is not None else "—",
+        delta=f"{present_cells}/{TOTAL_BASKET_CELLS} cells",
+    )
+    c6.metric(
+        "Max Staleness",
+        f"{max_stale}d" if max_stale is not None else "—",
+        delta=f"cap {cap}d" if cap is not None else "no cap",
+        delta_color="inverse" if stale_over else "off",
+    )
+    if stale_over:
+        st.warning(
+            f"The freshest cell in today's basket is {max_stale} days old — above "
+            f"the {cap}-day stale_cap_days. Prices are carried forward; consider "
+            f"a scrape pass for the lagging routes."
+        )
+
+    if open_today is not None and close_today is not None:
+        move = close_today - open_today
+        st.caption(
+            f"Intraday move {move:+.2f} pts since the day opened at 100.00 · "
+            "tape refreshes every 10 s"
+        )
+
+    if tape.empty:
+        if not running:
+            st.info("No live ticks recorded yet — press **Start Live** in the sidebar, or run "
+                    "`python -m src.live.run_live --interval 180` from a terminal.")
+        else:
+            st.info("Engine warming up — awaiting the first completed scrape cycle…")
+        return
+
+    t = tape.copy()
+    t["t"] = pd.to_datetime(t["tick_timestamp"], errors="coerce")
+    t["t"] = t["t"].fillna(pd.to_datetime(t["index_date"], errors="coerce"))
+    t = t[t["t"].notna()]
+    chart = px.line(
+        t,
+        x="t",
+        y="aggregate_index",
+        markers=True,
+        title="Live Headline — Last Recorded Ticks",
+        color_discrete_sequence=["#0D9488"],
+    )
+    if open_today is not None:
+        chart.add_hline(y=open_today, line_dash="dot", line_color="#94A3B8",
+                        annotation_text="day open", annotation_position="top left")
+    chart.update_layout(xaxis_title="Tick Time", yaxis_title="APIx Level")
+    fig_base(chart, height=300)
+    st.plotly_chart(chart, key="live_tape_chart", use_container_width=True, config={"displayModeBar": False})
+
+    last = t.tail(12).iloc[::-1][["t", "route", "lead_window_days", "route_price", "route_index", "delta"]].copy()
+    last["t"] = last["t"].dt.strftime("%H:%M:%S")
+    st.dataframe(
+        last.rename(columns={
+            "t": "Tick",
+            "route": "Mover Route",
+            "lead_window_days": "Window (T+)",
+            "route_price": "Route Fare (INR)",
+            "route_index": "Route Index",
+            "delta": "Headline Δ",
+        }).round({"route_price": 0, "route_index": 2, "delta": 2}),
+        use_container_width=True,
+        hide_index=True,
+    )
+
+
 # ── Long Teal Top Navigation Bar ──────────────────────────────────────────────
 st.markdown('<div style="height:3.5rem"></div>', unsafe_allow_html=True)
 st.markdown(
@@ -1035,6 +1314,7 @@ st.markdown(
     <nav class="topbar">
         <span class="rnav-title">Navigation</span>
         <a href="#sec-headline"><span class="rnav-dot"></span>Headline</a>
+        <a href="#sec-live"><span class="rnav-dot"></span>Live Tape</a>
         <a href="#sec-trend"><span class="rnav-dot"></span>Trend</a>
         <a href="#sec-composite-tables"><span class="rnav-dot"></span>Composite Tables</a>
         <a href="#sec-tabs"><span class="rnav-dot"></span>Globe, Windows & Search</a>
@@ -1059,24 +1339,38 @@ st.caption(
     "Automated high-frequency airfare inflation measurement across major Indian domestic corridors."
 )
 
+# ── Live Tick Tape Section (auto-refreshing, visible even on an empty DB) ────
+st.markdown('<div id="sec-live"></div>', unsafe_allow_html=True)
+st.subheader("Live Tick Tape")
+live_tape_fragment()
+
 cleaned = load_cleaned(_active_db())
 
 if cleaned.empty:
     _empty_state()
 else:
-    # Composite headline metrics
+    # Composite headline metrics (stock-market day session: open → close)
     composite = load_index("daily_index", _active_db())
     latest_date = None
-    latest_api = None
+    latest_open = None
+    latest_close = None
+    day_move = None
     if not composite.empty:
-        latest_composite = composite.sort_values("index_date").iloc[-1]
+        latest_composite = composite.drop_duplicates("index_date").sort_values("index_date").iloc[-1]
         latest_date = latest_composite["index_date"]
-        latest_api = float(latest_composite["aggregate_index"])
+        latest_close = float(latest_composite["aggregate_index"])
+        if "open_index" in composite.columns and pd.notna(latest_composite["open_index"]):
+            latest_open = float(latest_composite["open_index"])
+        else:
+            latest_open = latest_close
+        day_move = latest_close - latest_open
 
     st.markdown('<div id="sec-headline"></div>', unsafe_allow_html=True)
-    c1, c2 = st.columns(2)
-    c1.metric("Latest Composite APIx", f"{latest_api:.2f}" if latest_api is not None else "—")
-    c2.metric("Latest Index Date", str(latest_date) if latest_date else "—")
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Today's Open", f"{latest_open:.2f}" if latest_open is not None else "—")
+    c2.metric("Latest Close", f"{latest_close:.2f}" if latest_close is not None else "—")
+    c3.metric("Day Movement", f"{'+' if day_move and day_move >= 0 else ''}{day_move:.2f}" if day_move is not None else "—")
+    c4.metric("Latest Index Date", str(latest_date) if latest_date else "—")
 
     # ── Composite Trend Section (Macro Headline) ──────────────────────────────
     st.subheader("Composite Trend")
@@ -1096,15 +1390,16 @@ else:
 
     # ── Tabs Section: Globe (Default), Windows, and Dedicated Search ──────────
     st.markdown('<div id="sec-tabs"></div>', unsafe_allow_html=True)
-    tab_globe, tab1, tab7, tab30, tab_search = st.tabs([
+    tab_globe, tab1, tab7, tab30, tab_search, tab_docs = st.tabs([
         "Air Corridor Globe & Network",
         WINDOW_LABELS[1],
         WINDOW_LABELS[7],
         WINDOW_LABELS[30],
         "Flight Search by City",
+        "Docs / Methodology",
     ])
     st.caption(
-        "Tabs = Air corridor network on interactive globe (default), advance purchase lead windows (T+1, T+7, T+30), and city-pair search."
+        "Tabs = Air corridor network on interactive globe (default), advance purchase lead windows (T+1, T+7, T+30), city-pair search, and methodology documentation."
     )
 
     # ── TAB 1: 3D Globe Feature with Curved Flight Arcs (DEFAULT TAB) ─────────
@@ -1408,3 +1703,131 @@ else:
                 ]
                 search_cols = [c for c in search_cols if c in show.columns]
                 st.dataframe(show[search_cols].head(350), use_container_width=True, hide_index=True)
+
+    # ── TAB 6: Docs / Methodology ─────────────────────────────────────────────
+    with tab_docs:
+        st.markdown(
+            '<h2 class="feature-heading">APIx — Methodology &amp; Formula Reference</h2>',
+            unsafe_allow_html=True,
+        )
+        st.caption(
+            "Formulation basis for the Ministry of Statistics (MoSPI), NSO, and Reserve Bank of India (RBI). "
+            "Documentation mirrors the live index builders in src/indexer/api_index.py, src/indexer/estimators.py "
+            "and the stabilisation benchmark in src/indexer/metrics.py."
+        )
+
+        # ── 1. Index Formula ──────────────────────────────────────────────────
+        st.subheader("Index Definition")
+        st.markdown(
+            """
+            APIx is a **36-cell Laspeyres-type price basket** over leading Indian domestic corridors.
+            Each **cell** is a route × booking-lead window combination (12 routes × 3 windows = 36 cells).
+
+            **Step 1 — Cell price.** Every scraped fare on a given day collapses to a single robust cell price
+            using the **median** (not the mean), so one ultra-cheap or ultra-costly fare cannot distort a cell:
+
+            ```
+            P(t, r, w) = median fare observed on date t  for route r at lead window w
+            ```
+
+            **Step 2 — Cell index.** Each cell is priced against its own base-period fare on the shared
+            reference date (base = 100.00):
+
+            ```
+            index(t, r, w) = [ P(t, r, w) / P(0, r, w) ] × 100
+            ```
+
+            where `P(0, r, w)` is the base fare of cell `(r, w)`. Cells with no observation on the shared base
+            date join the basket at 100 on their own first observation date.
+
+            **Step 3 — Cell weight.** Each cell carries the product of its route and booking-horizon shares:
+
+            ```
+            w(r, w) = w_route(r) × w_window(w)
+            ```
+
+            Route weights are the DGCA traffic-share approximation (normalised to sum 1.0); window weights
+            reflect booking mix — 0.20 last-minute, 0.30 one-week, 0.50 one-month.
+
+            **Step 4 — Composite headline.** All cells present on date `t` are blended into a single national
+            headline using a robust aggregation estimator `E`:
+
+            ```
+            APIx(t) = E( index(t, r, w) · w(r, w) )   for every cell present on t
+            ```
+
+            Missing dates are **carried forward** from the last known fare, so a coverage gap never drags the
+            headline down artificially.
+
+            **Step 5 — Day session (open / close).** Within a given day the headline is recomputed on every
+            scrape cycle. The **open** is the first headline observed for the day (frozen once set); the **close**
+            is the latest headline, updated until the market day ends. The daily headline shown below is the
+            day's closing value.
+
+            **Step 6 — Rolling (weekly / monthly).** Exactly like a stock index moving average, the weekly and
+            monthly rollups are computed from the daily **closing** headlines, never from intraday values.
+            """
+        )
+
+        # ── 2. Estimator Benchmarking ─────────────────────────────────────────
+        st.subheader("Estimator Benchmarking — Stable Index Selection")
+        st.markdown(
+            """
+            The headline estimator **has been benchmarked** so that the daily index is the most *stable*
+            (calmest) yet still economically honest. Three aggregation estimators were compared over the same
+            underlying price data:
+            """
+        )
+
+        est_data = pd.DataFrame([
+            {
+                "Estimator": "Weighted Mean",
+                "Formula": "Σ (v · w) / Σ w",
+                "Role": "Classic Laspeyres aggregate; every cell contributes in proportion to its basket weight.",
+                "Behaviour": "Sensitive to extreme cells; skips up/down when one big route spikes.",
+            },
+            {
+                "Estimator": "Weighted Median",
+                "Formula": "value at cumulative weight = 0.5",
+                "Role": "Fully robust; the level at which half the basket weight lies on each side.",
+                "Behaviour": "Most resistant to outliers, but can underreact to genuine broad-based moves.",
+            },
+            {
+                "Estimator": "Trimmed Weighted Mean (10%)",
+                "Formula": "weighted mean after shaving 10% weight off each tail",
+                "Role": "Compromise; CPI-style. Removes cheap/costly extremes by WEIGHT MASS (not route count), re-balances and averages the survivors.",
+                "Behaviour": "Keeps the tail reactions of the mean while muting single-route noise. **Selected default.**",
+            },
+        ])
+        st.dataframe(
+            est_data,
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "Estimator": st.column_config.TextColumn("Estimator", width="medium"),
+                "Formula": st.column_config.TextColumn("Formula", width="medium"),
+                "Role": st.column_config.TextColumn("Role", width="large"),
+                "Behaviour": st.column_config.TextColumn("Benchmark Finding", width="large"),
+            },
+        )
+
+        st.markdown(
+            """
+            **Stability scoring.** Each candidate was scored on how the CONSTANT-COMPOSITION daily aggregate
+            moves day-to-day (lower = calmer):
+
+            - `mean_abs_change` — average index-point move between consecutive days
+            - `std_change` — volatility σ of those day-to-day moves
+            - `max_abs_change` — worst single-day move
+            - `extreme_move_days` — count of days moving more than ±5.0 index points
+
+            The **10% trimmed weighted mean** was selected because, across the 36-cell basket, it consistently
+            delivered the lowest volatility while preserving genuine trend signal — it avoids the weighted
+            mean's single-route spike sensitivity without the weighted median's sluggishness. The comparison is
+            reproducible: `compare_aggregation_estimators()` in `src/indexer/metrics.py` re-runs the index under
+            all three estimators and prints the per-window stability tables.
+
+            > **Current configuration** (config/indexer.yaml): `aggregation_estimator: "weighted_trimmed_mean"`,
+            > `aggregation_trim_frac: 0.10`, `route_price_method: "median"`.
+            """
+        )
