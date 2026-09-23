@@ -237,6 +237,15 @@ python -m pytest tests/ -q --cov=src --cov-report=term-missing
 - [x] Production cleaning pipeline (`clean.py`) + modular variant (`pipeline.py`).
 - [x] Index builder with pluggable estimators, 36-cell basket, carry-forward,
       rolling week/month indices.
+- [x] Indexer fix plan implemented (§4 of `docs/INDEX_METHODOLOGY.md`): prices
+      carried to the present with a `price_obs_date` stamp (schema migration +
+      coverage/staleness metrics on the dashboard, `stale_cap_days` flag policy),
+      and late cells chain-linked via a bridge anchor instead of joining at 100.
+      74 tests pass.
+- [x] Live engine (`src/live/run_live.py`) primes the full 12-route basket on
+      startup (skipped if today is already complete; `--no-prime` disables it),
+      then round-robins a `--rotate`-route subset per cycle + recomputes the
+      full index + emits diffs. 76 tests pass.
 - [x] 29-file HTML code walkthrough generator (`src/generate_walkthroughs.py`).
 - [x] Offline test suites for indexer, estimators, metrics.
 - [x] Streamlit dashboard (`src/dashboard/app.py`) — per-window tabs (T+1 / T+7 /

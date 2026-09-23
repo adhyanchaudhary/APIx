@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>APIx — Deck Slides</title>
+<style>
+:root{
+  --bg:#F4F7FA; --ink:#1A1A2E; --muted:#546E7A;
+  --teal:#0B7285; --teal-lt:#E0F2F1; --teal-bd:#80CBC4;
+  --dark:#0F2537; --dark-lt:#163B52;
+  --line:#D5DEE8; --card:#FFFFFF;
+  --mono:'SF Mono','Cascadia Code','Consolas',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-snap-type:y mandatory;overflow-y:scroll;background:var(--bg)}
+body{font-family:'Segoe UI','Inter','Helvetica Neue',Arial,sans-serif;color:var(--ink);background:var(--bg)}
+.hdr h1{font-family:'Segoe UI',Arial,sans-serif}
+
+.slide-page{width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;scroll-snap-align:start;padding:10px}
+.slide{width:min(96vw,calc(96vh*16/9));aspect-ratio:16/9;background:var(--card);border-radius:6px;box-shadow:0 2px 20px rgba(0,0,0,.12);overflow:hidden;display:flex;flex-direction:column}
+
+.hdr{padding:16px 28px 10px;background:var(--dark);color:#fff;flex:0 0 auto;position:relative}
+.hdr h1{font-size:1.1rem;font-weight:700}
+.hdr p{opacity:.7;margin-top:2px;font-size:.58rem}
+.hdr .sn{position:absolute;top:14px;right:22px;font-size:.52rem;font-weight:700;opacity:.45;letter-spacing:1px}
+.body{padding:10px 28px 16px;flex:1 1 auto;display:flex;flex-direction:column;gap:6px;overflow:hidden}
+
+.row{display:flex;gap:8px;align-items:stretch}
+.box{border-radius:5px;padding:8px 10px;flex:1 1 0;min-width:0;background:var(--teal-lt);border:1px solid var(--teal-bd)}
+.box .t{font-weight:700;font-size:.58rem;color:var(--teal);margin-bottom:2px}
+.box p,.box li{font-size:.46rem;line-height:1.3;color:var(--ink)}
+.box ul{margin:2px 0 0 10px}
+.box code{font-family:var(--mono);font-size:.43rem;background:rgba(0,0,0,.05);padding:0 3px;border-radius:2px}
+.box.alt{background:#F4F7FA;border:1px solid var(--line)}.box.alt .t{color:var(--dark)}
+
+.arrow{text-align:center;color:var(--muted);font-size:.65rem;padding:0;flex:0 0 auto}
+
+.pill{display:inline-block;font-size:.42rem;font-weight:700;letter-spacing:.4px;padding:2px 8px;border-radius:6px;color:#fff;text-transform:uppercase;background:var(--teal)}
+
+.banner{background:var(--dark);border-radius:5px;padding:8px 16px;color:#fff;text-align:center}
+.banner .big{font-family:var(--mono);font-size:.85rem;font-weight:700;letter-spacing:.3px}
+.banner .sub{font-size:.48rem;opacity:.7;margin-top:2px}
+
+.cards{display:flex;gap:8px}
+.card{border-radius:5px;padding:8px 10px;flex:1 1 0;border:1px solid var(--teal-bd);background:var(--teal-lt);min-width:0}
+.card .ct{font-weight:700;font-size:.52rem;color:var(--teal);margin-bottom:3px}
+.card .fm{font-family:var(--mono);font-size:.55rem;font-weight:700;color:var(--dark);margin-bottom:4px}
+.card p,.card li{font-size:.43rem;line-height:1.3}
+.card ul{margin:2px 0 0 10px}
+
+.chips{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.chip{font-size:.4rem;font-family:var(--mono);border:1px solid var(--teal-bd);border-radius:8px;padding:2px 7px;white-space:nowrap;background:var(--teal-lt);color:var(--teal)}
+
+.layers{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1 1 auto}
+.layer{display:flex;gap:6px;justify-content:center;width:100%}
+.larr{color:var(--muted);font-size:.55rem;padding:1px 0}
+
+.cycle{display:flex;align-items:center;justify-content:center;gap:0;margin:2px 0}
+.cnode{width:62px;height:62px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1.5px solid var(--teal-bd);background:var(--teal-lt);font-size:.4rem;font-weight:700;color:var(--teal);text-align:center;padding:3px;letter-spacing:.5px}
+.cnode .ci{font-size:.6rem;margin-bottom:2px;font-weight:800}
+.carr{font-size:.7rem;color:var(--muted);padding:0 2px}
+
+table.dt{border-collapse:collapse;font-size:.44rem;width:100%}
+table.dt th{text-align:left;color:#fff;background:var(--teal);padding:3px 6px}
+table.dt td{border:1px solid var(--line);padding:3px 6px}
+
+.nav{position:fixed;right:14px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:99}
+.nav a{width:10px;height:10px;border-radius:50%;background:rgba(11,114,133,.2);border:2px solid rgba(11,114,133,.4);display:block;transition:all .2s}
+.nav a.active,.nav a:hover{background:var(--teal);border-color:var(--dark);transform:scale(1.4)}
+.page-label{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);font-size:.5rem;color:var(--muted);letter-spacing:1px;z-index:99}
+</style>
+</head>
+<body>
+
+<div class="nav"><a href="#s1"></a><a href="#s2"></a><a href="#s3"></a><a href="#s4"></a></div>
+<div class="page-label">SCROLL &darr;</div>
+
+<!-- ══════ SLIDE 1 — PIPELINE ══════ -->
+<div class="slide-page" id="s1"><div class="slide">
+<div class="hdr">
+  <span class="sn">1 / 3</span>
+  <h1>Data Pipeline</h1>
+  <p>Scrape &rarr; Clean &rarr; Index &rarr; Dashboard</p>
+</div>
+<div class="body">
+
+  <span class="pill">Scrape</span>
+  <div class="row">
+    <div class="box"><div class="t">Google Flights</div><p>12 routes x 30 days x 3 windows</p></div>
+    <div class="box"><div class="t">Playwright + Chrome</div><p>60 req/h &middot; retries &middot; jitter</p></div>
+    <div class="box"><div class="t">APScheduler</div><p>Daily automated runs</p></div>
+  </div>
+  <div class="arrow">&darr; raw_flights &darr;</div>
+
+  <span class="pill">Clean</span>
+  <div class="row">
+    <div class="box"><div class="t">Dedup + Null Drop</div></div>
+    <div class="box"><div class="t">IQR Outlier Flag</div></div>
+    <div class="box"><div class="t">Type Cast + Quality Score</div></div>
+  </div>
+  <div class="arrow">&darr; cleaned_flights &darr;</div>
+
+  <span class="pill">Index &mdash; 36-cell basket</span>
+  <div class="row">
+    <div class="box"><div class="t">Median per Cell</div><p>route x window x day</p></div>
+    <div class="box"><div class="t">Weighted Trimmed Mean</div><p>DGCA traffic x lead share</p></div>
+    <div class="box"><div class="t">Daily &rarr; Weekly &rarr; Monthly</div><p>7-day & 30-day rolling</p></div>
+  </div>
+  <div class="arrow">&darr; index tables &darr;</div>
+
+  <span class="pill">Output</span>
+  <div class="row">
+    <div class="box"><div class="t">Streamlit Dashboard</div></div>
+    <div class="box"><div class="t">FastAPI (Future)</div></div>
+    <div class="box"><div class="t">NN Fare Classifier</div></div>
+  </div>
+
+</div>
+</div></div>
+
+<!-- ══════ SLIDE 2 — FORMULAS ══════ -->
+<div class="slide-page" id="s2"><div class="slide">
+<div class="hdr">
+  <span class="sn">2 / 3</span>
+  <h1>APIx Formulas</h1>
+  <p>Weighted basket index &middot; 12 routes x 3 windows = 36 cells &middot; Base = 100</p>
+</div>
+<div class="body">
+
+  <div class="banner">
+    <div class="big">APIx(t) = &Sigma; [ P_cell(t) / P_cell(0) x w_cell ] x 100</div>
+    <div class="sub">Weighted trimmed mean &middot; 10% trim &middot; Base day = 100</div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="ct">Cell Price</div>
+      <div class="fm">P = median(fare)</div>
+      <p>Exclude outliers, forward-fill gaps</p>
+    </div>
+    <div class="card">
+      <div class="ct">Cell Weight</div>
+      <div class="fm">w = route_wt x window_sh</div>
+      <p>T+1: 0.20 &middot; T+7: 0.30 &middot; T+30: 0.50</p>
+    </div>
+    <div class="card">
+      <div class="ct">Route Index</div>
+      <div class="fm">I = P(t)/P(0) x 100</div>
+      <p>Each cell starts at 100</p>
+    </div>
+    <div class="card">
+      <div class="ct">Composite</div>
+      <div class="fm">WTM{I, w}</div>
+      <p>One headline per day</p>
+    </div>
+  </div>
+
+  <div class="cards" style="margin-top:4px">
+    <div class="card" style="flex:1 1 0">
+      <div class="ct">Rollups</div>
+      <div class="fm">7d &rarr; weekly &middot; 30d &rarr; monthly</div>
+      <p>Rolling mean, min_periods=1</p>
+    </div>
+    <div class="card" style="flex:2 1 0">
+      <div class="ct">Example</div>
+      <p>DEL-BOM T+30: I=102.00 w=0.05 | DEL-BLR T+7: I=101.00 w=0.027 | BOM-BLR T+1: I=111.43 w=0.02</p>
+      <div class="fm" style="margin-top:2px">APIx = 104.06</div>
+    </div>
+  </div>
+
+  <div class="chips" style="margin-top:4px">
+    <span class="chip">PRICE = median</span>
+    <span class="chip">TRIM = 10%</span>
+    <span class="chip">AGG = weighted_trimmed_mean</span>
+    <span class="chip">ROLLING = mean</span>
+    <span class="chip">BASE = 100</span>
+  </div>
+
+  <div class="cards" style="margin-top:4px">
+    <div class="card"><div class="ct">weighted_mean</div><div class="fm">S(v.w)/S(w)</div><p>Classic Laspeyres</p></div>
+    <div class="card"><div class="ct">weighted_trimmed_mean (default)</div><div class="fm">trim tails, rebalance, avg</div><p>CPI-style</p></div>
+    <div class="card"><div class="ct">weighted_median</div><div class="fm">cumul. weight crosses 0.5</div><p>Fallback option</p></div>
+  </div>
+
+</div>
+</div></div>
+
+<!-- ══════ SLIDE 3 — FUTURE SCOPE ══════ -->
+<div class="slide-page" id="s3"><div class="slide">
+<div class="hdr">
+  <span class="sn">3 / 3</span>
+  <h1>Future Scope &mdash; Proxy &amp; IP Rotation</h1>
+  <p>Multi-source scraping at scale with anti-detection</p>
+</div>
+<div class="body" style="flex-direction:row;gap:12px">
+
+  <div style="flex:3 1 0;display:flex;flex-direction:column;gap:4px">
+    <span class="pill">Architecture</span>
+    <div class="layers">
+      <div class="layer"><div class="box" style="text-align:center"><div class="t">Scraper Orchestrator</div><p>APScheduler &rarr; worker pool</p></div></div>
+      <div class="larr">&darr;</div>
+      <div class="layer">
+        <div class="box" style="text-align:center"><div class="t">Proxy Pool Mgr</div><p>Health-check 5 min</p></div>
+        <div class="box" style="text-align:center"><div class="t">Residential IPs</div><p>BrightData / Oxylabs</p></div>
+        <div class="box" style="text-align:center"><div class="t">Datacenter Backup</div><p>Fallback</p></div>
+      </div>
+      <div class="larr">&darr;</div>
+      <div class="layer">
+        <div class="box" style="text-align:center"><div class="t">Fingerprint Rotator</div><p>UA, WebGL, Canvas</p></div>
+        <div class="box" style="text-align:center"><div class="t">Session Manager</div><p>Cookies, warm sessions</p></div>
+        <div class="box" style="text-align:center"><div class="t">Rate Limiter</div><p>429 auto-slow, 3-15s</p></div>
+      </div>
+      <div class="larr">&darr;</div>
+      <div class="layer">
+        <div class="box alt" style="text-align:center"><div class="t">Google Flights</div></div>
+        <div class="box alt" style="text-align:center"><div class="t">MakeMyTrip</div></div>
+        <div class="box alt" style="text-align:center"><div class="t">Ixigo</div></div>
+        <div class="box alt" style="text-align:center"><div class="t">EaseMyTrip</div></div>
+        <div class="box alt" style="text-align:center"><div class="t">Cleartrip</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="flex:2 1 0;display:flex;flex-direction:column;gap:4px">
+    <span class="pill">IP Lifecycle</span>
+    <div class="cycle">
+      <div class="cnode"><div class="ci">01</div>Acquire</div>
+      <div class="carr">&rarr;</div>
+      <div class="cnode"><div class="ci">02</div>Health</div>
+      <div class="carr">&rarr;</div>
+      <div class="cnode"><div class="ci">03</div>Assign</div>
+      <div class="carr">&rarr;</div>
+      <div class="cnode"><div class="ci">04</div>Scrape</div>
+      <div class="carr">&rarr;</div>
+      <div class="cnode"><div class="ci">05</div>Rotate</div>
+    </div>
+
+    <div class="chips">
+      <span class="chip">ROTATE = 10-25 reqs</span>
+      <span class="chip">SESSION = 30 min</span>
+      <span class="chip">HEALTH = 5 min</span>
+      <span class="chip">GEO = India</span>
+    </div>
+
+    <span class="pill">MVP vs Phase 2</span>
+    <table class="dt">
+      <tr><th></th><th>MVP</th><th>Phase 2</th></tr>
+      <tr><td><b>Sources</b></td><td>Google Flights</td><td>+ 5 OTAs</td></tr>
+      <tr><td><b>Routes</b></td><td>12</td><td>50+</td></tr>
+      <tr><td><b>Proxy</b></td><td>None</td><td>Residential + DC</td></tr>
+      <tr><td><b>Anti-detect</b></td><td>Rate limit</td><td>Fingerprint rotation</td></tr>
+      <tr><td><b>IP rotation</b></td><td>Single IP</td><td>Auto 10-25 reqs</td></tr>
+      <tr><td><b>Storage</b></td><td>SQLite</td><td>PostgreSQL</td></tr>
+      <tr><td><b>API</b></td><td>Streamlit</td><td>FastAPI + WS</td></tr>
+    </table>
+  </div>
+
+</div>
+</div></div>
+
+<!-- ══════ SLIDE 4 — FEASIBILITY & VIABILITY ══════ -->
+<div class="slide-page" id="s4"><div class="slide">
+<div class="hdr">
+  <span class="sn">4 / 4</span>
+  <h1>Feasibility &amp; Viability</h1>
+  <p>Proven by live runs &middot; low cost &middot; real demand gap</p>
+</div>
+<div class="body">
+
+  <span class="pill">Technical Feasibility</span>
+  <div class="row">
+    <div class="box"><div class="t">Working Today</div><p>scrape &rarr; clean &rarr; index &darr; runs daily, ~11 min, zero manual work</p></div>
+    <div class="box"><div class="t">Proven Data</div><p>2,308 raw / run &middot; 1,153 clean &middot; 102 outliers flagged</p></div>
+    <div class="box"><div class="t">Open-Source Stack</div><p>Python + Playwright + Pandas + Streamlit + SQLite</p></div>
+  </div>
+
+  <span class="pill" style="margin-top:4px">Operational Feasibility</span>
+  <div class="row">
+    <div class="box"><div class="t">Automation</div><p>APScheduler + Windows Task Scheduler, 06:00 daily</p></div>
+    <div class="box"><div class="t">Reliability</div><p>rate limit 60 req/h &middot; retries &middot; anomaly logging</p></div>
+    <div class="box"><div class="t">Portable</div><p>Docker-ready, runs on Windows / macOS / Linux</p></div>
+  </div>
+
+  <span class="pill" style="margin-top:4px">Economic Viability</span>
+  <div class="row">
+    <div class="box"><div class="t">Near-Zero Cost</div><p>single server / VPS, no data licensing fees</p></div>
+    <div class="box"><div class="t">Scale Path</div><p>proxies + OTA sources unlock depth, cost still low</p></div>
+    <div class="box"><div class="t">Recurring Value</div><p>one-time build, continuous index output for NSO / RBI</p></div>
+  </div>
+
+  <span class="pill" style="margin-top:4px">Market Viability</span>
+  <div class="row">
+    <div class="box"><div class="t">Demand Gap</div><p>no official Indian airfare price index exists today</p></div>
+    <div class="box"><div class="t">Buyers</div><p>MoSPI / NSO inflation stats &middot; RBI monetary policy</p></div>
+    <div class="box"><div class="t">Differentiator</div><p>high-frequency, route-aware, transparent and reproducible</p></div>
+  </div>
+
+  <div class="chips" style="margin-top:6px">
+    <span class="chip">RISK: anti-bot / ToS &rarr; proxy rotation plan</span>
+    <span class="chip">TRUST: clean metadata, quality scores, audit trail</span>
+  </div>
+
+</div>
+</div></div>
+
+<script>
+const dots=document.querySelectorAll('.nav a'),slides=document.querySelectorAll('.slide-page');
+slides.forEach((s,i)=>new IntersectionObserver(e=>{if(e[0].isIntersecting){dots.forEach(d=>d.classList.remove('active'));dots[i].classList.add('active')}},{threshold:.55}).observe(s));
+</script>
+</body>
+</html>

@@ -57,6 +57,13 @@ def clean_raw_data(
     log.info("Reading raw_flights from %s", path)
     conn = get_connection(path)
     df = pd.read_sql("SELECT * FROM raw_flights", conn)
+    try:
+        existing = pd.read_sql(
+            "SELECT DISTINCT dedup_hash FROM cleaned_flights", conn
+        )["dedup_hash"]
+        existing_hashes = set(existing)
+    except Exception:  # noqa: BLE001 - table missing on first run → treat all as new
+        existing_hashes = set()
     conn.close()
 
     if scrape_date:
@@ -65,7 +72,7 @@ def clean_raw_data(
 
     if df.empty:
         log.warning("raw_flights is empty - nothing to clean")
-        return {"raw": 0, "cleaned": 0, "duplicates": 0, "outliers": 0, "nulls": 0}
+        return {"raw": 0, "cleaned": 0, "duplicates": 0, "outliers": 0, "nulls": 0, "skipped": 0}
 
     raw_count = len(df)
     log.info("Loaded %d raw rows", raw_count)
@@ -75,6 +82,22 @@ def clean_raw_data(
     df = df.drop_duplicates(subset=["dedup_hash"], keep="first")
     duplicates = before_dedup - len(df)
     log.info("Removed %d duplicates", duplicates)
+
+    if existing_hashes:
+        already_cleaned = df["dedup_hash"].isin(existing_hashes)
+        skipped = int(already_cleaned.sum())
+        df = df[~already_cleaned]
+        log.info(
+            "Skipped %d raw rows already present in cleaned_flights (incremental)",
+            skipped,
+        )
+    else:
+        skipped = 0
+
+    if df.empty:
+        log.warning("No new raw rows to clean (all already in cleaned_flights)")
+        return {"raw": raw_count, "cleaned": 0, "duplicates": duplicates,
+                "outliers": 0, "nulls": 0, "skipped": skipped}
 
     if null_action == "drop":
         before_null = len(df)
@@ -121,6 +144,7 @@ def clean_raw_data(
         "duplicates": duplicates,
         "outliers": outlier_count,
         "nulls": nulls,
+        "skipped": skipped,
     }
     log.info("Cleaning complete: %s", stats)
     return stats

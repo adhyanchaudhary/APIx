@@ -117,13 +117,13 @@ python-dotenv>=1.0.0 pytest>=7.4.0   pytest-cov>=4.1.0</pre>
   delay_between_requests: {min_seconds: 3, max_seconds: 8}
   max_retries: 3
   backoff_multiplier: 2          # waits 3s, 6s, 12s
-  headless: false
+headless: true
   viewport_width: 1280
   viewport_height: 900
   user_agent: "Mozilla/5.0 ... Chrome/120.0.0.0 Safari/537.36"
   page_load_timeout: 30
   element_wait_timeout: 15</pre>
-<p>Rate limiting, a 3&ndash;8s random delay, and 3 retries with &times;2 backoff keep the scraper polite. <code>headless: false</code> makes failures easier to debug during development.</p>
+<p>Rate limiting, a 3&ndash;8s random delay, and 3 retries with &times;2 backoff keep the scraper polite. <code>headless: true</code> runs Chromium invisibly in production.</p>
 </div>
 </div>
 

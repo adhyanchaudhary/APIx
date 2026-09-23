@@ -4,6 +4,13 @@ index:
   round_to: 2                      # decimal places for index value
   min_data_points: 1               # index written from the first day with data
 
+  # ── Data freshness (coverage / staleness) ──
+  # Cells whose price is carried forward longer than this are "stale".
+  # Policy: KEEP BUT FLAG — stale cells stay in the basket, and consumers
+  # (dashboard live tape) turn the staleness metric orange when today's max
+  # reading exceeds the cap. Set to null to disable flagging.
+  stale_cap_days: 7
+
   # ── Active lead windows ──
   # The daily/weekly/monthly indices are built ONLY for these advance-purchase
   # windows, even though raw/cleaned data may span the full scrape horizon.

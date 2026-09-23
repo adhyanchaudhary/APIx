@@ -3,6 +3,7 @@
 Usage:
     python -m src.scraper.run_scrape              # scrape all routes for today
     python -m src.scraper.run_scrape --date 2026-09-15
+    python -m src.scraper.run_scrape --routes DEL-BOM,BOM-DEL   # subset only
 """
 import argparse
 import asyncio
@@ -65,13 +66,29 @@ def _insert_records(records: list[FlightRecord], scrape_date: str, db_path: Path
         conn.close()
 
 
-async def run_scrape(target_date: date | None = None, db_path: Path | str | None = None) -> None:
-    """Main scrape loop: every route × every configured lead window."""
+async def run_scrape(
+    target_date: date | None = None,
+    db_path: Path | str | None = None,
+    routes_subset: list[str] | None = None,
+) -> None:
+    """Main scrape loop: every route × every configured lead window.
+
+    ``routes_subset`` (e.g. ["DEL-BOM", "BOM-DEL"]) restricts the run to a
+    small rotating set of routes — used by the live loop so each iteration
+    hits a few routes instead of all 12 (rate-limit friendly).
+    """
     _setup_logging()
     init_db(db_path)
 
     cfg = _load_routes()
     routes = cfg["routes"]
+    if routes_subset:
+        routes = [
+            r for r in routes
+            if f"{r['origin']}-{r['dest']}" in set(routes_subset)
+        ]
+        if not routes:
+            log.warning("No configured routes matched subset %s", routes_subset)
     offsets = [int(w) for w in cfg.get("lead_windows", [1, 7, 30])]
     scrape_date_str = (target_date or date.today()).isoformat()
 
@@ -109,10 +126,13 @@ def main() -> None:
                         help="Scrape date as YYYY-MM-DD (default: today)")
     parser.add_argument("--db", type=str, default=None,
                         help="Path to SQLite db (default: data/apix.db)")
+    parser.add_argument("--routes", type=str, default=None,
+                        help="Comma-separated route subset, e.g. DEL-BOM,BOM-DEL (default: all routes)")
     args = parser.parse_args()
 
     target = date.fromisoformat(args.date) if args.date else None
-    asyncio.run(run_scrape(target, args.db))
+    subset = [r.strip() for r in args.routes.split(",") if r.strip()] if args.routes else None
+    asyncio.run(run_scrape(target, args.db, routes_subset=subset))
 
 
 if __name__ == "__main__":
